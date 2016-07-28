@@ -1,0 +1,11 @@
+<div class="form-group">
+	<label for="id_title" class="col-sm-2 control-label">Sub Category</label>
+	<div class="col-xs-4">
+		<select id="id_category" name="category" class="form-control">
+            {% for cat in sub_cats %}
+                <option value="{{cat.id}}">{{cat.name}}</option>
+            {% endfor %}
+        </select>
+    	<p style="color:red;">{{ form.type.errors.as_text }}</p>
+	</div>
+</div>

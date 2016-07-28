@@ -1,0 +1,14 @@
+<div class="form-group">
+	<label for="id_title" class="col-sm-2 control-label">Attributes</label>
+	<div class="col-xs-3">
+		<select multiple id="id_attributes" name="attributes" class="form-control">
+            {% for attr in attributes %}
+                <option {% if attr in product.attributes.all  %}selected{% endif %}
+                	value="{{attr.id}}">{{attr.name}}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="button" id="id_attr_values_add" name="add_attr_val" class="btn btn-default">Add</button>
+    	<p style="color:red;">{{ form.type.errors.as_text }}</p>
+	</div>
+</div>

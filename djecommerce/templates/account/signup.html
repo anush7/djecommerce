@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="container">
+    <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="panel-title">Sign Up</div>
+                <div style="float:right; font-size: 85%; position: relative; top:-10px">
+                	<a id="signinlink" href="{% url 'user_signin' %}" >Sign In</a>
+               	</div>
+            </div>  
+            <div class="panel-body" >
+                <form id="signupform" method="POST" class="form-horizontal" role="form">{% csrf_token %}
+                    {% if form.errors %}   
+                        <div id="signupalert" class="alert alert-danger">
+                            <span>{{form.errors}}</span>
+                        </div>
+                    {% endif %}
+                    <div class="form-group" style="padding-right:20px;">
+                        <label for="email" class="col-md-3 control-label">Email <span style="color:red;">*</span></label>
+                        <div class="col-md-9">
+                            {{form.email}}
+                            <div id="email_spinner" style="margin-left:362px;margin-top:4px;display: none;">
+                                <img src="/static/images/spinner.gif">
+                            </div>
+                            <div id="email_success" style="color:green;margin-left:362px;margin-top:5px;display: none;">
+                                <span class="glyphicon glyphicon-ok-circle"></span>
+                            </div>
+                            <p id="id_email_error" style="color:red;"></p>
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;">
+                        <label for="password" class="col-md-3 control-label">Password <span style="color:red;">*</span></label>
+                        <div class="col-md-9">
+                            {{form.password}}
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;">
+                        <label for="firstname" class="col-md-3 control-label">Username <span style="color:red;">*</span></label>
+                        <div class="col-md-9">
+                            {{form.username}}
+                            <div id="username_spinner" style="margin-left:362px;margin-top:4px;display: none;">
+                                <img src="/static/images/spinner.gif">
+                            </div>
+                            <div id="username_success" style="color:green;margin-left:362px;margin-top:5px;display: none;">
+                                <span class="glyphicon glyphicon-ok-circle"></span>
+                            </div>
+                            <p id="id_username_error" style="color:red;"></p>
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;">
+                        <label for="firstname" class="col-md-3 control-label">First Name</label>
+                        <div class="col-md-9">
+                            {{form.first_name}}
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;">
+                        <label for="lastname" class="col-md-3 control-label">Last Name</label>
+                        <div class="col-md-9">
+                            {{form.last_name}}
+                        </div>
+                    </div>
+                    <div class="form-group" style="padding-right:20px;">                                     
+                        <div class="col-md-offset-3 col-md-9">
+                            <button id="btn-signup" type="submit" disabled="true" class="btn btn-info">Sign Up</button>
+                            <!--span style="margin-left:8px;">or</span-->  
+                        </div>
+                    </div>
+                    <!--div style="border-top: 1px solid #999; padding-top:20px"  class="form-group">
+                    	<div class="col-md-offset-3 col-md-9">
+                            <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up with Facebook</button>
+                        </div>
+                    </div-->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+    var cemail=true;
+    var cusername=true;
+    $('#id_email').keyup(function() {
+        if($('#id_email').val().length > 3){
+            cemail = false;
+            $('#email_success').hide();
+            $('#email_spinner').show();
+            $('button').prop('disabled', true);
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                data: 'q='+$('#id_email').val()+'&action=email',
+                url: '{% url "check-username-email" %}',
+                success: function(data){
+                    if((data.status == 0) && data.msg){
+                        $('#id_email_error').text(data.msg);
+                    }else{
+                        $('#id_email_error').text('');
+                        if(data.status == 1){
+                            $('#email_success').show();
+                            cemail = true;                    
+                            if((cemail==true)&&(cusername==true)&&($('#id_password').val().length>1)){
+                                $('button').prop('disabled', false);
+                            }
+                        }
+                    }
+                    $('#email_spinner').hide();
+                }
+            });
+        }
+    });
+    $('#id_username').keyup(function() {
+        cusername = false;
+        $('#username_success').hide();
+        $('#username_spinner').show();
+        $('button').prop('disabled', true);
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: 'q='+$('#id_username').val()+'&action=username',
+            url: '{% url "check-username-email" %}',
+            success: function(data){
+                if((data.status == 0) && data.msg){
+                    $('#id_username_error').text(data.msg);
+                }else{
+                    $('#id_username_error').text('');
+                    if(data.status == 1){
+                        $('#username_success').show();
+                        cusername = true;
+                        if((cemail==true)&&(cusername==true)&&($('#id_password').val().length>1)){
+                            $('button').prop('disabled', false);
+                        }
+                    }
+                }
+                $('#username_spinner').hide();
+            }
+        });
+    });
+    $('#id_password').keyup(function() {
+        if((cemail==true)&&(cusername==true)&&($('#id_password').val().length>1)){
+            $('button').prop('disabled', false);
+        }else{
+            $('button').prop('disabled', true);
+        }
+    });
+});
+</script>
+
+{% endblock %}

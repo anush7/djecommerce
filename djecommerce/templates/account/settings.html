@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<ul class="nav nav-tabs">
+		<li><a href="#" style="cursor: pointer; cursor: hand;">Settings</a></li>
+		<li><a href="{% url 'orders' %}" style="cursor: pointer; cursor: hand;">Your Orders</a></li>
+		<li><a href="#" style="cursor: pointer; cursor: hand;">Manage Addresses</a></li>
+		<li class="active"><a href="{% url 'account_settings' %}" style="cursor: pointer; cursor: hand;">Change Password</a></li>
+	</ul>
+	<form class="form-horizontal" style="margin-top:30px;">
+		<div class="form-group">
+			<label for="id_oldpassword" class="col-sm-2 control-label">Old Password</label>
+			<div class="col-xs-3">
+				<input type="password" id="id_old" name="oldpassword" class="form-control">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="id_password1" class="col-sm-2 control-label">New Password</label>
+			<div class="col-xs-3">
+				<input type="password" id="id_new" name="password1" class="form-control">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="id_password2" class="col-sm-2 control-label">Confirm Password</label>
+			<div class="col-xs-3">
+				<input type="password" id="id_confirm" name="password2" class="form-control">
+			</div>
+		</div>
+		<div class="form-group">
+		    <div class="col-sm-offset-2 col-xs-3">
+		    	<a class="btn btn-default" onclick="change_password()" href="javascript:void(0);" xrole="button">Submit</a>
+		    </div>
+		</div>
+	</form>
+	<div style="display:none;" class="alert col-xs-6" role="alert"></div>
+</div>
+<script type="text/javascript">
+function change_password(){
+	$.ajax({
+    	type: 'POST',
+    	dataType: 'json',
+    	data: 'csrfmiddlewaretoken={{csrf_token}}&old='+$('#id_old').val()+'&new='+$('#id_new').val()+'&confirm='+$('#id_confirm').val(),
+        url: '{% url "change-password" %}',
+        success: function(data){
+        	if(data['msg'] == 'Password Reset Successful!'){
+        		$('.alert').addClass('alert-success');
+        	}else{
+        		$('.alert').addClass('alert-danger');
+        	}
+    		$('.alert').html('<p>'+data['msg']+'</p>');
+    		$('.alert').show();
+    		setTimeout(function(){
+    			$('.alert').fadeOut();
+    		}, 2000);
+		}
+	});
+}
+</script>
+{% endblock %}

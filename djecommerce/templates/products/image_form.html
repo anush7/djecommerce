@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
+			<li role="presentation"><a href="{{product.get_variants_url}}">Variants</a></li>
+			<li role="presentation"><a href="{{product.get_stocks_url}}">Stock</a></li>
+			<li role="presentation" class="active"><a href="{{product.get_images_url}}">Images</a></li>
+		</ul>
+	</div>
+	<div class="row" style="margin-top:15px;">
+		<form method='post' enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+			<div class="form-group">
+				<label class="col-md-2 control-label">Image</label>
+			    <div class="col-xs-4" id="image-cropper">
+			    	<div id="id_preview_image" class="cropit-image-preview" style="{% if object.image %}display:none;{% endif %}"></div>
+		    		<input type="range" class="cropit-image-zoom-input" style="{% if object.image %}display:none;{% endif %}" />
+		    		{% if object.image %}
+		    			<img class="img-responsive" src="{{object.image.url}}" alt="">
+		    		{% endif %}
+					<input name="cover_image" class="cropit-image-input" id="cover_image_upload" type="file" 
+						accept="image/*" tabindex="-1">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="id_content" class="col-md-2 control-label">Variant</label>
+				<div class="col-xs-4">
+					{{form.variant}}
+				</div>
+			</div>
+			<input type="hidden" id="cover_x1" name="cover_x1">
+			<input type="hidden" id="cover_y1" name="cover_y1">
+			<input type="hidden" id="zoom" name="zoom">
+			<div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-3">
+			    	<button type="submit" name="submit" value="I" class="btn btn-default">Create</button>
+			    	<a class="btn btn-default" href="{% url 'staff-image-list' product.id %}" role="button">
+			      		Cancel
+			      	</a>
+			    </div>
+			</div>
+		</form>
+	</div>
+</div>
+<script src="{% static 'js/jquery.cropit.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+	var editor = $('#image-cropper').cropit({
+    	onOffsetChange: crp_update,
+    	'width': 450,
+    	'height':450
+    });
+	
+	function crp_update(crpObj){
+		$('#cover_x1').val(crpObj.x);
+		$('#cover_y1').val(crpObj.y);
+		$('#zoom').val(editor.cropit('zoom'));
+	}
+
+});    
+</script>
+{% endblock %}

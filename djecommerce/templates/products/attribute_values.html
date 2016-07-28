@@ -1,0 +1,8 @@
+{% for attr in attributes %}
+<div class="form-group">
+	<label class="col-md-2 control-label" for="id_title">{{attr.name}}</label>
+	<div class="col-xs-4">
+		<input type="text" name="{{attr.id}}" class="form-control" autocomplete="off">
+	</div>
+</div>
+{% endfor %}

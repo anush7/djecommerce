@@ -1,0 +1,56 @@
+.cropit-image-preview {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-top: 7px;
+  width: 250px;
+  height: 250px;
+  cursor: move;
+}
+
+.image-size-label {
+  margin-top: 10px;
+}
+
+input {
+  display: block;
+}
+
+.export {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+header {
+    background-image: url(../images/background1.jpg);
+    height: 100%;
+    position: fixed;
+    width: 100%;
+    background-repeat:no-repeat;
+    background-size:cover;
+    margin-top: 0px;
+}
+
+.header-text{
+  font-size: 20px;
+  font-weight: 300;
+  margin-left:400px;
+  margin-top:140px;
+  color:white;
+}
+
+.float-lft{
+  float:left;  
+}
+
+
+.container-alert-flash {
+  position: absolute;
+    top: 60px;
+    z-index: 50000;
+    width: 100%;
+    right: 0%;
+    left: 50px;
+    margin: 0px;
+    display:none;
+}

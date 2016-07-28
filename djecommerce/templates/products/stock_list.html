@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
+			<li role="presentation"><a href="{{product.get_variants_url}}">Variants</a></li>
+			<li role="presentation" class="active"><a href="{{product.get_stocks_url}}">Stock</a></li>
+			<li role="presentation"><a href="{{product.get_images_url}}">Images</a></li>
+		</ul>
+	</div>
+	<div class="row" style="margin-top:15px;">
+		<a type="button" id="id_stage_add" href="{% url 'staff-stock-add' product.id %}" class="btn btn-default">Add Stock</a>
+		<a type="button" id="id_stage_delete" style="display:none;" href="javascript:void(0);" onclick="delete_stock();" class="btn btn-default">Delete</a>
+		<table class="table table-striped table-hover">
+	    	<thead>
+	    		<th></th>
+				<th>SKU</th>
+				<th>Quantity</th>
+				<th>Allocated</th>
+			</thead>
+			<tbody id="ajax_contact_list">
+				{% for stock in stocks %}
+					<tr id="stock_{{stock.id}}">
+						<td>
+							<input type="checkbox" onclick="enable_delete();" value="{{stock.id}}" name="stockdelete">
+						</td>
+						<td>
+							<a href="{% url 'staff-stock-update' product.id stock.id %}">
+								{{stock.variant.sku}}
+							</a>
+						</td>
+						<td>{{stock.quantity}}</td>
+						<td>{{stock.quantity_allocated}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+function enable_delete(){
+	if($('input[name=stockdelete]:checked').length > 0){
+		$('#id_stage_add').hide();
+		$('#id_stage_delete').show();
+	}else{
+		$('#id_stage_add').show();
+		$('#id_stage_delete').hide();
+	}
+}
+
+function delete_stock(){
+	var dataString='';
+	var stock_ids = []
+	var sids = $('input[name=stockdelete]:checked');
+	sids.each(function(){
+		stock_ids.push(this.value);
+	});
+	dataString += 'csrfmiddlewaretoken={{csrf_token}}&stock_ids='+stock_ids;
+	$.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: dataString,
+        url: '{% url "staff-stock-delete" product.id %}',
+        success: function(data){
+        	if(data.status == 1){
+        		stock_ids.forEach(function(sid) {
+        			$('#stock_'+sid).remove();
+				});
+            }else{
+                alert('oops! not able to process your request. Please try again later.')
+            }
+        }
+    });
+}
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load product_tags %}
+<div class="container">
+	<div class="row">
+		{% if product %}
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
+			<li role="presentation" class="active"><a href="{{product.get_variants_url}}">Variants</a></li>
+			<li role="presentation"><a href="{{product.get_stocks_url}}">Stock</a></li>
+			<li role="presentation"><a href="{{product.get_images_url}}">Images</a></li>
+		</ul>
+		{% endif %}
+	</div>
+	<div class="row" style="margin-top:15px;">
+		<form method='post' class="form-horizontal">{% csrf_token %}
+
+			<div class="form-group">
+				<label for="id_title" class="col-md-2 control-label">SKU</label>
+				<div class="col-xs-4">
+					{{form.sku}}
+					<p style="color:red;">{{ form.sku.errors.as_text }}</p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_content" class="col-md-2 control-label">Variant Name</label>
+				<div class="col-xs-4">
+					{{form.name}}
+					<p style="color:red;">{{ form.name.errors.as_text }}</p>
+				</div>
+			</div>
+			{% for attr in product.attributes.all %}
+				<div class="form-group">
+					<label for="id_content" class="col-md-2 control-label">{{attr.name}}</label>
+					<div class="col-xs-4">
+						<input type="text" class="form-control" name="{{attr.id}}" value="{{object|get_attr_val:attr.id}}"></input>
+					</div>
+				</div>
+			{% endfor %}
+
+			<div class="form-group">
+				<label for="id_content" class="col-md-2 control-label">Price Override(optional)</label>
+				<div class="col-xs-4">
+					{{form.price}}
+					<p style="color:red;">{{ form.price.errors.as_text }}</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="id_content" class="col-md-2 control-label">Deafult Selected</label>
+				<div class="col-xs-4">
+					{{form.default}}
+				</div>
+			</div>
+
+			<div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-3">
+			      <button type="submit" name="submit" value="I" class="btn btn-default">Create</button>
+			      <a class="btn btn-default" href="{% url 'staff-variant-list' product.id %}" role="button">Cancel</a>
+			    </div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}

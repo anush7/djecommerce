@@ -1,0 +1,21 @@
+ /* 
+ 	xs<768 
+    768<sm<992
+    992<md<1200
+    1200<lg
+ */
+
+ @media (max-width:767px){
+ 	.xs-btm-10{
+ 		margin-bottom:10px;
+ 	}
+ }
+
+@media (min-width:992px){
+	.plist-r1-col-2{
+		width: 12.8%;
+	}
+ 	.plist-r2-col-2{
+		width: 11.666667%;
+	}
+}

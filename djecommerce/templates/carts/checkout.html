@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if request.user.is_authenticated %}
+
+<div class="container">
+	<div class="row">
+		<p class='lead'>Order {% if order.order_id %}#{{ order.order_id }}{% endif %} Summary</p>
+		<table class="table table-striped table-hover" style="margin-bottom:0px;">
+	    	<thead>
+				<th>Product</th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th>Amount</th>
+			</thead>
+			<tbody id="ajax_contact_list">
+				{% for citem in order.cart.cartitem_set.all %}
+					<tr class='clickable-row' style="cursor: pointer;" data-href="">
+						<td>{{citem.item}}<br>
+							qty: {{citem.quantity}} | {{citem.item.get_checkout_display_label}}
+						</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>{{ citem.line_item_total }}</td>
+					</tr>
+				{% endfor %}
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Cart Subtotal:</td>
+					<td>{{ order.cart.subtotal }}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Tax:</td>
+					<td>{{ order.cart.tax_total }}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Items Total:</td>
+					<td>{{ order.cart.total }}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Shipping:</td>
+					<td>{{ order.shipping_total_price }}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>Order Total:</td>
+					<td>{{ order.order_total }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<hr style="margin-top:0px;">
+	<div class="row">
+		<div class='col-md-6'>
+			<p>
+				<b>Billing to</b><br/>
+				{{ order.billing_address.get_address }} - <a href="#">Edit</a>
+			</p>
+			<p>
+				<b>Shipping to</b><br/>
+				{{ order.shipping_address.get_address }} - <a href="#">Edit</a>
+			</p>
+			<p>
+		 		<a href='{% url "order_address" %}'>Change Address</a>
+		 	</p><br/>
+		</div>
+		
+		{% include 'payments.html' %}
+
+	</div>
+</div>
+
+{% else %}
+
+	{% include 'account/part_signin.html' %}
+	{% include 'account/part_signup.html' %}
+
+{% endif %}
+
+	
+<script type="text/javascript">
+function show_signup_form() {
+	$('#id_signin_form').hide();
+	$('#id_signup_form').show();
+}
+function show_signin_form() {
+	$('#id_signup_form').hide();
+	$('#id_signin_form').show();
+}
+</script>
+{% endblock %}

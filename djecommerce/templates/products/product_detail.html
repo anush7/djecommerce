@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <div class="container">
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-8">
+            <h1>{{object.title}}</h1>
+            <p>${{object.price}}</p>
+            <p class="lead">{{object.description}}</p>
+            <hr>
+
+
+            <!-- <p class="lead">by <a href="#">{{object.created_by}}</a></p><hr> -->
+            <!-- <div style="float:left;" class="fb-share-button" data-href="http://{{request.get_host}}{{request.path}}" data-layout="button_count"></div>
+            <span style="margin-left:10px;"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{object.title}}" data-size="large">Tweet</a></span><hr> -->
+
+            <!--img class="img-responsive" src="http://placehold.it/900x300" alt=""-->
+            <!--hr-->
+            
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

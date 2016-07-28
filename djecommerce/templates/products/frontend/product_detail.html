@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/lightslider.css' %}">
+<script src="{% static 'js/lightslider.js' %}"></script>
+<style type="text/css">
+    .divider-vertical {
+    height: 400px;
+    border-left: 1px solid gray;
+    float: left;
+    opacity: 0.2;
+    margin: 0 15px;
+}
+</style>
+ <div class="container">
+    <div class="row">
+        <div class="col-md-5 col-sm-12" id="id_product_images">
+            <ul id="lightSlider">
+                {% for img in product.get_default_variant_images %}
+                  <li data-thumb="{{img}}">
+                    <img src="{{img}}" />
+                  </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- <div class="divider-vertical"></div> -->
+        <div class="col-md-7 col-sm-12">
+            <h1>{{product.title}}</h1>
+            <p id="id_product_price">${{default_variant.price}}</p>
+            <hr>
+            <form id='add-to-form' method='post' class="form-horizontal">{% csrf_token %}
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <input id="variant_qnt" type="number" min="1" value="1" name="qty" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <select onchange="variant_change();" id="id_variant" name="parent_category" class="form-control">
+                            {% for variant in product.variants.all %}
+                                <option {% if variant.id == default_variant.id %}selected{% endif %}
+                                data-imgs='{{variant.get_variant_images}}' data-price="{{variant.price}}" value="{{variant.id}}">{{variant.get_display_label}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-6">
+                        <button onclick="add_to_cart(false);" type="button" name="addtocart" class="btn btn-warning">Add to Cart</button>
+                        <button onclick="add_to_cart(true);" type="button" name="buynow" class="btn btn-success">Buy Now</button>
+                    </div>
+                </div>
+            </form>
+            <hr>
+            <p class="lead">{{product.description}}</p>
+            <hr>
+            <!-- <p class="lead">by <a href="#">{{product.created_by}}</a></p><hr> -->
+            <!-- <div style="float:left;" class="fb-share-button" data-href="http://{{request.get_host}}{{request.path}}" data-layout="button_count"></div>
+            <span style="margin-left:10px;"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{product.title}}" data-size="large">Tweet</a></span><hr> -->
+
+            <!--img class="img-responsive" src="http://placehold.it/900x300" alt=""-->
+            <!--hr-->
+            
+            
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+var slider;
+$(document).ready(function(){
+    slider = $('#lightSlider').lightSlider({
+        gallery: true,
+        item: 1,
+        loop:true,
+        slideMargin: 0,
+        thumbItem: 9
+    });
+});
+
+function add_to_cart(buy_now){
+    var variant_qnt = $('#variant_qnt').val();
+    var variant_id = $('#id_variant option:selected').val();
+    var data = {'item_id':variant_id,'qty':variant_qnt}
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: data,
+        url: '{% url "add-to-cart" %}',
+        success: function(data){
+            if(buy_now){
+                window.location='{% url "add-to-cart" %}';
+            }
+            showFlashMessage(data.flash_message);
+            updateCartItemCount();
+        }
+    });
+}
+
+function variant_change(){
+    var variant_price = $('#id_variant option:selected').attr('data-price');
+    var variant_imgs = $('#id_variant option:selected').attr('data-imgs');
+    $('#id_product_price').text('$'+variant_price);
+    variant_imgs = variant_imgs.split(",")
+    html = ''
+    for(i=0;i<variant_imgs.length;i++){
+        html += '<li data-thumb="'+variant_imgs[i]+'">'
+        html += '<img src="'+variant_imgs[i]+'" />'
+        html += '</li>'
+    }
+    slider.destroy();  
+    $('#lightSlider').html(html);
+    slider = $('#lightSlider').lightSlider({
+        gallery: true,
+        item: 1,
+        loop:true,
+        slideMargin: 0,
+        thumbItem: 9
+    });
+}
+
+
+</script>
+{% endblock %}

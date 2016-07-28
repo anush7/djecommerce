@@ -1,0 +1,87 @@
+import json
+from django.http import HttpResponse, HttpResponseRedirect  
+from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
+from django.template.loader import render_to_string
+from django.template import Context, loader, RequestContext
+from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.defaultfilters import slugify
+
+from django.views.generic.list import ListView
+from django.views.generic import View
+from django.views.generic.edit import *
+from django.views.generic.detail import (
+    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
+)
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.db.models import Q, Count
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
+
+from users.models import EcUser as User
+from catalog.models import Catalog, CatalogCategory
+from products.models import Product, ProductAttribute, ProductCategory, ProductAttributeValue, ProductVariant, Stock, ProductImage
+from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
+from products.utils import image_cropper, get_unique_slug, decimal_default
+
+
+class ProductListView(ListView):
+    paginate_by = 8
+    context_object_name = 'product'
+    template_name = 'products/frontend/products.html'
+
+    def get_queryset(self):
+        return Product.objects.filter(status='A').order_by('created_on')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductListView, self).get_context_data(**kwargs)
+        context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
+        return context
+
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'products/frontend/product_detail.html'
+
+    def get_queryset(self):
+        return Product.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductDetailView, self).get_context_data(**kwargs)
+        context['default_variant'] = ProductVariant.objects.get(default=True, product_id=self.kwargs['pk'])
+        return context
+
+
+class VariantImageView(View):
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            var_id = self.request.GET.get('var_id')
+            varient = ProductVariant.objects.get(id=var_id)
+            if cart_id == None:
+                count = 0
+            else:
+                cart = Cart.objects.get(id=cart_id)
+                count = cart.items.count()
+            request.session["cart_item_count"] = count
+            return JsonResponse({"count": count})
+        else:
+            raise Http404
+
+
+
+
+#not req
+def GetVariantPrice(request):
+    data = {}
+    variant_id = request.GET['variant_id']
+    try:
+        vprice = ProductVariant.objects.get(id=variant_id).price
+        data['price'] = vprice
+        data['status'] = 1
+    except:
+        import sys
+        print sys.exc_info()
+        data['status'] = 0
+    return HttpResponse(json.dumps(data, default=decimal_default))

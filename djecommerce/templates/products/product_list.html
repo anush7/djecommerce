@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load product_tags %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/staff-products-list.css' %}">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-2 xs-btm-10 plist-r1-col-2">
+            <a class="btn btn-primary" href="{% url 'staff-product-add' %}">Add Procuct</a>
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-3 xs-btm-10">
+            <input id="id_search_product" type="text" class="form-control" placeholder="Search products">
+        </div>
+        <div class="col-xs-12 col-sm-4 col-md-2">
+            <select id="status_type" class="form-control">
+                <option value="A">Active</option>
+                <option value="I">Inactive</option>
+            </select>
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+        <div class="col-xs-12 col-md-2 xs-btm-10 plist-r2-col-2">
+            <div class="dropdown">
+                <button id="dLabel" role="button" data-toggle="dropdown" class="dropdown-toggle" data-target="#" href="/page.html">
+                    Categories <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dlevel1 multi-level" role="menu" aria-labelledby="dropdownMenu">
+                    <li><a tabindex="-1" onclick="filtercategory('all');" href="javascript:void(0);">All Categories</a></li>
+                    {% for cat in categories %}
+                        {% with cat.children.all as subcats %}
+                            {% if subcats %}
+                                <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="javascript:void(0);">{{cat.name}}
+                                    <ul class="dropdown-menu">
+                                        {% for subcat in subcats %}
+                                            <li><a onclick="filtercategory({{subcat.id}});" tabindex="-1" href="javascript:void(0);">{{subcat.name}}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a tabindex="-1" href="javascript:void(0);">{{cat.name}}</a></li>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-10">
+            <div id="ajax_product_list">
+            	{% include 'products/part_product_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="search" id="id_search">
+<input type="hidden" name="status" id="id_status">
+<input type="hidden" name="category" id="id_category">
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#id_search_product').keyup(function() {
+        $('#id_search').val($('#id_search_product').val());
+        var dataString='q='+$('#id_search_product').val();
+        if($('#id_category').val()!='' && $('#id_category').val()!=null){
+            dataString+="&c="+$('id_category').val();
+        }
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-product-list" %}',
+            success: function(data){
+                $('#ajax_product_list').empty().append(data['html']);
+            }
+        });
+    });
+
+    $('#status_type').change(function() {
+        $('#id_status').val($('#status_type option:selected').val());
+        var dataString='s='+$('#status_type option:selected').val();
+        if($('#id_search').val()!='' && $('#id_search').val()!=null){
+            dataString+="&q="+$('#id_search').val();
+        }
+        if($('#id_category').val()!='' && $('#id_category').val()!=null){
+            dataString+="&c="+$('id_category').val();
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-product-list" %}',
+            success: function(data){
+                $('#ajax_product_list').empty().append(data['html']);
+            }
+        });
+    });
+});
+
+function filtercategory(c){
+    $('#id_category').val(c);
+    var dataString='c='+c;
+    if($('#id_search').val()!='' && $('#id_search').val()!=null){
+        dataString+="&q="+$('#id_search').val();
+    }
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: '{% url "staff-ajax-product-list" %}',
+        success: function(data){
+            if(data.cat_name=='' || data.cat_name==null){
+                $('#selected_category').text('');
+            }else{
+                $('#selected_category').text(data.cat_name);
+            }
+            $('html, body').animate({scrollTop: $("#id_search_product").offset().top}, 1000);
+            $('#ajax_product_list').empty().append(data['html']);
+            //$(window).scrollTop($('#id_search_product').offset().top);
+        }
+    });
+}
+
+function pagination(p){
+    var dataString='';
+    dataString+="page="+p;
+    if($('#id_search').val()!='' && $('#id_search').val()!=null){
+        dataString+="&q="+$('#id_search').val();
+    }
+    if($('#id_category').val()!='' && $('#id_category').val()!=null){
+        dataString+="&c="+$('#id_category').val();
+    }
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        url: '{% url "staff-ajax-product-list" %}',
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        success:function(data){
+            $('#ajax_product_list').empty().append(data['html']);
+        }
+    });
+}
+</script>
+{% endblock %}

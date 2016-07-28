@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+<div class="container">
+    <div class="row">
+        <div class="col-md-2" style="width:13.1% !important">
+            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'staff-attribute-add' %}">Add Attribute</a>
+        </div>
+        <div class="col-md-9" style="margin-top:15px;">
+            <input id="id_search_attribute" type="text" class="form-control" placeholder="Search attributes" style="margin-top:-15px;margin-bottom:10px;width:300px;float: left;">
+            <select id="status_type" class="form-control" style="float:left;width:200px;margin-top:-15px;margin-left:10px;">
+                <option value="A">Active</option>
+                <option value="I">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-12" style="margin-top:15px;">
+            <div id="ajax_attribute_list" style="clear: left;">
+                {% include 'catalog/part_attribute_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="search" id="id_search">
+<input type="hidden" name="status" id="id_status">
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#id_search_attribute').on('keyup',function() {
+        var search_key = $('#id_search_attribute').val();
+        $('#id_search').val(search_key);
+        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        dataString+='&q='+search_key;
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-attribute-list" %}',
+            success: function(data){
+                $('#ajax_attribute_list').empty().append(data['html']);
+            }
+        });
+    });
+
+    $('#status_type').on('change',function() {
+        $('#id_search_attribute').val('');
+        clear_filter();
+        $('#id_category').prop('selectedIndex',0);
+
+        var status = $('#status_type option:selected').val();
+        $('#id_status').val(status);
+        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        dataString+='&s='+status;
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-attribute-list" %}',
+            success: function(data){
+                $('#ajax_attribute_list').empty().append(data['html']);
+            }
+        });
+    });
+});
+
+function clear_filter(argument) {
+    $('#id_search').val('');
+    $('#id_status').val('');
+}
+function pagination(p){
+    var dataString='';
+    dataString+="page="+p;
+    if($('#id_search').val()!='' && $('#id_search').val()!=null){
+        dataString+="&q="+$('#id_search').val();
+    }
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        url: '{% url "staff-ajax-attribute-list" %}',
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        success:function(data){
+            $('#ajax_attribute_list').empty().append(data['html']);
+        }
+    });
+}
+</script>
+{% endblock %}

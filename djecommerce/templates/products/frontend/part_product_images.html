@@ -1,0 +1,7 @@
+
+
+{% for img in product.get_default_variant_images %}
+	<li data-thumb="{{img}}">
+    	<img src="{{img}}" />
+	</li>
+{% endfor %}

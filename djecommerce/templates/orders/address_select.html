@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<h3 style="margin-left:75px;margin-bottom:15px;"><strong>Select your Billing and Shipping address.</strong></h3>
+		<form method='post' class="form-horizontal">{% csrf_token %}
+
+			<div class="form-group">
+				<label for="id_title" class="col-md-2 control-label">Billing Address:</label>
+				<div class="col-xs-8" style="margin-top:7px;">
+					{% for addr in form.billing_address %}
+						<div>
+						    {{ addr }} <a href="#">Edit</a>
+						</div>
+					{% endfor %}
+					<p style="color:red;">{{ form.billing_address.errors.as_text }}</p>
+				</div>
+			</div>
+			<hr>
+			<div class="form-group">
+				<label for="id_content" class="col-sm-2 control-label">Shipping Address:</label>
+				<div class="col-xs-8" style="margin-top:7px;">
+					{% for addr in form.shipping_address %}
+						<div>
+						    {{ addr }} <a href="#">Edit</a>
+						</div>
+					{% endfor %}
+					<p style="color:red;">{{ form.shipping_address.errors.as_text }}</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-3">
+			    	<a class="btn btn-default" href="{% url 'add-to-cart' %}" role="button">Back to Cart</a>
+			    	<button type="submit" name="submit" class="btn btn-default">Continue</button>
+			    </div>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

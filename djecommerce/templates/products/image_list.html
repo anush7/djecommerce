@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
+			<li role="presentation"><a href="{{product.get_variants_url}}">Variants</a></li>
+			<li role="presentation"><a href="{{product.get_stocks_url}}">Stock</a></li>
+			<li role="presentation" class="active"><a href="{{product.get_images_url}}">Images</a></li>
+		</ul>
+	</div>
+	<a type="button" style="margin-top:10px;" id="id_variant_add" href="{% url 'staff-image-add' product.id %}" class="btn btn-default">Add Image</a>
+	<div class="row" style="margin-top:20px;">
+		{% for image in object_list %}
+		    <div id="image_{{image.id}}" class="col-lg-3 col-md-4 col-xs-6 thumb">
+		    	<div class="thumbnail">
+			        <a href="#">
+			            <img class="img-responsive" src="{{image.image.url}}" alt="">
+			        </a>
+			        <div class="ratings" style="padding-bottom:25px;margin-top:5px;">
+	                	<a href="{% url 'staff-image-update' product.id image.id %}" style="margin-left:5px;" class="pull-right btn btn-xs btn-info"><span class="glyphicon glyphicon-pencil"></span></a>
+	                	<a onclick="delete_image({{image.id}})" href="javascript:void(0);" class="pull-right btn btn-xs btn-warning"><span class="glyphicon glyphicon-trash"></span></a>
+	                </div>
+		        </div>
+		    </div>
+		{% endfor %}
+	</div>
+</div>
+
+<script type="text/javascript">
+function enable_delete(){
+	if($('input[name=variantdelete]:checked').length > 0){
+		$('#id_variant_add').hide();
+		$('#id_variant_delete').show();
+	}else{
+		$('#id_variant_add').show();
+		$('#id_variant_delete').hide();
+	}
+}
+function delete_image(id){
+	var dataString='';
+	dataString += 'csrfmiddlewaretoken={{csrf_token}}&image_id='+id;
+	$.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: dataString,
+        url: '{% url "staff-image-delete" product.id %}',
+        success: function(data){
+        	if(data.status == 1){
+        		$('#image_'+id).remove();
+            }else{
+                alert('oops! not able to process your request. Please try again later.')
+            }
+        }
+    });
+}
+
+
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if object %}Edit{% else %}Add{% endif %} Address:</strong></h3>
+		<form method='post' class="form-horizontal">{% csrf_token %}
+			<div class="form-group">
+				<label for="id_title" class="col-md-2 control-label">Street</label>
+				<div class="col-xs-4">
+					{{form.street}}
+					<p style="color:red;">{{ form.street.errors.as_text }}</p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_content" class="col-sm-2 control-label">City</label>
+				<div class="col-xs-4">
+					{{form.city}}
+					<p style="color:red;">{{ form.city.errors.as_text }}</p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_title" class="col-sm-2 control-label">State</label>
+				<div class="col-xs-4">
+					{{form.state}}
+			    	<p style="color:red;">{{ form.state.errors.as_text }}</p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_content" class="col-sm-2 control-label">zipcode</label>
+				<div class="col-xs-4">
+					{{form.zipcode}}
+					<p style="color:red;">{{ form.zipcode.errors.as_text }}</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="id_content" class="col-sm-2 control-label">Type</label>
+				<div class="col-xs-2">
+					{{form.type}}
+					<p style="color:red;">{{ form.type.errors.as_text }}</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="id_content" class="col-sm-2 control-label">Default</label>
+				<div class="col-xs-2">
+					{{form.default}}
+					<p style="color:red;">{{ form.default.errors.as_text }}</p>
+				</div>
+			</div>
+
+			<div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-3">
+			    	<button type="submit" name="submit" value="I" class="btn btn-default">Save</button>
+			    	<a class="btn btn-default" href="{% url 'staff-product-list' %}" role="button">Cancel</a>
+			    </div>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

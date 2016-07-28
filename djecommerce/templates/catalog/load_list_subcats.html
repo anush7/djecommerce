@@ -1,0 +1,31 @@
+<select id="id_category" class="form-control" style="float:left;width:200px;margin-top:-7px;margin-left:10px;">
+	<option>--</option>
+    {% for scat in sub_cats %}
+        <option value="{{scat.id}}">{{scat.name}}</option>
+    {% endfor %}
+</select>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#id_category').on('change',function() {
+        var subcat = $('#id_category option:selected').val();
+        $('#id_category_val').val(subcat);
+        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        dataString+='&q='+$('#id_search').val();
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        if(subcat!='' && subcat!=null){
+            dataString+="&c="+subcat;
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-attribute-list" %}',
+            success: function(data){
+                $('#ajax_attribute_list').empty().append(data['html']);
+            }
+        });
+    });
+});
+</script>

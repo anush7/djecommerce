@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/articles.css' %}">
+<div class="container">
+    <div class="row">
+        <div class="col-md-2" style="width:13.1% !important">
+            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'staff-catalog-add' %}">Add Catalog</a>
+        </div>
+        <div class="col-md-9" style="margin-top:15px;">
+            <input id="id_search_catalog" type="text" class="form-control" placeholder="Search catalogs" style="margin-top:-15px;margin-bottom:10px;width:300px;float: left;">
+            <select id="status_type" class="form-control" style="float:left;width:200px;margin-top:-15px;margin-left:10px;">
+                <option value="A">Active</option>
+                <option value="I">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-12" style="margin-top:15px;">
+            <div id="ajax_catalog_list" style="clear: left;">
+                {% include 'catalog/part_catalog_list.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" name="search" id="id_search">
+<input type="hidden" name="status" id="id_status">
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#id_search_catalog').keyup(function() {
+        var dataString='';
+        dataString+='q='+$('#id_search_catalog').val();
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        $('#id_search').val($('#id_search_catalog').val());
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-catalog-list" %}',
+            success: function(data){
+                $('#ajax_catalog_list').empty().append(data['html']);
+            }
+        });
+    });
+
+    $('#status_type').change(function() {
+        $('#id_search_catalog').val('');
+        var status = $('#status_type option:selected').val();
+        $('#id_status').val(status);
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: 's='+status,
+            url: '{% url "staff-ajax-catalog-list" %}',
+            success: function(data){
+                $('#ajax_catalog_list').empty().append(data['html']);
+            }
+        });
+    });
+});
+
+function pagination(p){
+    var dataString='';
+    dataString+="page="+p;
+    if($('#id_search').val()!='' && $('#id_search').val()!=null){
+        dataString+="&q="+$('#id_search').val();
+    }
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        url: '{% url "staff-ajax-catalog-list" %}',
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        success:function(data){
+            $('#ajax_catalog_list').empty().append(data['html']);
+        }
+    });
+}
+</script>
+{% endblock %}

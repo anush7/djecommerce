@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load product_tags %}
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
+			<li role="presentation" class="active"><a href="{{product.get_variants_url}}">Variants</a></li>
+			<li role="presentation"><a href="{{product.get_stocks_url}}">Stock</a></li>
+			<li role="presentation"><a href="{{product.get_images_url}}">Images</a></li>
+		</ul>
+	</div>
+	<div class="row" style="margin-top:15px;">
+		<a type="button"  id="id_variant_add" href="{% url 'staff-variant-add' product.id %}" class="btn btn-default">Add Variant</a>
+		<a type="button" id="id_variant_delete" style="display:none;" href="javascript:void(0);" onclick="delete_variant();" class="btn btn-default">Delete</a>
+		<table class="table table-striped table-hover">
+	    	<thead>
+	    		<th></th>
+				<th>SKU</th>
+				{% for attr in product.attributes.all %}
+					<th>{{attr.name}}</th>
+				{% endfor %}
+				<th>Variant Name</th>
+				<th>Variant Price</th>
+				<th>Default Selected</th>
+			</thead>
+			<tbody id="ajax_contact_list">
+				{% for variant in product.variants.all %}
+					<tr id="variant_{{variant.id}}">
+						<td>
+							<input type="checkbox" onclick="enable_delete();" value="{{variant.id}}" name="variantdelete">
+						</td>
+						<td><a href="{% url 'staff-variant-update' product.id variant.id %}">{{variant.sku}}</a></td>
+						{% for attr in product.attributes.all %}
+							<td>{{variant.attributes|attr_json_filter:attr.id}}</td>
+						{% endfor %}
+						<td>{% if variant.name %}{{variant.name}}{% else %}--{% endif %}</td>
+						<td>{{variant.price}}</td>
+						<td>{{variant.default}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+function enable_delete(){
+	if($('input[name=variantdelete]:checked').length > 0){
+		$('#id_variant_add').hide();
+		$('#id_variant_delete').show();
+	}else{
+		$('#id_variant_add').show();
+		$('#id_variant_delete').hide();
+	}
+}
+function delete_variant(){
+	var dataString='';
+	var variant_ids = []
+	var vids = $('input[name=variantdelete]:checked');
+	vids.each(function(){
+		variant_ids.push(this.value);
+	});
+	dataString += 'csrfmiddlewaretoken={{csrf_token}}&variant_ids='+variant_ids;
+	$.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: dataString,
+        url: '{% url "staff-variant-delete" product.id %}',
+        success: function(data){
+        	if(data.status == 1){
+        		variant_ids.forEach(function(sid) {
+        			$('#variant_'+sid).remove();
+				});
+            }else{
+                alert('oops! not able to process your request. Please try again later.')
+            }
+        }
+    });
+}
+
+
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}

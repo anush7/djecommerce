@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class='container'>
+
+{% if object.cartitem_set.count < 1 %}
+	{% include "carts/empty_cart.html" %}
+{% else %}
+<div class='col-sm-8 col-sm-offset-2'>
+<h1>Your cart</h1>
+<table class='table'>
+	{% for item in object.cartitem_set.all %}
+	<tr id='item-{{ item.item.id }}'>
+		<td>{{ item.item.name }}</td>
+		<td>
+			<form action="." method="GET" >
+				<input type='hidden' name='item' value='{{ item.item.id }}' />
+				<input id="item-qty-{{item.item.id}}" type='number' class='item-qty' name='qty' value='{{ item.quantity }}' />
+			</form>
+		</td>
+		<td id='item-line-total-{{ item.item.id }}'>{{ item.line_item_total }}</td>
+		<td class='text-right' >
+			<a data-item-id="{{item.item.id}}" class="remove-item" href='javascript:void(0);'>X</a>
+		</td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td  colspan='4' class='text-right'>Subtotal: <span id='subtotal'>{{ object.subtotal }}</span></td>
+	</tr>
+
+	<tr>
+		<td colspan='4' class='text-right'>Tax (Estimated): <span id='taxtotal'>{{ object.tax_total }}</span></td>
+	</tr>
+
+	<tr>
+		<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{ object.total }}</span></td>
+	</tr>
+	<tr>
+		<td colspan='4' class='text-right'><a class='btn btn-warning' href="{% url 'checkout' %}">Checkout </a></td>
+	</tr>
+</table>
+</div>
+{% endif %}
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$(".item-qty").change(function(){
+		var item_id = $(this).prev("input[type='hidden']").val();
+		var qty = $(this).val()
+		var data = {
+			item_id: item_id,
+			qty: qty
+		}
+		cart_ajax_call(data, item_id)
+	});
+	$(".remove-item").click(function(){
+		var item_id = $(this).attr('data-item-id');
+		var qty = $('#item-qty-'+item_id).val()
+		var data = {
+			item_id: item_id,
+			qty: qty,
+			delete: true
+		}
+		cart_ajax_call(data,item_id)
+	});
+});
+function cart_ajax_call(data, item){
+	$.ajax({
+		type: "GET",
+		url: "{% url 'add-to-cart' %}",
+		data: data,
+		success: function(data) {
+			if (data.deleted){
+				$("#item-"+item).fadeOut();
+				$("#subtotal").text(data.subtotal);
+				$("#taxtotal").text(data.tax_total);
+				$("#carttotal").text(data.cart_total);
+			} else {
+				$("#item-line-total-"+item).text(data.line_total);
+				$("#subtotal").text(data.subtotal);
+				$("#taxtotal").text(data.tax_total);
+				$("#carttotal").text(data.cart_total);
+			}
+			if (data.total_items == 0 ) {
+				$(".table").fadeOut()
+				var template = "{% include 'carts/empty_cart.html' %}";
+				$(".container").html(template);
+			}
+			showFlashMessage(data.flash_message);
+			$("#cart_count").text(data.total_items);
+		}
+	});
+}
+</script>
+{% endblock %}

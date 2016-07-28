@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container-fluid">
+	<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if catalog_obj %}Edit{% else %}Add{% endif %} Category:</strong></h3>
+
+	<form method='post' enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+		<div class="form-group">
+			<label for="id_title" class="col-sm-2 control-label">Name</label>
+			<div class="col-xs-4">
+				{{form.name}}
+				<p style="color:red;">{{ form.name.errors.as_text }}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="id_content" class="col-sm-2 control-label">Description</label>
+			<div class="col-xs-6">
+				{{form.description}}
+				<p style="color:red;">{{ form.description.errors.as_text }}</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="id_content" class="col-sm-2 control-label">Parent Category</label>
+			<div class="col-xs-6">
+				{{form.parent}}
+				<p style="color:red;">{{ form.parent.errors.as_text }}</p>
+			</div>
+		</div>
+		<div class="form-group">
+		    <div class="col-sm-offset-2 col-xs-3">
+		      <button type="submit" name="submit" value="P" class="btn btn-default">Submit</button>
+		      <a class="btn btn-default" href="{% url 'staff-category-list' %}" role="button">Cancel</a>
+		    </div>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+</script>
+{% endblock %}
