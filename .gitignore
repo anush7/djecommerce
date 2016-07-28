@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
-djecommerce/settings/local.py
+.gitignore~
+djecommerce/djecommerce/settings/local.py
 estatic_prod/
 __pycache__/
 *.py[cod]
