@@ -25,7 +25,7 @@ config.read(os.path.join(SETTINGS_DIR, 'config.cfg'))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '*&3&r^&^j0c%vp28yqun9!4_r1%72mr40j0^upg&ooyf%*g@%e'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'products',
     'carts',
     'orders',
+    'storages',
 ]
 
 MIDDLEWARE_CLASSES = [
