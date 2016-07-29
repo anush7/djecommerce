@@ -111,3 +111,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'estatic_prod','media_root')
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR),'estatic_prod','static_root')
