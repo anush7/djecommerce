@@ -108,6 +108,9 @@ class ProductVariant(models.Model):
         images = ', '.join(images)
         return images
 
+    def get_title(self):
+        return "%s - %s" %(self.product.title, self.name)
+
 
 @receiver(post_delete, sender=ProductVariant)
 def variant_post_delete(sender, instance, **kwargs):
