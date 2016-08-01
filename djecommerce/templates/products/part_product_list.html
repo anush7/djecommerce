@@ -4,7 +4,7 @@
             <img src="{% if product.get_cover_image %}{{product.get_cover_image}}{% else %}http://placehold.it/320x150{% endif %}" style="min-height:100px; height:250px;" alt="">
             <div class="caption" >
                 <h4>
-                    <a href="{% url 'staff-product-detail' product.id %}">{{product.title}}</a>
+                    <a href="{% url 'product-detail' product.id %}">{{product.title}}</a>
                 </h4>
                 {% if product.descriprion %}
                     <p>{{product.descriprion}}</p>

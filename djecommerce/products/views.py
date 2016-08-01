@@ -40,6 +40,67 @@ class ProductListView(ListView):
         context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
         return context
 
+@csrf_exempt
+def ajax_product_list(request, template='products/frontend/part_product_list.html'):
+    data = {}
+    html_data = {}
+    key = {}
+    q = request.GET.get('q', False)
+    category_id = request.GET.get('c', False)
+    key['status'] = 'A'
+
+    if category_id:
+        try:
+            html_data['pcat_name'] = CatalogCategory.objects.get(id=category_id).parent.name
+            html_data['scat_name'] = CatalogCategory.objects.get(id=category_id).name
+            key['categories__id__in'] = [category_id]
+        except:pass
+
+    if q:
+        html_data['search_key'] = q
+        q_text = (Q(title__icontains=q)|Q(description__icontains=q))
+        product_list = Product.objects.filter(q_text, **key).order_by('created_on')
+    else:
+        product_list = Product.objects.filter(**key).order_by('created_on')
+
+    try:page = request.GET.get('page')
+    except:page = 1
+    paginator = Paginator(product_list, 8)
+    try:
+        product_list = paginator.page(page)
+    except PageNotAnInteger:
+        product_list = paginator.page(1)
+    except EmptyPage:
+        product_list = paginator.page(paginator.num_pages)
+
+    try:next_page = product_list.next_page_number
+    except:next_page = False
+
+    page_obj = {
+        'has_previous': product_list.has_previous,
+        'previous_page_number' : product_list.previous_page_number,
+        'number' : product_list.number,
+        'paginator' : product_list.paginator,
+        'has_next' : product_list.has_next,
+        'next_page_number' : product_list.next_page_number
+    }
+
+    data['object_list'] = product_list
+    data['page_obj'] = page_obj
+    html_data['html'] = render_to_string(template,data,context_instance=RequestContext(request))
+    html_data['page'] = 1
+    return HttpResponse(json.dumps(html_data))
+
+
+
+
+
+
+
+
+
+
+
 
 class ProductDetailView(DetailView):
     model = Product
