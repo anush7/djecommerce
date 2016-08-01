@@ -10,6 +10,7 @@ from orders.views import OrderList, OrderDetail, AddressSelectFormView, UserAddr
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^dd$', views.home, name="home"),
+    
     url(r'^', include('products.urls')),
 
     url(r'^landing$', views.landing, name="landing"),
@@ -17,7 +18,7 @@ urlpatterns = [
     url(r'^staff/', include('djecommerce.staffurls')),
 
     url(r'^cart/?$', CartView.as_view(), name='add-to-cart'),
-    url(r'^cart-count$', CartCountView.as_view(), name='cart_count'),
+    url(r'^cart/count$', CartCountView.as_view(), name='cart_count'),
     url(r'^checkout/$', CheckoutView.as_view(), name='checkout'),
 
     url(r'^checkout/address/$', AddressSelectFormView.as_view(), name='order_address'),

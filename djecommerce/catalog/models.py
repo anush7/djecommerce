@@ -3,6 +3,7 @@ from django.db import models
 from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
 from users.models import EcUser as User
+from django.core.urlresolvers import reverse
 
 class Catalog(models.Model):
     name = models.CharField(max_length=255)
@@ -38,7 +39,10 @@ class CatalogCategory(models.Model):
     def __str__(self):
         return self.name
 
-
+    def get_absolute_url(self):
+        url = reverse('category-product-list', args=[self.slug])
+        # url = reverse('staff-product-edit', kwargs={"pk": self.id})
+        return url
 
 
 

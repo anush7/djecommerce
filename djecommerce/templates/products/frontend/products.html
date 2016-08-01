@@ -3,7 +3,20 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/staff-products-list.css' %}">
-<ol class="breadcrumb" id="cat_breadcrumb" style="display:none;">
+<ol class="breadcrumb" id="cat_breadcrumb" style="margin-bottom: 0px;{% if not subCat and not search_key  %}display:none;{% endif %}">
+{% if subCat %}
+    <li>{{subCat.parent.name}}</li>
+    {% if search_key %}
+        <li>
+            {{subCat.name}} <a href="{% url 'product-list' %}?q={{search_key}}"><span class="glyphicon glyphicon-remove-circle"></span></a> : 
+            results for "{{search_key}}" <a href="{{subCat.get_absolute_url}}"><span class="glyphicon glyphicon-remove-circle"></span></a>
+        </li>
+    {% else %}
+        <li>{{subCat.name}}</li> <a href="{% url 'product-list' %}"><span class="glyphicon glyphicon-remove-circle"></span></a>
+    {% endif %}
+{% elif search_key %}
+    <li>results for "{{search_key}}" <a href="{% url 'product-list' %}"></li> <span class="glyphicon glyphicon-remove-circle"></span></a>
+{% endif %}
 </ol>
 <div class="container-fluid">
     <div class="row" style="margin-top:10px">
@@ -18,70 +31,13 @@
 <input type="hidden" name="category" id="id_category">
 <script type="text/javascript">
 $(document).ready(function(){
-
-    $("#gb_search_button").click(function () {
-        var e = $.Event('keyup');
-        e.which = 13; // #13 = Enter key
-        $("#id_search_product").focus();
-        $("#id_search_product").trigger(e);
-    });
-
-    $('#id_search_product').keyup(function(event) {
-        if (event.which == 13) {
-            $('#id_search').val($('#id_search_product').val());
-            var dataString='q='+$('#id_search_product').val();
-            if($('#id_category').val()!='' && $('#id_category').val()!=null){
-                dataString+="&c="+$('#id_category').val();
-            }
-            $.ajax({
-                type: 'GET',
-                dataType: 'json',
-                data: dataString,
-                url: '{% url "ajax-product-list" %}',
-                success: function(data){
-                    if(data.search_key != '' && data.search_key != null){
-                        if(data.pcat_name != '' && data.scat_name != '' && data.pcat_name != null && data.scat_name != null){
-                            htmlData = '<li>'+data.pcat_name+'</li>'+
-                                        '<li>'+data.scat_name+':   results for "'+data.search_key+'"</li>'
-                        }else{
-                            htmlData = '<li>results for "'+data.search_key+'" </li>'
-                        }
-                        $('#cat_breadcrumb').empty().html(htmlData);
-                        $('#cat_breadcrumb').show();
-                    }else{
-                        $('#cat_breadcrumb').empty().hide();
-                    }
-                    $('#ajax_product_list').empty().append(data['html']);
-                }
-            });
-        }
-    });
+    {% if subCat %}
+        $('#id_category').val({{subCat.id}})
+    {% endif %}
+    {% if search_key %}
+        $('#id_search').val('{{search_key}}')
+    {% endif %}
 });
-
-function filtercategory(cat_id){
-    $('#id_search_product').val('');
-    $('#id_search').val('');
-    $('#id_category').val(cat_id);
-    var dataString='c='+cat_id;
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        data: dataString,
-        url: '{% url "ajax-product-list" %}',
-        success: function(data){
-            if(data.pcat_name != '' && data.scat_name != '' && data.pcat_name != null && data.scat_name != null){
-                htmlData = '<li>'+data.pcat_name+'</li>'+'<li>'+data.scat_name+'</li>'
-                $('#cat_breadcrumb').empty().html(htmlData);
-                $('#cat_breadcrumb').show();
-            }else{
-                $('#cat_breadcrumb').empty().hide();
-            }
-            $('#ajax_product_list').empty().append(data['html']);
-            //$('html, body').animate({scrollTop: $("#id_search_product").offset().top}, 1000);
-            //$(window).scrollTop($('#id_search_product').offset().top);
-        }
-    });
-}
 
 function pagination(p){
     var dataString='';

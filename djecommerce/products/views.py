@@ -33,10 +33,25 @@ class ProductListView(ListView):
     template_name = 'products/frontend/products.html'
 
     def get_queryset(self):
-        return Product.objects.filter(status='A').order_by('created_on')
+        key = {}
+        html_data = {}
+        key['status'] = 'A'
+        slug = self.kwargs.get('slug',False)
+        q = self.request.GET.get('q', False)
+        if slug:key['categories__slug'] = slug
+        if q:
+            q_text = (Q(title__icontains=q)|Q(description__icontains=q))
+            products = Product.objects.filter(q_text, **key).order_by('created_on')
+        else:
+            products = Product.objects.filter(**key).order_by('created_on')
+        return products
 
     def get_context_data(self, **kwargs):
         context = super(ProductListView, self).get_context_data(**kwargs)
+        slug = self.kwargs.get('slug',False)
+        q = self.request.GET.get('q', False)
+        if slug:context['subCat'] = CatalogCategory.objects.get(slug=slug)
+        if q:context['search_key'] = q
         context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
         return context
 

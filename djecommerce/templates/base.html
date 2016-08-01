@@ -14,7 +14,8 @@
 	<script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
 </head>
 <body>
-	<nav class="navbar navbar-inverse" {% if request.resolver_match.url_name == 'product-list' %}style="margin-bottom:0px; !important"{% endif %}>
+	{% with request.resolver_match.url_name as url_name %}
+	<nav class="navbar navbar-inverse" {% if url_name == 'product-list' or url_name == 'category-product-list' %}style="margin-bottom:0px; !important"{% endif %}>
   		<div class="container-fluid">
     		<div class="navbar-header">
       			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -27,7 +28,6 @@
     		</div>
 
     		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-    			{% with request.resolver_match.url_name as url_name %}
       			<ul class="nav navbar-nav">
       				<li><a class="navbar-brand" href="{% url 'product-list' %}">Ecommerce</a></li>
 			        {% if 'staff' in url_name %}
@@ -46,7 +46,7 @@
 			                    Categories <span class="caret"></span>
 			                </a>
 			                <ul class="dropdown-menu dlevel1 multi-level" role="menu" aria-labelledby="dropdownMenu">
-			                    <li><a tabindex="-1" onclick="filtercategory('all');" href="javascript:void(0);">All Categories</a></li>
+			                    <li><a tabindex="-1" href="{% url 'product-list' %}">All Categories</a></li>
 			                    {% for cat in categories %}
 			                        {% with cat.children.all as subcats %}
 			                            {% if subcats %}
@@ -54,7 +54,7 @@
 			                                    <a tabindex="-1" href="javascript:void(0);">{{cat.name}}
 			                                    <ul class="dropdown-menu">
 			                                        {% for subcat in subcats %}
-			                                            <li><a onclick="filtercategory({{subcat.id}});" tabindex="-1" href="javascript:void(0);">{{subcat.name}}</a></li>
+			                                            <li><a href="{{subcat.get_absolute_url}}" tabindex="-1" >{{subcat.name}}</a></li>
 			                                        {% endfor %}
 			                                    </ul>
 			                                </li>
@@ -66,10 +66,12 @@
 			                </ul>
 			            </li>
 				    	<div class="navbar-form navbar-left" role="search">
+				    		<form method="GET">
 					        <div class="form-group">
-					        	<input style="width:430px !important;"  id="id_search_product" type="text" class="form-control" placeholder="Search products">
+					        	<input style="width:430px !important;" id="id_search_product" type="text" class="form-control" name="q" placeholder="Search products">
 					        </div>
-					        <button type="button" id="gb_search_button" class="btn btn-default">Search</button>
+					        <button type="submit" id="gb_search_button" class="btn btn-default">Search</button>
+					        </form>
 				      	</div>
 				    {% endif %}
 		       	</ul>
@@ -93,10 +95,10 @@
 			        	<li><a href="{% url 'user_signin' %}">Login</a></li>
 			        {% endif %}
 		      	</ul>
-		      	{% endwith %}
     		</div>
   		</div>
 	</nav>
+	{% endwith %}
 	{% if messages %}
 		<div class='container'>
 			<div class='alert alert-success text-center alert-dismissible'>
