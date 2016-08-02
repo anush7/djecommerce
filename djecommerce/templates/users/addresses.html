@@ -5,16 +5,16 @@
 <div class="container">
 	<div>
 		<ul class="nav nav-tabs">
-			<li><a href="#" style="cursor: pointer; cursor: hand;">Settings</a></li>
+			<li><a href="#" style="cursor: pointer; cursor: hand;">Profile</a></li>
 			<li><a href="{% url 'orders' %}" style="cursor: pointer; cursor: hand;">Your Orders</a></li>
 			<li class="active"><a href="{% url 'user_address_list' %}" style="cursor: pointer; cursor: hand;">Manage Addresses</a></li>
 			<li><a href="{% url 'account_settings' %}" style="cursor: pointer; cursor: hand;">Change Password</a></li>
 		</ul>
 	</div>
-	<a class="btn btn-primary" style="margin-top:30px;" href="{% url 'user-address-add' %}" role="button">Add Address</a>
-	<div class="row" style="margin-top:30px;">
+	<a class="btn btn-primary" style="margin-top:13px;" href="{% url 'user-address-add' %}" role="button">Add Address</a>
+	<div class="row" style="margin-top:13px;">
 		<div class="col-md-10">
-		<h2 style="margin-top:0px;">Billing Addresses</h2>
+		<h3 style="margin-top:0px;">Billing Addresses</h3>
 		{% for addr in object_list %}
 			{% if addr.type == 'billing' %}
 			<div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
@@ -35,10 +35,10 @@
 	    {% endfor %}
 	    </div>
 	</div>
-	<hr>
+	<hr style="margin-top:10px;margin-bottom:10px;">
 	<div class="row">
-		<h2 style="margin-top:0px;">Shipping Addresses</h2>
 		<div class="col-md-10">
+			<h3 style="margin-top:0px;">Shipping Addresses</h3>
 			{% for addr in object_list %}
 				{% if addr.type == 'shipping' %}
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
