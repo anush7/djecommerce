@@ -45,6 +45,7 @@ class Order(models.Model):
 	shipping_total_price = models.DecimalField(max_digits=50, decimal_places=2, default=5.99)
 	order_total = models.DecimalField(max_digits=50, decimal_places=2, )
 	order_id = models.CharField(max_length=20, null=True, blank=True)
+	order_placed = models.DateTimeField(blank=True, null=True)
 
 	def __unicode__(self):
 		return str(self.cart.id)
