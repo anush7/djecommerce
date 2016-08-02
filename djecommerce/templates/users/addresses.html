@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div>
+		<ul class="nav nav-tabs">
+			<li><a href="#" style="cursor: pointer; cursor: hand;">Settings</a></li>
+			<li><a href="{% url 'orders' %}" style="cursor: pointer; cursor: hand;">Your Orders</a></li>
+			<li class="active"><a href="{% url 'user_address_list' %}" style="cursor: pointer; cursor: hand;">Manage Addresses</a></li>
+			<li><a href="{% url 'account_settings' %}" style="cursor: pointer; cursor: hand;">Change Password</a></li>
+		</ul>
+	</div>
+	<a class="btn btn-primary" style="margin-top:30px;" href="{% url 'user-address-add' %}" role="button">Add Address</a>
+	<div class="row" style="margin-top:30px;">
+		<div class="col-md-10">
+		<h2 style="margin-top:0px;">Billing Addresses</h2>
+		{% for addr in object_list %}
+			{% if addr.type == 'billing' %}
+			<div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+				<div class="thumbnail">
+		            <div class="caption" style="margin-bottom:25px;">
+		                <h4>
+		                    <b>{{addr.user.first_name}} {{addr.user.last_name}}</b>
+		                </h4>
+		                {{ addr }}
+		            </div>
+		            <div class="ratings">
+                		<a href="{% url 'user-address-update' addr.id %}" style="margin-top:-25px;margin-right:30px;" class="pull-right btn btn-xs btn-info"><span class="glyphicon glyphicon-pencil"></span></a>
+                		<a onclick="delete_product({{product.id}})" href="javascript:void(0);" style="margin-top:-25px;margin-right:2px;" class="pull-right btn btn-xs btn-warning"><span class="glyphicon glyphicon-trash"></span></a>
+                	</div>
+		        </div>
+	        </div>
+	        {% endif %}
+	    {% endfor %}
+	    </div>
+	</div>
+	<hr>
+	<div class="row">
+		<h2 style="margin-top:0px;">Shipping Addresses</h2>
+		<div class="col-md-10">
+			{% for addr in object_list %}
+				{% if addr.type == 'shipping' %}
+				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+					<div class="thumbnail">
+			            <div class="caption" style="margin-bottom:25px;">
+			                <h4>
+			                    <b>{{addr.user.first_name}} {{addr.user.last_name}}</b>
+			                </h4>
+			                {{ addr }}
+			            </div>
+			            <div class="ratings">
+	                		<a href="{% url 'user-address-update' addr.id %}" style="margin-top:-25px;margin-right:30px;" class="pull-right btn btn-xs btn-info"><span class="glyphicon glyphicon-pencil"></span></a>
+	                		<a onclick="delete_product({{product.id}})" href="javascript:void(0);" style="margin-top:-25px;margin-right:2px;" class="pull-right btn btn-xs btn-warning"><span class="glyphicon glyphicon-trash"></span></a>
+	                	</div>
+			        </div>
+		        </div>
+		        {% endif %}
+		    {% endfor %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

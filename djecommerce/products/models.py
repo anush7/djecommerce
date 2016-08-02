@@ -39,6 +39,11 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    def get_product_url(self):
+        url = reverse('product-detail', args=[self.id])
+        # url = reverse('staff-product-edit', kwargs={"pk": self.id})
+        return url
+
     def get_absolute_url(self):
         url = reverse('staff-product-edit', args=[self.id])
         # url = reverse('staff-product-edit', kwargs={"pk": self.id})

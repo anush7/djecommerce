@@ -7,10 +7,14 @@ from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth import authenticate, login
+from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.views.generic.list import ListView
 from django.core.mail import send_mail
 from django.conf import settings
 from users.forms import UserSignUpForm
 from users.models import EcUser as User
+from orders.models import UserAddress
+from orders.forms import AddressForm, UserAddressForm
 
 def home(request,template='account/home.html'):
     return render(request, template)
@@ -159,3 +163,33 @@ def check_username_email(request):
 	else:
 		data['status'] = 0
 	return HttpResponse(json.dumps(data))
+
+
+class UserAddressListView(ListView):
+    template_name = 'users/addresses.html'
+
+    def get_queryset(self):
+        return UserAddress.objects.filter(user=self.request.user)
+
+class UserAddressCreateView(CreateView):
+	form_class = UserAddressForm
+	template_name = "orders/add_address.html"
+	success_url = reverse_lazy("order_address")
+
+	def form_valid(self, form, *args, **kwargs):
+		form.instance.user = self.request.user
+		return super(UserAddressCreateView, self).form_valid(form, *args, **kwargs)
+
+class UserAddressUpdateView(UpdateView):
+	model = UserAddress
+	form_class = UserAddressForm
+	template_name = "orders/add_address.html"
+	success_url = reverse_lazy("order_address")
+
+	def form_valid(self, form, *args, **kwargs):
+		form.instance.user = self.request.user
+		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
+
+
+
+

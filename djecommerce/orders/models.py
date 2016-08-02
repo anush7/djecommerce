@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from decimal import Decimal
-
+from datetime import datetime
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.core.urlresolvers import reverse
@@ -60,6 +60,7 @@ class Order(models.Model):
 		self.status = "paid"
 		if order_id and not self.order_id:
 			self.order_id = order_id
+		self.order_placed = datetime.now()
 		self.save()
 
 	def update_order(self):

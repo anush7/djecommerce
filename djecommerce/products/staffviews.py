@@ -228,6 +228,8 @@ class VariantCreateView(CreateView):
         for attr in product.attributes.all():
             data[attr.id] = self.request.POST.get(str(attr.id))
         self.object.attributes = data
+        if form.cleaned_data['default']:
+            ProductVariant.objects.filter(product_id=self.kwargs['pid'], default=True).update(default=False)
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -252,6 +254,8 @@ class VariantUpdateView(UpdateView):
             print self.request.POST.get(str(attr.id))
             data[attr.id] = self.request.POST.get(str(attr.id))
         self.object.attributes = data
+        if form.cleaned_data['default']:
+            ProductVariant.objects.filter(product_id=self.kwargs['pid'], default=True).update(default=False)
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 

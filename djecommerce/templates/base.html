@@ -136,10 +136,14 @@
      			$("#cart_count").text(data.count);
      		}
      	});
-     }
-     $(document).ready(function(){
-     	updateCartItemCount()
-     });
+    }
+    $(document).ready(function(){
+     	updateCartItemCount();
+
+     	$('[data-toggle="tooltip"]').tooltip({
+	        placement: 'top'
+	    });
+    });
 </script>
 
 <!-- <div id="fb-root"></div>

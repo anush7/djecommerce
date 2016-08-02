@@ -1,28 +1,36 @@
-<p class='lead'>
-Order Id: {% if order.order_id %}{{ order.order_id }}{% else %}{{order.id}}{% endif %}</p>
 
-<table class='table'>
-<tr><td>{{ order.cart.cartitem_set.count }} Item(s): <br/>{% for i in order.cart.cartitem_set.all %}
-<b>{{ i.item.get_title }}</b><br/>
-{% endfor %}</td></tr>
-<tr><td>Cart Subtotal: {{ order.cart.subtotal }}</td></tr>
-<tr><td>Tax: {{ order.cart.tax_total }}</td></tr>
-<tr><td>Items Total: {{ order.cart.total }}</td></tr>
-
-<tr><td>Shipping: {{ order.shipping_total_price }}</td></tr>
-<tr><td>Order Total: {{ order.order_total }}</td></tr>
-
-
-</table>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-4 col-sm-offset-4 text-center">
+			<p class='lead'><b>Order Details</b></p>
+			<table class="table table-striped table-hover" style="margin-bottom:0px;">
+				<tbody id="ajax_order_list">
+					<tr><td><b>Order Id:</b></td> <td>{% if order.order_id %}{{ order.order_id }}{% else %}{{order.id}}{% endif %}</td></tr>
+					<tr class='clickable-row' style="cursor: pointer;" data-href="">
+						<td>
+							<b>{{order.cart.cartitem_set.count}} Item(s):</b><br>
+						</td>
+						<td>
+							{% with order.cart.cartitem_set.all as items %}
+								{% for i in items %}
+									<a href="{{i.item.product.get_product_url}}">{{ i.item.get_title }}</a><br/>
+									{% if items|length > 1 and not forloop.last %}<hr style="margin:2px;">{% endif %}
+								{% endfor %}
+							{% endwith %}
+						</td>
+					</tr>
+					<tr><td><b>Cart Subtotal:</b></td> <td>{{order.cart.subtotal}}</td></tr>
+					<tr><td><b>Tax:</b></td> <td>{{order.cart.tax_total}}</td></tr>
+					<tr><td><b>Items Total:</b></td> <td>{{order.cart.total}}</td></tr>
+					<tr><td><b>Shipping:</b></td> <td>{{order.shipping_total_price }}</td></tr>
+					<tr><td><b>Order Total:</b></td> <td> {{ order.order_total }}</td></tr>
+					<tr><td><b>Billing to:</b></td> <td>{{order.billing_address.get_address}}</td></tr>
+					<tr><td><b>Shipping to:</b></td> <td>{{order.shipping_address.get_address}}</td></tr>
+				</tbody>
+			</table>
+			<div class="text-center" style="margin-top:20px;">
+		  		<a role="button" onclick="window.print();" href="javascript:void(0);" class="btn btn-default">Print</a>
+		 	</div>
+		</div>
+	</div>
 </div>
-
-<div class='col-sm-4 col-sm-offset-4 text-center'>
-
-<p><b>Billing to</b>
-<br/>
-{{ order.billing_address.get_address }}
-<p>
-<p><b>Shipping to</b>
-<br/>
-{{ order.shipping_address.get_address }}
-<p>
