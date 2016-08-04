@@ -16,6 +16,7 @@ urlpatterns = [
 	url(r'^addresses$', views.UserAddressListView.as_view(), name='user_address_list'),
     url(r'^address/add/$', views.UserAddressCreateView.as_view(), name='user-address-add'),
     url(r'^address/update/(?P<pk>\d+)$', views.UserAddressUpdateView.as_view(), name='user-address-update'),
+    url(r'^address/delete/(?P<pk>\d+)$', views.delete_address, name='user-address-delete'),
 
     url(r'^check-username-email$', views.check_username_email, name='check-username-email'),
 ]

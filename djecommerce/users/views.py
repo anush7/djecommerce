@@ -190,6 +190,11 @@ class UserAddressUpdateView(UpdateView):
 		form.instance.user = self.request.user
 		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
-
-
-
+def delete_address(request, pk):
+	data = {}
+	try:
+		address = UserAddress.objects.get(id=pk)
+		address.delete()
+		data['status'] = 1
+	except:data['status'] = 0
+	return HttpResponse(json.dumps(data))
