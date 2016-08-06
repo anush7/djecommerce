@@ -4,45 +4,45 @@
 
 
 <div class='container'>
+	<div class="row">
+		{% if object.cartitem_set.count > 0 %}
+			<h1>Your cart</h1>
+			<table class="table table-striped table-hover">
+				<tbody>
+					{% for item in object.cartitem_set.all %}
+						<tr id='item-{{ item.item.id }}'>
+							<td><a href="{{item.item.product.get_product_url}}">{{ item.item.name }}</a></td>
+							<td>
+								<form action="." method="GET" >
+									<input type='hidden' name='item' value='{{ item.item.id }}' />
+									<input id="item-qty-{{item.item.id}}" type='number' class='item-qty' name='qty' value='{{ item.quantity }}' />
+								</form>
+							</td>
+							<td id='item-line-total-{{item.item.id}}'>{{item.line_item_total}}</td>
+							<td class='text-right'>
+								<a data-item-id="{{item.item.id}}" class="remove-item" href='javascript:void(0);'>X</a>
+							</td>
+						</tr>
+					{% endfor %}
+					<tr>
+						<td  colspan='4' class='text-right'>Subtotal: <span id='subtotal'>{{ object.subtotal }}</span></td>
+					</tr>
+					<tr>
+						<td colspan='4' class='text-right'>Tax (Estimated): <span id='taxtotal'>{{ object.tax_total }}</span></td>
+					</tr>
 
-{% if object.cartitem_set.count < 1 %}
-	{% include "carts/empty_cart.html" %}
-{% else %}
-<div class='col-sm-8 col-sm-offset-2'>
-<h1>Your cart</h1>
-<table class='table'>
-	{% for item in object.cartitem_set.all %}
-	<tr id='item-{{ item.item.id }}'>
-		<td>{{ item.item.name }}</td>
-		<td>
-			<form action="." method="GET" >
-				<input type='hidden' name='item' value='{{ item.item.id }}' />
-				<input id="item-qty-{{item.item.id}}" type='number' class='item-qty' name='qty' value='{{ item.quantity }}' />
-			</form>
-		</td>
-		<td id='item-line-total-{{ item.item.id }}'>{{ item.line_item_total }}</td>
-		<td class='text-right' >
-			<a data-item-id="{{item.item.id}}" class="remove-item" href='javascript:void(0);'>X</a>
-		</td>
-	</tr>
-	{% endfor %}
-	<tr>
-		<td  colspan='4' class='text-right'>Subtotal: <span id='subtotal'>{{ object.subtotal }}</span></td>
-	</tr>
-
-	<tr>
-		<td colspan='4' class='text-right'>Tax (Estimated): <span id='taxtotal'>{{ object.tax_total }}</span></td>
-	</tr>
-
-	<tr>
-		<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{ object.total }}</span></td>
-	</tr>
-	<tr>
-		<td colspan='4' class='text-right'><a class='btn btn-warning' href="{% url 'checkout' %}">Checkout </a></td>
-	</tr>
-</table>
-</div>
-{% endif %}
+					<tr>
+						<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{ object.total }}</span></td>
+					</tr>
+					<tr>
+						<td colspan='4' class='text-right'><a class='btn btn-warning' href="{% url 'checkout' %}">Checkout </a></td>
+					</tr>
+				</tbody>
+			</table>
+		{% else %}
+			{% include "carts/empty_cart.html" %}
+		{% endif %}
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -86,8 +86,10 @@ function cart_ajax_call(data, item){
 			}
 			if (data.total_items == 0 ) {
 				$(".table").fadeOut()
-				var template = "{% include 'carts/empty_cart.html' %}";
-				$(".container").html(template);
+				html = "<div class='col-sm-6 col-sm-offset-3 text-center'>"
+				html += "<h1>Your cart is empty</h1><a href='/'>Continue Shopping</a>"
+				html += "</div>"
+				$(".container .row").empty().append(html);
 			}
 			showFlashMessage(data.flash_message);
 			$("#cart_count").text(data.total_items);

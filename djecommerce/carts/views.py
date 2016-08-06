@@ -85,7 +85,8 @@ class CartView(SingleObjectMixin, View):
 					"cart_total": cart_total,
 					"tax_total": tax_total,
 					"flash_message": flash_message,
-					"total_items": total_items
+					"total_items": total_items,
+					"deleted": delete_item
 				}
 			return JsonResponse(data) 
 
