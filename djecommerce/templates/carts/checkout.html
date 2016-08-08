@@ -14,7 +14,7 @@
 				<th></th>
 				<th></th>
 				<th></th>
-				<th>Amount</th>
+				<th class='text-right'>Amount</th>
 			</thead>
 			<tbody id="ajax_contact_list">
 				{% for citem in order.cart.cartitem_set.all %}
@@ -25,43 +25,43 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td>{{ citem.line_item_total }}</td>
+						<td class='text-right'>{{ citem.line_item_total }}</td>
 					</tr>
 				{% endfor %}
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>Cart Subtotal:</td>
-					<td>{{ order.cart.subtotal }}</td>
+					<td class='text-right'>Cart Subtotal:</td>
+					<td class='text-right'>{{ order.cart.subtotal }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>Tax:</td>
-					<td>{{ order.cart.tax_total }}</td>
+					<td class='text-right'>Tax:</td>
+					<td class='text-right'>{{ order.cart.tax_total }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>Items Total:</td>
-					<td>{{ order.cart.total }}</td>
+					<td class='text-right'>Items Total:</td>
+					<td class='text-right'>{{ order.cart.total }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>Shipping:</td>
-					<td>{{ order.shipping_total_price }}</td>
+					<td class='text-right'>Shipping:</td>
+					<td class='text-right'>{{ order.shipping_total_price }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
-					<td>Order Total:</td>
-					<td>{{ order.order_total }}</td>
+					<td class='text-right'>Order Total:</td>
+					<td class='text-right'>{{ order.order_total }}</td>
 				</tr>
 			</tbody>
 		</table>

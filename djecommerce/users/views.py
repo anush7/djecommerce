@@ -2,6 +2,7 @@ import re
 import json
 import uuid
 from django.http import HttpResponse, HttpResponseRedirect  
+from django.contrib import messages
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
@@ -11,7 +12,7 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django.core.mail import send_mail
 from django.conf import settings
-from users.forms import UserSignUpForm
+from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
@@ -198,3 +199,19 @@ def delete_address(request, pk):
 		data['status'] = 1
 	except:data['status'] = 0
 	return HttpResponse(json.dumps(data))
+
+
+class UserProfileUpdateView(UpdateView):
+	model = User
+	form_class = UserProfileForm
+	template_name = "account/profile.html"
+
+	def get_success_url(self):
+		messages.success(self.request, "Profile Updated!")
+		return reverse("user_profile", args=[self.request.user.id])
+
+	# def form_valid(self, form, *args, **kwargs):
+	# 	form.instance.user = self.request.user
+	# 	return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
+
+

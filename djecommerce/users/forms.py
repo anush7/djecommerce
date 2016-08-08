@@ -15,3 +15,12 @@ class UserSignUpForm(forms.Form):
         except User.DoesNotExist:
             return self.cleaned_data['email']
         raise forms.ValidationError("The email already exists!")
+
+class UserProfileForm(forms.ModelForm):
+    first_name = forms.CharField(required=True,max_length=30, error_messages={'required': 'Please enter the first_name'},widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off','placeholder':'First Name'}))
+    last_name = forms.CharField(required=True,max_length=30, error_messages={'required': 'Please enter the last_name'},widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off','placeholder':'Last Name'}))
+    braintree_id = forms.CharField(required=False,max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off','placeholder':'Braintree Key'}))
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'braintree_id']
