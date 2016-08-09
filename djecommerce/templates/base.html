@@ -33,11 +33,12 @@
       				<li><a class="navbar-brand" href="{% url 'product-list' %}">Ecommerce</a></li>
 			        {% if 'staff' in url_name %}
 				        {% if user.is_authenticated %}
-					        {% if user.is_staff %}
+				        	{% if user.is_staff %}
+				        		<li><a href="{% url 'staff-product-list' %}">Product</a></li>
+				        		<li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
+					        {% elif user.is_admin %}
 						        <li><a href="{% url 'staff-catalog-list' %}">Catalog</a></li>
 						        <li><a href="{% url 'staff-category-list' %}">Category</a></li>
-						        <li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
-						        <li><a href="{% url 'staff-product-list' %}">Product</a></li>
 						        <li><a href="{% url 'staff-tax-list' %}">Tax</a></li>
 					        {% endif %}
 					    {% endif %}
