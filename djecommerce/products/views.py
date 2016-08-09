@@ -52,7 +52,6 @@ class ProductListView(ListView):
         q = self.request.GET.get('q', False)
         if slug:context['subCat'] = CatalogCategory.objects.get(slug=slug)
         if q:context['search_key'] = q
-        context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
         return context
 
 @csrf_exempt
@@ -105,16 +104,6 @@ def ajax_product_list(request, template='products/frontend/part_product_list.htm
     html_data['html'] = render_to_string(template,data,context_instance=RequestContext(request))
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
-
-
-
-
-
-
-
-
-
-
 
 
 class ProductDetailView(DetailView):

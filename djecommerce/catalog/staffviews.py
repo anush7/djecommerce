@@ -32,11 +32,6 @@ class CatalogListView(ListView):
     paginate_by = 10
     template_name = 'catalog/catalog_list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(CatalogListView, self).get_context_data(**kwargs)
-        context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
-        return context
-
     def get_queryset(self):
         return Catalog.objects.all().order_by('created_on')
 
@@ -154,11 +149,6 @@ class CategoryListView(ListView):
     # @method_decorator(login_required)
     # def dispatch(self, *args, **kwargs):
     #     return super(ProductListView, self).dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(CategoryListView, self).get_context_data(**kwargs)
-        context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
-        return context
 
     def get_queryset(self):
         key = {}

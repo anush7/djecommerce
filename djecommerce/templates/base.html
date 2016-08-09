@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load category_tags %}
 <!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
@@ -47,6 +48,7 @@
 			                </a>
 			                <ul class="dropdown-menu dlevel1 multi-level" role="menu" aria-labelledby="dropdownMenu">
 			                    <li><a tabindex="-1" href="{% url 'product-list' %}">All Categories</a></li>
+			                    {% get_categories as categories %}
 			                    {% for cat in categories %}
 			                        {% with cat.children.all as subcats %}
 			                            {% if subcats %}
@@ -66,7 +68,7 @@
 			                </ul>
 			            </li>
 				    	<div class="navbar-form navbar-left" role="search">
-				    		<form method="GET">
+				    		<form action="/" method="GET">
 					        <div class="form-group">
 					        	<input style="width:430px !important;" id="id_search_product" type="text" class="form-control" name="q" placeholder="Search products">
 					        </div>

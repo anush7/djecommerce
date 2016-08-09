@@ -34,11 +34,6 @@ class ProductListView(ListView):
     def get_queryset(self):
         return Product.objects.filter(status='A').order_by('created_on')
 
-    def get_context_data(self, **kwargs):
-        context = super(ProductListView, self).get_context_data(**kwargs)
-        context['categories'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
-        return context
-
 @csrf_exempt
 def ajax_product_list(request, template='products/part_product_list.html'):
     data = {}
