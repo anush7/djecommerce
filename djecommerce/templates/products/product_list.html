@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load product_tags %}
+{% load category_tags %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/staff-products-list.css' %}">
@@ -27,6 +28,7 @@
                 </button>
                 <ul class="dropdown-menu dlevel1 multi-level" role="menu" aria-labelledby="dropdownMenu">
                     <li><a tabindex="-1" onclick="filtercategory('all');" href="javascript:void(0);">All Categories</a></li>
+                    {% get_categories as categories %}
                     {% for cat in categories %}
                         {% with cat.children.all as subcats %}
                             {% if subcats %}
