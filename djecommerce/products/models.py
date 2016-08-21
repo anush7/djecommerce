@@ -84,6 +84,19 @@ class ProductVariant(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def quantity(self):
+        stock = Stock.objects.get(variant=self.id)
+        return stock.quantity
+
+    @property
+    def available_quantity(self):
+        stock = Stock.objects.get(variant=self.id)
+        if  stock.quantity_allocated < stock.quantity:
+            ava_stock = stock.quantity - stock.quantity_allocated
+        else:ava_stock = 0
+        return ava_stock
+
     def get_display_label(self):
         label = self.name+', '
         try:attributes = self.attributes.iteritems()
@@ -148,18 +161,18 @@ class Stock(models.Model):
     cost_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     variant = models.ForeignKey(ProductVariant, related_name='stocks')
 
-    def save(self, *args, **kwargs):
-        super(Stock, self).save(*args, **kwargs)
-        try:
-            if self.quantity > self.quantity_allocated:
-                self.variant.product.status = 'A'
-                self.variant.product.save()
-            else:
-                self.variant.product.status = 'I'
-                self.variant.product.save()
-            # variants = self.variant.product.variants.annotate(nstocks=Count('stocks')).filter(nstocks__gt=0)
-        except:
-            pass
+    # def save(self, *args, **kwargs):
+    #     super(Stock, self).save(*args, **kwargs)
+    #     try:
+    #         if self.quantity > self.quantity_allocated:
+    #             self.variant.product.status = 'A'
+    #             self.variant.product.save()
+    #         else:
+    #             self.variant.product.status = 'I'
+    #             self.variant.product.save()
+    #         # variants = self.variant.product.variants.annotate(nstocks=Count('stocks')).filter(nstocks__gt=0)
+    #     except:
+    #         pass
 
 
 

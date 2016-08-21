@@ -33,13 +33,14 @@
       				<li><a class="navbar-brand" href="{% url 'product-list' %}">Ecommerce</a></li>
 			        {% if 'staff' in url_name %}
 				        {% if user.is_authenticated %}
-				        	{% if user.is_staff %}
-				        		<li><a href="{% url 'staff-product-list' %}">Product</a></li>
-				        		<li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
-					        {% elif user.is_admin %}
-						        <li><a href="{% url 'staff-catalog-list' %}">Catalog</a></li>
+				        	{% if user.is_superuser %}
+				        		<li><a href="{% url 'staff-catalog-list' %}">Catalog</a></li>
 						        <li><a href="{% url 'staff-category-list' %}">Category</a></li>
 						        <li><a href="{% url 'staff-tax-list' %}">Tax</a></li>
+						    {% endif %}
+					        {% if user.is_staff %}
+						        <li><a href="{% url 'staff-product-list' %}">Product</a></li>
+				        		<li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
 					        {% endif %}
 					    {% endif %}
 				    {% else %}
@@ -125,6 +126,7 @@
 					   "<div class='alert alert-success alert-dismissible' role='alert'>" + 
 					   "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
 					   "<span aria-hidden='true'>&times;</span></button>"+ message +"</div></div></div>"
+		$(".container-alert-flash").remove();
 		$("body").append(template);
 		$(".container-alert-flash").fadeIn();
 		setTimeout(function(){ 

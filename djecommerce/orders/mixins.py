@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from carts.models import Cart
+from carts.models import Cart, CartItem
 from .models import Order
 
 
@@ -30,6 +30,13 @@ class CartOrderMixin(object):
 		if cart_id == None:
 			return None
 		cart = Cart.objects.get(id=cart_id)
+
+		citems = CartItem.objects.filter(cart=cart)
+		for citem in citems:
+			if citem.item.available_quantity <= 0:
+				citem.delete()
+		cart.update_subtotal()
+
 		if cart.items.count() <= 0:
 			return None
 		return cart

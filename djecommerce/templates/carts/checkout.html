@@ -17,7 +17,7 @@
 				<th class='text-right'>Amount</th>
 			</thead>
 			<tbody id="ajax_contact_list">
-				{% for citem in order.cart.cartitem_set.all %}
+				{% for citem in order.cart.cart_items %}
 					<tr>
 						<td>{{citem.item}}<br>
 							qty: {{citem.quantity}} | {{citem.item.get_checkout_display_label}}

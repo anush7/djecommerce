@@ -6,7 +6,8 @@ from django.db.models.signals import pre_save, post_save
 from django.core.urlresolvers import reverse
 
 from users.models import EcUser as User
-from carts.models import Cart
+from carts.models import Cart, CartItem
+from products.models import Stock
 
 ADDRESS_TYPE = (
 	('billing', 'Billing'),
@@ -62,6 +63,15 @@ class Order(models.Model):
 			self.order_id = order_id
 		self.order_placed = datetime.now()
 		self.save()
+		citems = CartItem.objects.filter(cart=self.cart)
+		for citem in citems:
+			stock = Stock.objects.get(variant=citem.item)
+			if citem.quantity <= stock.quantity:
+				stock.quantity -= citem.quantity
+			else:
+				stock.quantity = 0
+			stock.quantity_allocated += citem.quantity
+			stock.save()
 
 	def update_order(self):
 		shipping_total_price = self.shipping_total_price

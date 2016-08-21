@@ -22,13 +22,25 @@
 								<a data-item-id="{{item.item.id}}" class="remove-item" href='javascript:void(0);'>remove</a>
 							</td>
 							<td>
+								{% if not item.out_of_stock %}
 								<form action="." method="GET" >
 									<input type='hidden' name='item' value='{{ item.item.id }}' />
 									<input id="item-qty-{{item.item.id}}" type='number' class='item-qty' name='qty' value='{{ item.quantity }}' />
 								</form>
+								{% else %}
+								<p style="color:red;">Out of Stock</p>
+								{% endif %}
 							</td>
-							<td><span id='item-total-qty-{{item.item.id}}'>{{ item.quantity }}</span> X {{item.item.price}}</td>
-							<td class='text-right' id='item-line-total-{{item.item.id}}'>{{item.line_item_total}}</td>
+							<td>
+								{% if not item.out_of_stock %}
+								<span id='item-total-qty-{{item.item.id}}'>{{ item.quantity }}</span> X {{item.item.price}}
+								{% endif %}
+							</td>
+							<td class='text-right' id='item-line-total-{{item.item.id}}'>
+								{% if not item.out_of_stock %}
+									{{item.line_item_total}}
+								{% endif %}
+							</td>
 						</tr>
 					{% endfor %}
 					<tr>
@@ -42,7 +54,9 @@
 						<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{ object.total }}</span></td>
 					</tr>
 					<tr>
-						<td colspan='4' class='text-right'><a class='btn btn-warning' href="{% url 'checkout' %}">Checkout </a></td>
+						<td colspan='4' class='text-right'>
+						<a id="checkout_btn" href="javascript:void(0);" class='btn btn-warning {% if object.total == "0.00" %}disabled{% endif %}' xhref="{% url 'checkout' %}">Checkout</a>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -73,6 +87,16 @@ $(document).ready(function(){
 		}
 		cart_ajax_call(data,item_id)
 	});
+	$('#checkout_btn').click(function() {
+		{% if object.check_for_out_of_stock_items %}
+			var cont = confirm("Out of stock products will be removed from the cart");
+			if(cont){
+				window.location='{% url "checkout" %}';
+			}
+		{% else %}
+			window.location='{% url "checkout" %}';
+		{% endif %}
+	});
 });
 function cart_ajax_call(data, item){
 	$.ajax({
@@ -86,6 +110,9 @@ function cart_ajax_call(data, item){
 				$("#taxtotal").text(data.tax_total);
 				$("#carttotal").text(data.cart_total);
 			} else {
+				if (data.max_qty){
+					$("#item-qty-"+item).val(data.max_qty)
+				}
 				$("#item-line-total-"+item).text(data.line_total);
 				$("#item-total-qty-"+item).text($("#item-qty-"+item).val());
 				$("#subtotal").text(data.subtotal);

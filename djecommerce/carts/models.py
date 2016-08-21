@@ -11,6 +11,7 @@ class CartItem(models.Model):
 	item = models.ForeignKey(ProductVariant)
 	quantity = models.PositiveIntegerField(default=1)
 	line_item_total = models.DecimalField(max_digits=10, decimal_places=2)
+	out_of_stock = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.item.title
@@ -19,11 +20,12 @@ class CartItem(models.Model):
 		return self.item.remove_from_cart()
 
 def cart_item_pre_save_receiver(sender, instance, *args, **kwargs):
-	qty = instance.quantity
-	if qty >= 1:
-		price = instance.item.get_price()
-		line_item_total = Decimal(qty) * Decimal(price)
-		instance.line_item_total = line_item_total
+	if not instance.out_of_stock:
+		qty = instance.quantity
+		if qty >= 1:
+			price = instance.item.get_price()
+			line_item_total = Decimal(qty) * Decimal(price)
+			instance.line_item_total = line_item_total
 
 def cart_item_post_save_receiver(sender, instance, *args, **kwargs):
 	instance.cart.update_subtotal()
@@ -48,12 +50,20 @@ class Cart(models.Model):
 
 	def update_subtotal(self):
 		subtotal = 0
-		items = self.cartitem_set.all()
+		items = self.cartitem_set.filter(out_of_stock=False)
 		for item in items:
 			subtotal += item.line_item_total
 		self.subtotal = "%.2f" %(subtotal)
 		self.save()
 
+	@property
+	def cart_items(self):
+		return self.cartitem_set.filter(out_of_stock=False)
+
+	@property
+	def check_for_out_of_stock_items(self):
+		return self.cartitem_set.filter(out_of_stock=True).exists()
+	
 
 def cal_tax_and_total_receiver(sender, instance, *args, **kwargs):
 	subtotal = Decimal(instance.subtotal)
@@ -70,5 +80,5 @@ pre_save.connect(cal_tax_and_total_receiver, sender=Cart)
 
 class Tax(models.Model):
 	name = models.CharField(max_length=500)
-	tax_percentage  = models.DecimalField(max_digits=10, decimal_places=5)
-	is_active =  models.BooleanField(default=False)
+	tax_percentage = models.DecimalField(max_digits=10, decimal_places=5)
+	is_active = models.BooleanField(default=False)

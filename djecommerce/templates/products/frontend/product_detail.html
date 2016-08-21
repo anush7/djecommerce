@@ -32,7 +32,7 @@
             <form id='add-to-form' method='post' class="form-horizontal">{% csrf_token %}
                 <div class="form-group">
                     <div class="col-xs-10">
-                        <input id="variant_qnt" type="number" min="1" value="1" name="qty" class="form-control">
+                        <input id="variant_qnt" type="number" min="1" max="{{default_variant.available_quantity}}" value="1" name="qty" class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
@@ -40,17 +40,18 @@
                         <select onchange="variant_change();" id="id_variant" name="parent_category" class="form-control">
                             {% for variant in product.variants.all %}
                                 <option {% if variant.id == default_variant.id %}selected{% endif %}
-                                data-imgs='{{variant.get_variant_images}}' data-price="{{variant.price}}" value="{{variant.id}}">{{variant.get_display_label}}</option>
+                                data-quantity='{{variant.available_quantity}}' data-imgs='{{variant.get_variant_images}}' data-price="{{variant.price}}" value="{{variant.id}}">{{variant.get_display_label}}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
+                <div id="product_action_buttons" class="form-group">
                     <div class="col-xs-6">
                         <button onclick="add_to_cart(false);" type="button" name="addtocart" class="btn btn-warning">Add to Cart</button>
                         <button onclick="add_to_cart(true);" type="button" name="buynow" class="btn btn-success">Buy Now</button>
                     </div>
                 </div>
+                <P id="product_not_available" style="color:red;display:none;" >Out of Stock</P>
             </form>
             <hr>
             <p class="lead">{{product.description}}</p>
@@ -89,11 +90,16 @@ function add_to_cart(buy_now){
         data: data,
         url: '{% url "add-to-cart" %}',
         success: function(data){
-            if(buy_now){
-                window.location='{% url "add-to-cart" %}';
+            if (data.status != 'not_available'){
+                if(buy_now){
+                    window.location='{% url "add-to-cart" %}';
+                }
+                showFlashMessage(data.flash_message);
+                updateCartItemCount();
+            }else{
+                $('#product_action_buttons').hide();
+                $('#product_not_available').show();
             }
-            showFlashMessage(data.flash_message);
-            updateCartItemCount();
         }
     });
 }
@@ -101,7 +107,10 @@ function add_to_cart(buy_now){
 function variant_change(){
     var variant_price = $('#id_variant option:selected').attr('data-price');
     var variant_imgs = $('#id_variant option:selected').attr('data-imgs');
+    var variant_qty = $('#id_variant option:selected').attr('data-quantity');
     $('#id_product_price').text('$'+variant_price);
+    $('#variant_qnt').val(1);
+    $('#variant_qnt').attr('max',variant_qty);
     variant_imgs = variant_imgs.split(",")
     html = ''
     for(i=0;i<variant_imgs.length;i++){

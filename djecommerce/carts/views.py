@@ -38,6 +38,13 @@ class CartView(SingleObjectMixin, View):
 		if self.request.user.is_authenticated():
 			cart.user = self.request.user
 			cart.save()
+		citems = CartItem.objects.filter(cart=cart)
+		for citem in citems:
+			if citem.item.available_quantity <= 0:
+				citem.out_of_stock = True
+				citem.line_item_total = 0.0
+				citem.save()
+		cart.update_subtotal()
 		return cart
 
 	def get(self, request, *args, **kwargs):
@@ -45,6 +52,7 @@ class CartView(SingleObjectMixin, View):
 		item_id = request.GET.get("item_id")
 		delete_item = request.GET.get("delete", False)
 		flash_message = ""
+		data = {'max_qty':False}
 		if item_id:
 			item_instance = get_object_or_404(ProductVariant, id=item_id)
 			qty = request.GET.get("qty", 1)
@@ -62,8 +70,14 @@ class CartView(SingleObjectMixin, View):
 			else:
 				if not created:
 					flash_message = "Item Quantity has been updated successfully."
-				cart_item.quantity = qty
-				cart_item.save()
+				if int(qty) > cart_item.item.available_quantity:
+					flash_message = "Only "+str(cart_item.item.available_quantity)+" available"
+					data['max_qty'] = cart_item.item.available_quantity
+				else:
+					cart_item.quantity = qty
+					cart_item.save()
+			if item_instance.available_quantity <= 0:
+				data['status'] = 'not_available'
 			if not request.is_ajax():
 				return HttpResponseRedirect(reverse("add-to-cart"))
 		
@@ -79,15 +93,14 @@ class CartView(SingleObjectMixin, View):
 			try:total_items = cart_item.cart.items.count()
 			except:total_items = 0
 
-			data = {
-					"line_total": total,
-					"subtotal": subtotal,
-					"cart_total": cart_total,
-					"tax_total": tax_total,
-					"flash_message": flash_message,
-					"total_items": total_items,
-					"deleted": delete_item
-				}
+			data["line_total"] = total,
+			data["subtotal"] = subtotal,
+			data["cart_total"] = cart_total,
+			data["tax_total"] = tax_total,
+			data["flash_message"] = flash_message,
+			data["total_items"] = total_items,
+			data["deleted"] = delete_item
+			
 			return JsonResponse(data) 
 
 		context = {
@@ -121,7 +134,7 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 	def get(self, request, *args, **kwargs):
 		get_data = super(CheckoutView, self).get(request, *args, **kwargs)
 		cart = self.get_object()
-		if cart == None:
+		if cart == None or not cart.total:
 			return redirect("add-to-cart")
 		if self.request.user.is_authenticated():
 			new_order = self.get_order()
