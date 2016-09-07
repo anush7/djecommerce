@@ -83,10 +83,10 @@ def decimal_default(obj):
     raise TypeError
 
 
-def get_products():
-    products =  Product.objects.all(status='A')
-    for product in products:
-        pass
+def get_rows(queryset, fields=[]):
+    yield ([fld.title().replace('_',' ') for fld in fields])
+    for item in queryset:
+        yield ([getattr(item, fld) for fld in fields])
 
 
 

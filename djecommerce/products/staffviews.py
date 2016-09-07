@@ -1,5 +1,6 @@
 import json
 import csv
+from datetime import datetime
 from django.utils.six.moves import range
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
@@ -26,38 +27,7 @@ from users.models import EcUser as User
 from catalog.models import Catalog, CatalogCategory
 from products.models import Product, ProductAttribute, ProductCategory, ProductAttributeValue, ProductVariant, Stock, ProductImage
 from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
-from products.utils import image_cropper, get_unique_slug
-
-class Echo(object):
-    """An object that implements just the write method of the file-like
-    interface.
-    """
-    def write(self, value):
-        """Write the value by returning it, instead of storing in a buffer."""
-        return value
-
-
-class ProductImportView(TemplateView):
-    template_name = 'products/import.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ProductImportView, self).get_context_data(**kwargs)
-        return context
-
-class ProductExportView(TemplateView):
-    template_name = 'products/export.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ProductExportView, self).get_context_data(**kwargs)
-        return context
-
-def ProductExportCsv(request):
-
-    pseudo_buffer = Echo()
-    writer = csv.writer(pseudo_buffer)
-    response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
-    response['Content-Disposition'] = 'attachment; filename="products-%.csv"' % datetime.now().strftime('%Y/%m/%d-%H:%M:%S.%f')
-    return response
+from products.utils import image_cropper, get_unique_slug, get_rows
 
 class ProductListView(ListView):
     paginate_by = 8
@@ -419,7 +389,39 @@ def ProductImageDeleteView(request, pid):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
+"""########################### PRODUCT IMPORT EXPORT ############################"""
 
+class Echo(object):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
+class ProductImportView(TemplateView):
+    template_name = 'products/import.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductImportView, self).get_context_data(**kwargs)
+        return context
+
+class ProductExportView(TemplateView):
+    template_name = 'products/export.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductExportView, self).get_context_data(**kwargs)
+        return context
+
+def ProductExportCsv(request):
+    pseudo_buffer = Echo()
+    fields = ['title','description','price','rating']
+    queryset = Product.objects.filter(status='A')
+    writer = csv.writer(pseudo_buffer)
+    response = StreamingHttpResponse((writer.writerow(row) for row in get_rows(queryset, fields)), content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="products-%s.csv"' % datetime.now().strftime('%Y/%m/%d-%H:%M:%S')
+    return response
 
 
 
