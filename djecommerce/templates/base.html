@@ -42,6 +42,9 @@
 						        <li><a href="{% url 'staff-product-list' %}">Product</a></li>
 				        		<li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
 					        {% endif %}
+					        {% if user.is_superuser %}
+					        	<li><a href="{% url 'staff-products-import' %}">Import/Export</a></li>
+					        {% endif %}
 					    {% endif %}
 				    {% else %}
 				    	<li class="dropdown ">

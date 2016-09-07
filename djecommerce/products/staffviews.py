@@ -1,5 +1,7 @@
 import json
-from django.http import HttpResponse, HttpResponseRedirect  
+import csv
+from django.utils.six.moves import range
+from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
@@ -9,7 +11,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 
 from django.views.generic.list import ListView
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 from django.views.generic.edit import *
 from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
@@ -26,6 +28,36 @@ from products.models import Product, ProductAttribute, ProductCategory, ProductA
 from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
 from products.utils import image_cropper, get_unique_slug
 
+class Echo(object):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
+class ProductImportView(TemplateView):
+    template_name = 'products/import.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductImportView, self).get_context_data(**kwargs)
+        return context
+
+class ProductExportView(TemplateView):
+    template_name = 'products/export.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductExportView, self).get_context_data(**kwargs)
+        return context
+
+def ProductExportCsv(request):
+
+    pseudo_buffer = Echo()
+    writer = csv.writer(pseudo_buffer)
+    response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="products-%.csv"' % datetime.now().strftime('%Y/%m/%d-%H:%M:%S.%f')
+    return response
 
 class ProductListView(ListView):
     paginate_by = 8

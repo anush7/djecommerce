@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation" class="active"><a href="{% url 'staff-products-import' %}">Import</a></li>
+			<li role="presentation"><a href="{% url 'staff-products-export' %}">Export</a></li>
+		</ul>
+	</div>
+	<div class="row" style="margin-top:15px;">
+	</div>
+</div>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}

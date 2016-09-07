@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+	<div class="row">
+		<ul class="nav nav-tabs">
+			<li role="presentation"><a href="{% url 'staff-products-import' %}">Import</a></li>
+			<li role="presentation" class="active"><a href="{% url 'staff-products-export' %}">Export</a></li>
+		</ul>
+	</div>
+	<div class="row" style="margin-top:15px;">
+		<a class="btn btn-default" onclick="export_csv();" xhref="{% url 'staff-products-export-csv' %}" role="button">Export Products</a>
+
+		<!-- <div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-4">
+			    	<button type="submit" name="submit" value="I" class="btn btn-default">
+			    		{% if product %}
+			    			Save
+			    		{% else %}
+			    			Save and Add Variant
+			    		{% endif %}
+			    	</button>
+			    	<a class="btn btn-default" href="{% url 'staff-product-list' %}" role="button">Cancel</a>
+			    </div>
+			</div> -->
+	</div>
+</div>
+
+
+<script type="text/javascript">
+function export_csv(){
+	window.open("{% url 'staff-products-export-csv' %}");
+}
+
+$(document).ready(function(){
+
+});    
+</script>
+{% endblock %}
