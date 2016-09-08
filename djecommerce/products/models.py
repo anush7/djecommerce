@@ -153,7 +153,6 @@ class ProductAttributeValue(models.Model):
     attribute = models.ForeignKey(ProductAttribute, related_name='values')
     attribute_value = models.CharField(max_length=100)
 
-
 class Stock(models.Model):
     location = models.CharField(max_length=100, blank=True, null=True)
     quantity = models.IntegerField(default=1)

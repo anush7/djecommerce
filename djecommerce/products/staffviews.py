@@ -1,6 +1,7 @@
 import json
 import csv
 from datetime import datetime
+from django.contrib import messages
 from django.utils.six.moves import range
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
@@ -389,12 +390,10 @@ def ProductImageDeleteView(request, pid):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
-"""########################### PRODUCT IMPORT EXPORT ############################"""
+"""################################ PRODUCT IMPORT EXPORT ############################"""
 
 class Echo(object):
-    """An object that implements just the write method of the file-like
-    interface.
-    """
+    """An object that implements just the write method of the file-like interface."""
     def write(self, value):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
@@ -406,12 +405,36 @@ class ProductImportView(TemplateView):
         context = super(ProductImportView, self).get_context_data(**kwargs)
         return context
 
+    def post(self, request, *args, **kwargs):
+        try:csvfile = request.FILES['csvfile']
+        except:
+            messages.error(request, "Please select a file to import")
+            return render(request, self.template_name, {})
+
+        req_fields = ['title','description','price','rating','status']
+        python_csv_object = csv.DictReader(csvfile.read().splitlines())
+        new_product = Product()
+        required_field = True
+        for i, rowData in enumerate(python_csv_object):
+            row = {}
+            for k in rowData.keys():row[k.replace(' ','_').lower()] = rowData[k]
+            if i == 0:
+                if not all(map(lambda v: v in row.keys(), req_fields)):
+                    messages.error(request, "Required Columns not available")
+                    break
+                else:messages.success(request, "Import Complete")
+
+            for field in req_fields:
+                setattr(new_product, field, row[field])
+
+            new_product.created_by = request.user
+            new_product.save()
+
+        context = {}
+        return render(request, self.template_name, context)
+
 class ProductExportView(TemplateView):
     template_name = 'products/export.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ProductExportView, self).get_context_data(**kwargs)
-        return context
 
 def ProductExportCsv(request):
     pseudo_buffer = Echo()
