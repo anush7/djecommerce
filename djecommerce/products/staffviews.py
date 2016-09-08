@@ -181,9 +181,12 @@ def get_sub_cats(request, template="products/load_sub_cats.html"):
     html_data = {}
     pk = request.POST.get('pid')
     product_id = request.POST.get('product_id')
+    import_page = request.POST.get('import_page')
     if product_id:
         product = Product.objects.get(id=product_id)
         data['product'] = product
+    if import_page:
+        data['import_page'] = True
     try:
         parent_cat = CatalogCategory.objects.get(id=pk)
         data['sub_cats'] = parent_cat.children.all()
@@ -406,6 +409,10 @@ class ProductImportView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        if not request.POST.getlist('category'):
+            messages.error(request, "Please select a category")
+            return render(request, self.template_name, {})
+
         try:csvfile = request.FILES['csvfile']
         except:
             messages.error(request, "Please select a file to import")
@@ -414,7 +421,6 @@ class ProductImportView(TemplateView):
         req_fields = ['title','description','price','rating','status']
         python_csv_object = csv.DictReader(csvfile.read().splitlines())
         new_product = Product()
-        required_field = True
         for i, rowData in enumerate(python_csv_object):
             row = {}
             for k in rowData.keys():row[k.replace(' ','_').lower()] = rowData[k]
@@ -428,6 +434,12 @@ class ProductImportView(TemplateView):
 
             new_product.created_by = request.user
             new_product.save()
+            subcat_ids = self.request.POST.getlist('category')
+            if subcat_ids:
+                ProductCategory.objects.filter(product=self.object).delete()
+                for cid in subcat_ids:
+                    subcat = CatalogCategory.objects.get(id=cid)
+                    ProductCategory.objects.create(product=new_product, category=subcat)
 
         messages.success(request, "Import Complete")
         return render(request, self.template_name, {})
@@ -436,9 +448,17 @@ class ProductExportView(TemplateView):
     template_name = 'products/export.html'
 
 def ProductExportCsv(request):
-    pseudo_buffer = Echo()
+    cats = []
+    key= {}
     fields = ['title','description','price','rating']
-    queryset = Product.objects.filter(status='A')
+    
+    pseudo_buffer = Echo()
+    catids = request.GET.get('cats',False)
+    if catids:cats = catids.split(',')
+    cats = CatalogCategory.objects.filter(id__in=cats)
+    if cats:key['categories__in']=cats
+
+    queryset = Product.objects.filter(status='A',**key)
     writer = csv.writer(pseudo_buffer)
     response = StreamingHttpResponse((writer.writerow(row) for row in get_rows(queryset, fields)), content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="products-%s.csv"' % datetime.now().strftime('%Y/%m/%d-%H:%M:%S')

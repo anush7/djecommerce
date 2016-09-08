@@ -1,5 +1,7 @@
 <div class="form-group">
-	<label for="id_title" class="col-sm-2 control-label">Sub Category</label>
+	{% if not import_page %}
+		<label for="id_title" class="col-sm-2 control-label">Sub Category</label>
+	{% endif %}
 	<div class="col-xs-3">
 		<select multiple id="id_category" name="category" class="form-control">
             {% for scat in sub_cats %}

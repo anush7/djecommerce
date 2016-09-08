@@ -2,6 +2,7 @@
 
 {% block content %}
 {% load staticfiles %}
+{% load category_tags %}
 
 <div class="container">
 	<div class="row">
@@ -11,30 +12,67 @@
 		</ul>
 	</div>
 	<div class="row" style="margin-top:15px;">
-		<a class="btn btn-default" onclick="export_csv();" xhref="{% url 'staff-products-export-csv' %}" role="button">Export Products</a>
-
-		<!-- <div class="form-group">
-			    <div class="col-sm-offset-2 col-xs-4">
-			    	<button type="submit" name="submit" value="I" class="btn btn-default">
-			    		{% if product %}
-			    			Save
-			    		{% else %}
-			    			Save and Add Variant
-			    		{% endif %}
-			    	</button>
-			    	<a class="btn btn-default" href="{% url 'staff-product-list' %}" role="button">Cancel</a>
-			    </div>
-			</div> -->
+		<form class="form-horizontal" method="post" enctype="multipart/form-data">
+			{% get_categories as categories %}
+			<div class="form-group">
+				<!-- <label for="id_title" class="col-sm-2 control-label">Category</label> -->
+				<div class="col-xs-3">
+					<select id="id_parent_category" name="parent_category" class="form-control">
+						<option>All Categories</option>
+			            {% for cat in categories %}
+			                <option value="{{cat.id}}">{{cat.name}}</option>
+			            {% endfor %}
+			        </select>
+			    	<p style="color:red;">{{ form.type.errors.as_text }}</p>
+				</div>
+			</div>
+			<div id="id_sub_cats">
+			</div>
+			<div class="form-group">
+				<div class="col-xs-4">
+					<a class="btn btn-default" onclick="export_csv();" xhref="{% url 'staff-products-export-csv' %}" role="button">Export Products</a>
+				</div>
+			</div>
+		</form>
 	</div>
 </div>
 
 
 <script type="text/javascript">
 function export_csv(){
-	window.open("{% url 'staff-products-export-csv' %}");
+	try {
+		url = "{% url 'staff-products-export-csv' %}?cats="+$('#id_category').val().join();
+	}catch(err){
+		url = "{% url 'staff-products-export-csv' %}";
+	}
+	window.open(url);
 }
 
 $(document).ready(function(){
+
+	$('#id_parent_category').change(function() {
+    	var parentcat = $('#id_parent_category option:selected').val();
+        var dataString='';
+        dataString += 'csrfmiddlewaretoken={{csrf_token}}&pid='+parentcat;
+        dataString += '&import_page=true';
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-load-prod-subcats" %}',
+            success: function(data){
+            	if(data['status'] == 1){
+            		$('#id_sub_cats').empty().append(data['html']);
+            		$('#id_category').multiselect({
+						includeSelectAllOption: true,
+						enableFiltering: true
+					});
+            	}else{
+            		$('#id_sub_cats').empty()
+            	}
+            }
+        });
+    });
 
 });    
 </script>
