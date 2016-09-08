@@ -399,7 +399,6 @@ class Echo(object):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
 
-
 class ProductImportView(TemplateView):
     template_name = 'products/import.html'
 
