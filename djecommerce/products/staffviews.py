@@ -421,8 +421,7 @@ class ProductImportView(TemplateView):
             if i == 0:
                 if not all(map(lambda v: v in row.keys(), req_fields)):
                     messages.error(request, "Required Columns not available")
-                    break
-                else:messages.success(request, "Import Complete")
+                    return render(request, self.template_name, {})
 
             for field in req_fields:
                 setattr(new_product, field, row[field])
@@ -430,8 +429,8 @@ class ProductImportView(TemplateView):
             new_product.created_by = request.user
             new_product.save()
 
-        context = {}
-        return render(request, self.template_name, context)
+        messages.success(request, "Import Complete")
+        return render(request, self.template_name, {})
 
 class ProductExportView(TemplateView):
     template_name = 'products/export.html'
