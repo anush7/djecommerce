@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/staff-products-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/frontend-products-list.css' %}">
 <ol class="breadcrumb" id="cat_breadcrumb" style="margin-bottom: 0px;{% if not subCat and not search_key  %}display:none;{% endif %}">
 {% if subCat %}
     <li>{{subCat.parent.name}}</li>
@@ -20,7 +20,7 @@
 </ol>
 <div class="container-fluid">
     <div class="row" style="margin-top:10px">
-        <div class="col-xs-12 col-md-10">
+        <div xclass="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div id="ajax_product_list">
             	{% include 'products/frontend/part_product_list.html' %}
             </div>

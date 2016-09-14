@@ -17,6 +17,7 @@
 		<table class="table table-striped table-hover">
 	    	<thead>
 	    		<th></th>
+				<th>Variant</th>
 				<th>SKU</th>
 				<th>Quantity</th>
 				<th>Allocated</th>
@@ -27,6 +28,7 @@
 						<td>
 							<input type="checkbox" onclick="enable_delete();" value="{{stock.id}}" name="stockdelete">
 						</td>
+						<td>{{stock.variant.name}}</td>
 						<td>
 							<a href="{% url 'staff-stock-update' product.id stock.id %}">
 								{{stock.variant.sku}}

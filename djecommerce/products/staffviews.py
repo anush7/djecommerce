@@ -300,7 +300,8 @@ class StockCreateView(CreateView):
         context = super(StockCreateView, self).get_context_data(**kwargs)
         context['product'] = product
         context['stocks'] = Stock.objects.filter(variant__product_id=self.kwargs['pid'])
-        variants = context['form'].fields["variant"].queryset.filter(product_id=self.kwargs['pid'])
+        variants = context['form'].fields["variant"].queryset.annotate(nstocks=Count('stocks'))\
+                        .filter(product_id=self.kwargs['pid'],nstocks=0)
         context['form'].fields["variant"].queryset = variants
         return context
 
@@ -316,7 +317,8 @@ class StockUpdateView(UpdateView):
         context = super(StockUpdateView, self).get_context_data(**kwargs)
         context['product'] = product = Product.objects.get(id=self.kwargs['pid'])
         context['stocks'] = Stock.objects.filter(variant__product_id=self.kwargs['pid'])
-        variants = context['form'].fields["variant"].queryset.filter(product_id=self.kwargs['pid'])
+        variants = context['form'].fields["variant"].queryset.annotate(nstocks=Count('stocks'))\
+                        .filter((Q(nstocks=0)|Q(stocks=context['object'])),product_id=self.kwargs['pid']).distinct()
         context['form'].fields["variant"].queryset = variants
         return context
 

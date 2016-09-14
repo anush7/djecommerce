@@ -1,0 +1,34 @@
+ /* 
+ 	xs<768 
+    768<sm<992
+    992<md<1200
+    1200<lg
+ */
+
+ @media (max-width:768px){
+ 	.xs-cl-12{
+ 		margin-top:10px;
+ 		background-color: red;
+ 	}
+ }
+
+@media (min-width:768px) and (max-width:992px){
+	.sm-cl-12{
+		margin-top:20px;
+		background-color: green;
+	}
+}
+
+@media (min-width:992px) and (max-width:1200px){
+	.md-cl-12{
+		margin-top:30px;
+		background-color: yellow;
+	}
+}
+
+@media (min-width:1200px){
+	.lg-cl-12{
+		margin-top:40px;
+		background-color: blue;
+	}
+}

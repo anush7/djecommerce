@@ -17,14 +17,14 @@
 		<form method='post' class="form-horizontal">{% csrf_token %}
 
 			<div class="form-group">
-				<label for="id_title" class="col-md-2 control-label">SKU</label>
+				<label for="id_title" class="col-md-2 control-label">SKU <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.sku}}
 					<p style="color:red;">{{ form.sku.errors.as_text }}</p>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="id_content" class="col-md-2 control-label">Variant Name</label>
+				<label for="id_content" class="col-md-2 control-label">Variant Name <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.name}}
 					<p style="color:red;">{{ form.name.errors.as_text }}</p>
@@ -32,7 +32,7 @@
 			</div>
 			{% for attr in product.attributes.all %}
 				<div class="form-group">
-					<label for="id_content" class="col-md-2 control-label">{{attr.name}}</label>
+					<label for="id_content" class="col-md-2 control-label">{{attr.name}} <span style="color:red;">*</span></label>
 					<div class="col-xs-4">
 						<input type="text" class="form-control" name="{{attr.id}}" value="{{object|get_attr_val:attr.id}}"></input>
 					</div>

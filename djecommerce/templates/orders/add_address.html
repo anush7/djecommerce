@@ -3,32 +3,40 @@
 {% block content %}
 
 <div class="container">
+	<div>
+		<ul class="nav nav-tabs">
+			<li><a href="{% url 'user_profile' user.id %}" style="cursor: pointer; cursor: hand;">Profile</a></li>
+			<li><a href="{% url 'orders' %}" style="cursor: pointer; cursor: hand;">Your Orders</a></li>
+			<li class="active"><a href="{% url 'user_address_list' %}" style="cursor: pointer; cursor: hand;">Manage Addresses</a></li>
+			<li><a href="{% url 'account_settings' %}" style="cursor: pointer; cursor: hand;">Change Password</a></li>
+		</ul>
+	</div>
 	<div class="row">
 		<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if object %}Edit{% else %}Add{% endif %} Address:</strong></h3>
 		<form method='post' class="form-horizontal">{% csrf_token %}
 			<div class="form-group">
-				<label for="id_title" class="col-md-2 control-label">Street</label>
+				<label for="id_title" class="col-md-2 control-label">Street <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.street}}
 					<p style="color:red;">{{ form.street.errors.as_text }}</p>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="id_content" class="col-sm-2 control-label">City</label>
+				<label for="id_content" class="col-sm-2 control-label">City <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.city}}
 					<p style="color:red;">{{ form.city.errors.as_text }}</p>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="id_title" class="col-sm-2 control-label">State</label>
+				<label for="id_title" class="col-sm-2 control-label">State <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.state}}
 			    	<p style="color:red;">{{ form.state.errors.as_text }}</p>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="id_content" class="col-sm-2 control-label">zipcode</label>
+				<label for="id_content" class="col-sm-2 control-label">zipcode <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.zipcode}}
 					<p style="color:red;">{{ form.zipcode.errors.as_text }}</p>

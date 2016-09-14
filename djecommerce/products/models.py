@@ -73,7 +73,6 @@ class Product(models.Model):
         return images
 
 
-
 class ProductVariant(models.Model):
     sku = models.CharField(max_length=32, unique=True)
     default = models.BooleanField(default=False)
@@ -130,13 +129,20 @@ class ProductVariant(models.Model):
     def get_title(self):
         return "%s - %s" %(self.product.title, self.name)
 
+@receiver(post_save, sender=ProductVariant)
+def variant_post_save(sender, instance, created=False, **kwargs):
+    product_variants = ProductVariant.objects.filter(product=instance.product,default=True).count()
+    if not product_variants:
+        instance.default=True
+        instance.save()
 
 @receiver(post_delete, sender=ProductVariant)
 def variant_post_delete(sender, instance, **kwargs):
-    variants = ProductVariant.objects.filter(product=instance.product)
-    if variants:
-        variants[0].default=True
-        variants[0].save()
+    if instance.default:
+        variants = ProductVariant.objects.filter(product=instance.product)
+        if variants:
+            variants[0].default=True
+            variants[0].save()
 
 class ProductAttribute(models.Model):
     name = models.CharField(max_length=100)
