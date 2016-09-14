@@ -218,8 +218,10 @@ class VariantCreateView(CreateView):
         return reverse_lazy('staff-variant-list',args=[self.kwargs['pid']])
 
     def get_context_data(self, **kwargs):
+        product = Product.objects.get(id=self.kwargs['pid'])
+        self.initial = {'price':product.price}
         context = super(VariantCreateView, self).get_context_data(**kwargs)
-        context['product'] = product = Product.objects.get(id=self.kwargs['pid'])
+        context['product'] = product
         return context
 
     def form_valid(self, form):
@@ -293,8 +295,10 @@ class StockCreateView(CreateView):
         return reverse_lazy('staff-stock-list',args=[self.kwargs['pid']])
 
     def get_context_data(self, **kwargs):
+        product = Product.objects.get(id=self.kwargs['pid'])
+        self.initial = {'cost_price':product.price,'quantity_allocated':0}
         context = super(StockCreateView, self).get_context_data(**kwargs)
-        context['product'] = product = Product.objects.get(id=self.kwargs['pid'])
+        context['product'] = product
         context['stocks'] = Stock.objects.filter(variant__product_id=self.kwargs['pid'])
         variants = context['form'].fields["variant"].queryset.filter(product_id=self.kwargs['pid'])
         context['form'].fields["variant"].queryset = variants
