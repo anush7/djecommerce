@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import os
 import json
 import uuid
+from django.db.models import F
 from django.db import models
 from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +11,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from users.models import EcUser as User
 from catalog.models import CatalogCategory
 from django.contrib.postgres.fields import JSONField
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
 
 
@@ -160,19 +161,23 @@ class Stock(models.Model):
     cost_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     variant = models.ForeignKey(ProductVariant, related_name='stocks')
 
-    # def save(self, *args, **kwargs):
-    #     super(Stock, self).save(*args, **kwargs)
-    #     try:
-    #         if self.quantity > self.quantity_allocated:
-    #             self.variant.product.status = 'A'
-    #             self.variant.product.save()
-    #         else:
-    #             self.variant.product.status = 'I'
-    #             self.variant.product.save()
-    #         # variants = self.variant.product.variants.annotate(nstocks=Count('stocks')).filter(nstocks__gt=0)
-    #     except:
-    #         pass
+def update_product_status(sender, instance, created=False, **kwargs):
+    if created:
+        variants = instance.variant.product.variants.all()
+        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exclude(id=instance.id).count()
+        if not stocks:
+            if instance.quantity <= instance.quantity_allocated:instance.variant.product.status = 'I'
+            else:instance.variant.product.status = 'A'
+            instance.variant.product.save()
+    else:
+        variants = instance.variant.product.variants.all()
+        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).count()
+        if stocks: instance.variant.product.status = 'A'
+        else: instance.variant.product.status = 'I'
+        instance.variant.product.save()
 
+post_save.connect(update_product_status, sender=Stock)
+post_delete.connect(update_product_status, sender=Stock)
 
 
 def get_product_image_path(instance, filename):

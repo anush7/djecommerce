@@ -48,6 +48,12 @@ class StockForm(forms.ModelForm):
                 error_messages={'required': 'Please choose the product variant'},
                 widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off'})
             )
+    quantity_allocated = forms.DecimalField(
+                required=False, 
+                decimal_places=2,
+                error_messages={'required': 'Please choose the product variant'},
+                widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off'})
+            )
     cost_price = forms.DecimalField(
                 required=False, 
                 decimal_places=2,
@@ -56,7 +62,7 @@ class StockForm(forms.ModelForm):
 
     class Meta:
         model = Stock
-        fields = ['variant', 'quantity', 'cost_price']
+        fields = ['variant', 'quantity', 'quantity_allocated', 'cost_price']
 
 class ProductImageForm(forms.ModelForm):
     variant = forms.ModelChoiceField(
