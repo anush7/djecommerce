@@ -5,12 +5,6 @@ from carts.models import Cart, CartItem
 from .models import Order
 
 
-class LoginRequiredMixin(object):
-	@method_decorator(login_required)
-	def dispatch(self, request, *args, **kwargs):
-		return super(LoginRequiredMixin, self).dispatch(request,*args, **kwargs)
-
-
 class CartOrderMixin(object):
 	def get_order(self, *args, **kwargs):
 		cart = self.get_cart()

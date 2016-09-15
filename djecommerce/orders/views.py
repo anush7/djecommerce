@@ -8,16 +8,17 @@ from  django.views.generic.list import ListView
 
 from users.models import EcUser as User
 from .forms import AddressForm, UserAddressForm
-from .mixins import CartOrderMixin, LoginRequiredMixin
+from .mixins import CartOrderMixin
 from .models import UserAddress, Order
+from catalog.mixins import StaffRequiredMixin
 
-class OrderList(LoginRequiredMixin, ListView):
+class OrderList(StaffRequiredMixin, ListView):
 	queryset = Order.objects.all()
 
 	def get_queryset(self):
 		return super(OrderList, self).get_queryset().filter(user=self.request.user)
 
-class OrderDetail(DetailView):
+class OrderDetail(StaffRequiredMixin, DetailView):
 	model = Order
 
 	def dispatch(self, request, *args, **kwargs):
@@ -27,7 +28,7 @@ class OrderDetail(DetailView):
 		else:
 			raise Http404
 
-class AddressSelectFormView(CartOrderMixin, FormView):
+class AddressSelectFormView(StaffRequiredMixin, CartOrderMixin, FormView):
 	form_class = AddressForm
 	template_name = "orders/address_select.html"
 
@@ -78,7 +79,7 @@ class AddressSelectFormView(CartOrderMixin, FormView):
 		return reverse("checkout")
 
 
-class UserAddressCreateView(CreateView):
+class UserAddressCreateView(StaffRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
 	success_url = reverse_lazy("order_address")

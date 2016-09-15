@@ -15,6 +15,7 @@ from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
 )
 from django.contrib.auth.decorators import login_required
+from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required
 from django.utils.decorators import method_decorator
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
@@ -28,7 +29,7 @@ from catalog.forms import CatalogForm, CatalogCategoryForm, AttributeForm, Attri
 from catalog.utils import image_cropper, get_unique_slug
 
 """########################### CATALOG VIEWS ############################"""
-class CatalogListView(ListView):
+class CatalogListView(StaffRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/catalog_list.html'
 
@@ -77,15 +78,11 @@ def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CatalogCreateView(CreateView):
+class CatalogCreateView(StaffRequiredMixin, CreateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
     template_name = 'catalog/catalog_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(CatalogCreateView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -96,15 +93,11 @@ class CatalogCreateView(CreateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
-class CatalogUpdateView(UpdateView):
+class CatalogUpdateView(StaffRequiredMixin, UpdateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
     template_name = 'catalog/catalog_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(CatalogUpdateView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CatalogUpdateView, self).get_context_data(**kwargs)
@@ -142,13 +135,9 @@ def change_catalog_status(request, pk):
 
 """############################### CATEGORY VIEWS #################################"""
 
-class CategoryListView(ListView):
+class CategoryListView(StaffRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/category_list.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(ProductListView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
         key = {}
@@ -199,15 +188,11 @@ def ajax_category_list(request, template='catalog/part_category_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(StaffRequiredMixin, CreateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
     template_name = 'catalog/category_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(CategoryCreateView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -217,15 +202,11 @@ class CategoryCreateView(CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(StaffRequiredMixin, UpdateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
     template_name = 'catalog/category_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(CategoryUpdateView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CategoryUpdateView, self).get_context_data(**kwargs)
@@ -262,13 +243,9 @@ def change_category_status(request, pk):
 
 """############################### ATTRIBUTES VIEWS #################################"""
 
-class AttributeListView(ListView):
+class AttributeListView(StaffRequiredMixin, ListView):
     paginate_by = 5
     template_name = 'catalog/attribute_list.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(AttributeListView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AttributeListView, self).get_context_data(**kwargs)
@@ -328,15 +305,11 @@ def ajax_attribute_list(request, template='catalog/part_attribute_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class AttributeCreateView(CreateView):
+class AttributeCreateView(StaffRequiredMixin, CreateView):
     model = ProductAttribute
     form_class = AttributeForm
     success_url = reverse_lazy('staff-attribute-list')
     template_name = 'catalog/attribute_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(AttributeCreateView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AttributeCreateView, self).get_context_data(**kwargs)
@@ -353,15 +326,11 @@ class AttributeCreateView(CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-class AttributeUpdateView(UpdateView):
+class AttributeUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductAttribute
     form_class = AttributeForm
     success_url = reverse_lazy('staff-attribute-list')
     template_name = 'catalog/attribute_form.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(AttributeUpdateView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AttributeUpdateView, self).get_context_data(**kwargs)
@@ -429,24 +398,16 @@ def get_sub_cats(request, template="catalog/load_subcats.html"):
 """#################################################################################################"""
 
 
-class TaxListView(ListView):
+class TaxListView(StaffRequiredMixin, ListView):
     template_name = 'catalog/tax_list.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(TaxListView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
         return Tax.objects.all().order_by('name')
 
-class TaxFormView(FormView):
+class TaxFormView(StaffRequiredMixin, FormView):
     template_name = 'catalog/tax_form.html'
     form_class = TaxForm
     success_url = reverse_lazy('staff-tax-list')
-
-    # @method_decorator(login_required)
-    # def dispatch(self, *args, **kwargs):
-    #     return super(TaxFormView, self).dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super(TaxFormView, self).get_form_kwargs()
@@ -463,7 +424,7 @@ class TaxFormView(FormView):
         else:
             return self.form_invalid(form)
 
-class TaxDeleteView(View):
+class TaxDeleteView(StaffRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         if request.is_ajax():

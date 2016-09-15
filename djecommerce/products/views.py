@@ -4,6 +4,7 @@ from django.shortcuts import render, render_to_response, get_list_or_404,get_obj
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.defaultfilters import slugify
@@ -115,7 +116,8 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        context['default_variant'] = ProductVariant.objects.get(default=True, product_id=self.kwargs['pk'])
+        try:context['default_variant'] = ProductVariant.objects.get(default=True, product_id=self.kwargs['pk'])
+        except:messages.success(self.request, "Product inactive. No variants available!")
         return context
 
 

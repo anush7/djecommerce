@@ -14,6 +14,7 @@ from users.forms import UserSignUpForm
 from users.models import EcUser as User
 from products.models import Product, ProductVariant
 from carts.models import Cart, CartItem
+from catalog.mixins import LoginRequiredMixin
 
 if settings.DEBUG:
 	braintree.Configuration.configure(braintree.Environment.Sandbox,
@@ -22,7 +23,7 @@ if settings.DEBUG:
       private_key=settings.BRAINTREE_PRIVATE)
 
 
-class CartView(SingleObjectMixin, View):
+class CartView(LoginRequiredMixin, SingleObjectMixin, View):
 	model = Cart
 	template = "carts/cart.html"
 
@@ -109,7 +110,7 @@ class CartView(SingleObjectMixin, View):
 		return render(request, self.template, context)
 
 
-class CheckoutView(CartOrderMixin, FormMixin, DetailView):
+class CheckoutView(LoginRequiredMixin, CartOrderMixin, FormMixin, DetailView):
 	model = Cart
 	form_class = UserSignUpForm
 	template_name = "carts/checkout.html"
@@ -143,7 +144,7 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 		return get_data
 
 
-class CheckoutFinalView(CartOrderMixin, View):
+class CheckoutFinalView(LoginRequiredMixin, CartOrderMixin, View):
 	def post(self, request, *args, **kwargs):
 		order = self.get_order()
 		order_total = order.order_total
@@ -178,7 +179,7 @@ class CheckoutFinalView(CartOrderMixin, View):
 
 
 
-class CartCountView(View):
+class CartCountView(LoginRequiredMixin, View):
 	def get(self, request, *args, **kwargs):
 		if request.is_ajax():
 			cart_id = self.request.session.get("cart_id")

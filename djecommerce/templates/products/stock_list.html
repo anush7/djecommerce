@@ -6,9 +6,24 @@
 	<div class="row">
 		<ul class="nav nav-tabs">
 			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
-			<li role="presentation"><a href="{{product.get_variants_url}}">Variants</a></li>
-			<li role="presentation" class="active"><a href="{{product.get_stocks_url}}">Stock</a></li>
-			<li role="presentation"><a href="{{product.get_images_url}}">Images</a></li>
+			<li role="presentation">
+				<a href="{{product.get_variants_url}}">
+					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Variants
+				</a>
+			</li>
+			<li role="presentation" class="active">
+				<a href="{{product.get_stocks_url}}">
+					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Stock
+				</a>
+			</li>
+			<li role="presentation">
+				<a href="{{product.get_images_url}}">
+					{% if not product.get_image_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Images
+				</a>
+			</li>
+			<li style="margin-left:10px; !important">
+				<h4>| {% if product %}{% if product.status == 'A' %} Status: Active{% else %} Status: InActive{% endif %}{% else %}Status: InActive{% endif %}</h4>
+			</li>
 		</ul>
 	</div>
 	<div class="row" style="margin-top:15px;">

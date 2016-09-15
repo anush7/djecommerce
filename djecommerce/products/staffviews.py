@@ -26,18 +26,21 @@ from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
 
 from users.models import EcUser as User
 from catalog.models import Catalog, CatalogCategory
+from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required
+from django.contrib.admin.views.decorators import staff_member_required
 from products.models import Product, ProductAttribute, ProductCategory, ProductAttributeValue, ProductVariant, Stock, ProductImage
 from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
 from products.utils import image_cropper, get_unique_slug, get_rows
 
-class ProductListView(ListView):
-    paginate_by = 8
+class ProductListView(StaffRequiredMixin, ListView):
+    paginate_by = 1
     template_name = 'products/product_list.html'
 
     def get_queryset(self):
         return Product.objects.filter(status='A').order_by('created_on')
 
 @csrf_exempt
+@staff_required
 def ajax_product_list(request, template='products/part_product_list.html'):
     data = {}
     html_data = {}
@@ -64,7 +67,7 @@ def ajax_product_list(request, template='products/part_product_list.html'):
 
     try:page = request.GET.get('page')
     except:page = 1
-    paginator = Paginator(product_list, 8)
+    paginator = Paginator(product_list, 1)
     try:
         product_list = paginator.page(page)
     except PageNotAnInteger:
@@ -90,7 +93,7 @@ def ajax_product_list(request, template='products/part_product_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class ProductCreateView(CreateView):
+class ProductCreateView(StaffRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_form.html'
@@ -127,7 +130,7 @@ class ProductCreateView(CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(StaffRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_form.html'
@@ -160,6 +163,7 @@ class ProductUpdateView(UpdateView):
                 ProductCategory.objects.create(product=self.object, category=subcat)
         return HttpResponseRedirect(self.get_success_url())
 
+@staff_required
 def delete_product(request, pk):
     data = {}
     try:
@@ -176,6 +180,7 @@ class ProductDetailView(DetailView):
     def get_queryset(self):
         return Product.objects.all()
 
+@staff_required
 def get_sub_cats(request, template="products/load_sub_cats.html"):
     data = {}
     html_data = {}
@@ -198,7 +203,7 @@ def get_sub_cats(request, template="products/load_sub_cats.html"):
 
 """########################### VARIANTS VIEWS ############################"""
 
-class VariantListView(ListView):
+class VariantListView(StaffRequiredMixin, ListView):
     template_name = 'products/variant_list.html'
 
     def get_queryset(self):
@@ -209,7 +214,7 @@ class VariantListView(ListView):
         context['product'] = product = Product.objects.get(id=self.kwargs['pid'])
         return context
 
-class VariantCreateView(CreateView):
+class VariantCreateView(StaffRequiredMixin, CreateView):
     model = ProductVariant
     form_class = VariantForm
     template_name = 'products/variant_form.html'
@@ -236,7 +241,7 @@ class VariantCreateView(CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-class VariantUpdateView(UpdateView):
+class VariantUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductVariant
     form_class = VariantForm
     template_name = 'products/variant_form.html'
@@ -262,6 +267,7 @@ class VariantUpdateView(UpdateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
+@staff_required
 def VariantDeleteView(request, pid):
     data = {}
     try:
@@ -274,7 +280,7 @@ def VariantDeleteView(request, pid):
 
 """########################### STOCKS VIEWS ############################"""
 
-class StockListView(ListView):
+class StockListView(StaffRequiredMixin, ListView):
     template_name = 'products/stock_list.html'
 
     def get_queryset(self):
@@ -286,7 +292,7 @@ class StockListView(ListView):
         context['stocks'] = Stock.objects.filter(variant__product_id=self.kwargs['pid'])
         return context
 
-class StockCreateView(CreateView):
+class StockCreateView(StaffRequiredMixin, CreateView):
     model = Stock
     form_class = StockForm
     template_name = 'products/stock_form.html'
@@ -305,7 +311,7 @@ class StockCreateView(CreateView):
         context['form'].fields["variant"].queryset = variants
         return context
 
-class StockUpdateView(UpdateView):
+class StockUpdateView(StaffRequiredMixin, UpdateView):
     model = Stock
     form_class = StockForm
     template_name = 'products/stock_form.html'
@@ -322,6 +328,7 @@ class StockUpdateView(UpdateView):
         context['form'].fields["variant"].queryset = variants
         return context
 
+@staff_required
 def StockDeleteView(request, pid):
     data = {}
     try:
@@ -334,7 +341,7 @@ def StockDeleteView(request, pid):
 
 """########################### PRODUCT IMAGE VIEWS ############################"""
 
-class ProductImageView(ListView):
+class ProductImageView(StaffRequiredMixin, ListView):
     template_name = 'products/image_list.html'
 
     def get_queryset(self):
@@ -345,7 +352,7 @@ class ProductImageView(ListView):
         context['product'] = product = Product.objects.get(id=self.kwargs['pid'])
         return context
 
-class ProductImageCreateView(CreateView):
+class ProductImageCreateView(StaffRequiredMixin, CreateView):
     model = ProductImage
     form_class = ProductImageForm
     template_name = 'products/image_form.html'
@@ -367,7 +374,7 @@ class ProductImageCreateView(CreateView):
         image = image_cropper(self.request.POST, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
-class ProductImageUpdateView(UpdateView):
+class ProductImageUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductImage
     form_class = StockForm
     template_name = 'products/image_form.html'
@@ -389,6 +396,7 @@ class ProductImageUpdateView(UpdateView):
         image = image_cropper(self.request.POST, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
+@staff_required
 def ProductImageDeleteView(request, pid):
     data = {}
     try:
@@ -407,7 +415,7 @@ class Echo(object):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
 
-class ProductImportView(TemplateView):
+class ProductImportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/import.html'
 
     def get_context_data(self, **kwargs):
@@ -450,9 +458,10 @@ class ProductImportView(TemplateView):
         messages.success(request, "Import Complete")
         return render(request, self.template_name, {})
 
-class ProductExportView(TemplateView):
+class ProductExportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/export.html'
 
+@staff_required
 def ProductExportCsv(request):
     cats = []
     key= {}

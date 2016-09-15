@@ -72,6 +72,14 @@ class Product(models.Model):
         images = [imgobj.image.url for imgobj in ProductImage.objects.filter(variant_id=variant.id)]
         return images
 
+    def get_variant_count(self):
+        return ProductVariant.objects.filter(product=self).exists()
+
+    def get_stock_count(self):
+        return Stock.objects.filter(variant__in=self.variants.all()).exists()
+
+    def get_image_count(self):
+        return ProductImage.objects.filter(variant__in=self.variants.all()).exists()
 
 class ProductVariant(models.Model):
     sku = models.CharField(max_length=32, unique=True)

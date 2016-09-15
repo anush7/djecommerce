@@ -1,9 +1,22 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from functools import wraps
 
 from django.http import Http404
 
+def staff_required(export_func):
+	def export_func_wrap(request, *args, **kwargs):
+
+		if request.user.is_authenticated() and request.user.is_staff:
+			return export_func(request, *args, **kwargs)
+		else:
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+	export_func_wrap.__doc__ = export_func.__doc__
+	export_func_wrap.__name__ = export_func.__name__
+	return export_func_wrap
 
 class StaffRequiredMixin(object):
 	@classmethod
@@ -16,9 +29,7 @@ class StaffRequiredMixin(object):
 		if request.user.is_staff:
 			return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
 		else:
-			raise Http404
-
-
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
 
 class LoginRequiredMixin(object):
 	@classmethod
