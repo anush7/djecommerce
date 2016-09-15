@@ -9,8 +9,17 @@ from django.http import Http404
 
 def staff_required(export_func):
 	def export_func_wrap(request, *args, **kwargs):
-
 		if request.user.is_authenticated() and request.user.is_staff:
+			return export_func(request, *args, **kwargs)
+		else:
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+	export_func_wrap.__doc__ = export_func.__doc__
+	export_func_wrap.__name__ = export_func.__name__
+	return export_func_wrap
+
+def admin_required(export_func):
+	def export_func_wrap(request, *args, **kwargs):
+		if request.user.is_authenticated() and request.user.is_admin:
 			return export_func(request, *args, **kwargs)
 		else:
 			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])

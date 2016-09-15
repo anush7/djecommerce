@@ -15,7 +15,7 @@ from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
 )
 from django.contrib.auth.decorators import login_required
-from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required, AdminRequiredMixin
+from catalog.mixins import *
 from django.utils.decorators import method_decorator
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
@@ -37,6 +37,7 @@ class CatalogListView(AdminRequiredMixin, ListView):
         return Catalog.objects.all().order_by('created_on')
 
 @csrf_exempt
+@admin_required
 def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     data = {}
     html_data = {}
@@ -112,6 +113,7 @@ class CatalogUpdateView(AdminRequiredMixin, UpdateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
+@admin_required
 def delete_catalog(request, pk):
     data = {}
     try:
@@ -121,6 +123,7 @@ def delete_catalog(request, pk):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
+@admin_required
 def change_catalog_status(request, pk):
     data = {}
     try:
@@ -146,6 +149,7 @@ class CategoryListView(AdminRequiredMixin, ListView):
         return CatalogCategory.objects.filter(**key).prefetch_related('children').order_by('name')
 
 @csrf_exempt
+@admin_required
 def ajax_category_list(request, template='catalog/part_category_list.html'):
     data = {}
     html_data = {}
@@ -220,6 +224,7 @@ class CategoryUpdateView(AdminRequiredMixin, UpdateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
+@admin_required
 def delete_category(request, pk):
     data = {}
     try:
@@ -229,6 +234,7 @@ def delete_category(request, pk):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
+@admin_required
 def change_category_status(request, pk):
     data = {}
     try:
