@@ -18,6 +18,19 @@ def staff_required(export_func):
 	export_func_wrap.__name__ = export_func.__name__
 	return export_func_wrap
 
+class AdminRequiredMixin(object):
+	@classmethod
+	def as_view(self, *args, **kwargs):
+		view = super(AdminRequiredMixin, self).as_view(*args, **kwargs)
+		return login_required(view)
+
+	@method_decorator(login_required)
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_admin:
+			return super(AdminRequiredMixin, self).dispatch(request, *args, **kwargs)
+		else:
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+
 class StaffRequiredMixin(object):
 	@classmethod
 	def as_view(self, *args, **kwargs):

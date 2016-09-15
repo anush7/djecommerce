@@ -15,7 +15,7 @@ from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
 )
 from django.contrib.auth.decorators import login_required
-from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required
+from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required, AdminRequiredMixin
 from django.utils.decorators import method_decorator
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
@@ -29,7 +29,7 @@ from catalog.forms import CatalogForm, CatalogCategoryForm, AttributeForm, Attri
 from catalog.utils import image_cropper, get_unique_slug
 
 """########################### CATALOG VIEWS ############################"""
-class CatalogListView(StaffRequiredMixin, ListView):
+class CatalogListView(AdminRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/catalog_list.html'
 
@@ -78,7 +78,7 @@ def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CatalogCreateView(StaffRequiredMixin, CreateView):
+class CatalogCreateView(AdminRequiredMixin, CreateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
@@ -93,7 +93,7 @@ class CatalogCreateView(StaffRequiredMixin, CreateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
-class CatalogUpdateView(StaffRequiredMixin, UpdateView):
+class CatalogUpdateView(AdminRequiredMixin, UpdateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
@@ -135,7 +135,7 @@ def change_catalog_status(request, pk):
 
 """############################### CATEGORY VIEWS #################################"""
 
-class CategoryListView(StaffRequiredMixin, ListView):
+class CategoryListView(AdminRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/category_list.html'
 
@@ -188,7 +188,7 @@ def ajax_category_list(request, template='catalog/part_category_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CategoryCreateView(StaffRequiredMixin, CreateView):
+class CategoryCreateView(AdminRequiredMixin, CreateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
@@ -202,7 +202,7 @@ class CategoryCreateView(StaffRequiredMixin, CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-class CategoryUpdateView(StaffRequiredMixin, UpdateView):
+class CategoryUpdateView(AdminRequiredMixin, UpdateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
@@ -398,13 +398,13 @@ def get_sub_cats(request, template="catalog/load_subcats.html"):
 """#################################################################################################"""
 
 
-class TaxListView(StaffRequiredMixin, ListView):
+class TaxListView(AdminRequiredMixin, ListView):
     template_name = 'catalog/tax_list.html'
 
     def get_queryset(self):
         return Tax.objects.all().order_by('name')
 
-class TaxFormView(StaffRequiredMixin, FormView):
+class TaxFormView(AdminRequiredMixin, FormView):
     template_name = 'catalog/tax_form.html'
     form_class = TaxForm
     success_url = reverse_lazy('staff-tax-list')
@@ -424,7 +424,7 @@ class TaxFormView(StaffRequiredMixin, FormView):
         else:
             return self.form_invalid(form)
 
-class TaxDeleteView(StaffRequiredMixin, View):
+class TaxDeleteView(AdminRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
