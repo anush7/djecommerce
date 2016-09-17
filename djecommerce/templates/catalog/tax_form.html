@@ -6,7 +6,7 @@
 <div class="container-fluid">
 	<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if catalog_obj %}Edit{% else %}Add{% endif %} Tax:</strong></h3>
 
-	<form method='post' enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+	<form method='post' name="tax_form" class="form-horizontal">{% csrf_token %}
 		<div class="form-group">
 			<label for="id_title" class="col-sm-2 control-label">Tax Name</label>
 			<div class="col-xs-4">
@@ -38,6 +38,25 @@
 </div>
 
 <script type="text/javascript">
+
+$(document).ready(function(){
+
+	$("form[name='tax_form']").validate({
+	    rules: {
+	    	name: "required",
+	    	tax_percentage: "required"
+	    },
+	    messages: {
+	    	name: "Please enter the Tax name",
+	    	tax_percentage: "Please enter the tax percentage"
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
+
+});
+
 </script>
 {% endblock %}
 

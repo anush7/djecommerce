@@ -9,17 +9,17 @@
 			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
 			<li role="presentation" class="active">
 				<a href="{{product.get_variants_url}}">
-					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Variants
+					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" data-original-title="No Variants added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Variants
 				</a>
 			</li>
 			<li role="presentation">
 				<a href="{{product.get_stocks_url}}">
-					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Stock
+					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" data-original-title="No Stocks added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Stock
 				</a>
 			</li>
 			<li role="presentation">
 				<a href="{{product.get_images_url}}">
-					{% if not product.get_image_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Images
+					{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images
 				</a>
 			</li>
 			<li style="margin-left:10px; !important">
@@ -29,13 +29,16 @@
 		{% endif %}
 	</div>
 	<div class="row" style="margin-top:15px;">
-		<form method='post' class="form-horizontal">{% csrf_token %}
+		<form method='post' name="variant_form" class="form-horizontal">{% csrf_token %}
 
 			<div class="form-group">
-				<label for="id_title" class="col-md-2 control-label">SKU <span style="color:red;">*</span></label>
+				<label for="id_title" class="col-md-2 control-label">SKU <span data-original-title="Stock Keeping Unit" data-toggle="tooltip" class="glyphicon glyphicon-question-sign"></span><span style="color:red;">*</span></label>
 				<div class="col-xs-4">
 					{{form.sku}}
 					<p style="color:red;">{{ form.sku.errors.as_text }}</p>
+				</div>
+				<div style="margin-top:7px;">
+					<a target='_blank' href='https://en.wikipedia.org/wiki/Stock_keeping_unit'>Learn more <span class='glyphicon glyphicon-new-window'></span></a>
 				</div>
 			</div>
 			<div class="form-group">
@@ -55,16 +58,15 @@
 			{% endfor %}
 
 			<div class="form-group">
-				<label for="id_content" class="col-md-2 control-label">Price Override(optional)</label>
+				<label for="id_content" class="col-md-2 control-label">Price Override <span data-original-title="This price will override the product price for this variant" data-toggle="tooltip" class="glyphicon glyphicon-question-sign"></span></label>
 				<div class="col-xs-4">
 					{{form.price}}
-					<!-- <span style="display:inline-block;float:right;" data-original-title="If provided will override the product price" data-toggle="tooltip" class="glyphicon glyphicon-question-sign"></span> -->
 					<p style="color:red;">{{ form.price.errors.as_text }}</p>
 				</div>
 			</div>
 
 			<div class="form-group">
-				<label for="id_content" class="col-md-2 control-label">Deafult Selected</label>
+				<label for="id_content" class="col-md-2 control-label">Deafult Selected <span data-original-title="This variant will be selected by default in the product page." data-toggle="tooltip" class="glyphicon glyphicon-question-sign"></span></label>
 				<div class="col-xs-4">
 					{{form.default}}
 				</div>
@@ -82,7 +84,27 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-
+	$("form[name='variant_form']").validate({
+	    rules: {
+	    	sku: "required",
+	    	name: "required",
+	    	price: {
+	    		required: true,
+	    		number: true
+	    	}
+	    },
+	    messages: {
+	    	sku: "Please enter the SKU(Stock Keeping Unit)",
+	    	name: "Please enter the variant name",
+	    	price: {
+	    		required:"Please select a price",
+	    		number:"Please enter a number"
+	    	}
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
 });    
 </script>
 {% endblock %}

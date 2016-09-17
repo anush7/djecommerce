@@ -8,13 +8,13 @@
 		<ul class="nav nav-tabs">
 			<li role="presentation" class="active"><a href="{{product.get_absolute_url}}">Product</a></li>
 			<li role="presentation">
-				<a {% if product %}href="{{product.get_variants_url}}"{% endif %}>{% if not product.get_variant_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Variants</a>
+				<a {% if product %}href="{{product.get_variants_url}}"{% endif %}>{% if not product.get_variant_count %}<span style="margin-bottom:2px;" data-original-title="No Variants added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Variants</a>
 			</li>
 			<li role="presentation">
-				<a {% if product %}href="{{product.get_stocks_url}}"{% endif %}>{% if not product.get_stock_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Stock</a>
+				<a {% if product %}href="{{product.get_stocks_url}}"{% endif %}>{% if not product.get_stock_count %}<span style="margin-bottom:2px;" data-original-title="No Stocks added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Stock</a>
 			</li>
 			<li role="presentation">
-				<a {% if product %}href="{{product.get_images_url}}"{% endif %}>{% if not product.get_image_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Images</a>
+				<a {% if product %}href="{{product.get_images_url}}"{% endif %}>{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images</a>
 			</li>
 			<li style="margin-left:10px; !important">
 				<h4>| {% if product %}{% if product.status == 'A' %} Status: Active{% else %} Status: InActive{% endif %}{% else %}Status: InActive{% endif %}</h4>
@@ -22,7 +22,7 @@
 		</ul>
 	</div>
 	<div class="row" style="margin-top:15px;">
-		<form method='post' class="form-horizontal">{% csrf_token %}
+		<form method='post' name="product_form" class="form-horizontal">{% csrf_token %}
 
 			<div class="form-group">
 				<label for="id_title" class="col-md-2 control-label">Title <span style="color:red;">*</span></label>
@@ -42,7 +42,7 @@
 				<label for="id_title" class="col-sm-2 control-label">Category <span style="color:red;">*</span></label>
 				<div class="col-xs-3">
 					<select id="id_parent_category" name="parent_category" class="form-control">
-						<option>--</option>
+						<option></option>
 			            {% for cat in parent_cats %}
 			                <option {% if cat.id == selected_parent_cat.id %}selected{% endif %} 
 			                	value="{{cat.id}}">{{cat.name}}
@@ -100,7 +100,35 @@
 </div>
 
 <script type="text/javascript">
+
 $(document).ready(function(){
+
+	$("form[name='product_form']").validate({
+	    rules: {
+	    	title: "required",
+	    	description: "required",
+	    	parent_category: "required",
+	    	category: "required",
+	    	price: {
+	    		required: true,
+	    		number: true
+	    	}
+	    },
+	    messages: {
+	    	title: "Please enter the title",
+	    	description: "Please enter the description",
+	    	parent_category: "Please select a parent category",
+	    	category: "Please select a Sub category",
+	    	price: {
+	    		required:"Please select a price",
+	    		number:"Please enter a number"
+	    	}
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
+
 	$('#id_category').multiselect({
 		includeSelectAllOption: true,
 		enableFiltering: true
@@ -161,6 +189,20 @@ $(document).ready(function(){
     //         }
     //     });
     // });
+
+    // $(function() {
+	// });
+
+
+	    // messages: {
+	    // 	firstname: "Please enter your firstname",
+	    // 	lastname: "Please enter your lastname",
+	    // 	password: {
+	    // 		required: "Please provide a password",
+	    // 		minlength: "Your password must be at least 5 characters long"
+	    // 	},
+	    // 	email: "Please enter a valid email address"
+	   	// },
 
 });    
 </script>

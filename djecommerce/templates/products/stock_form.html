@@ -10,17 +10,17 @@
 			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
 			<li role="presentation">
 				<a href="{{product.get_variants_url}}">
-					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Variants
+					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" data-original-title="No Variants added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Variants
 				</a>
 			</li>
 			<li role="presentation" class="active">
 				<a href="{{product.get_stocks_url}}">
-					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Stock
+					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" data-original-title="No Stocks added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Stock
 				</a>
 			</li>
 			<li role="presentation">
 				<a href="{{product.get_images_url}}">
-					{% if not product.get_image_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Images
+					{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images
 				</a>
 			</li>
 			<li style="margin-left:10px; !important">
@@ -30,7 +30,7 @@
 		{% endif %}
 	</div>
 	<div class="row" style="margin-top:15px;">
-		<form method='post' class="form-horizontal">{% csrf_token %}
+		<form method='post' name="stock_form" class="form-horizontal">{% csrf_token %}
 
 			<div class="form-group">
 				<label for="id_title" class="col-md-2 control-label">Variant <span style="color:red;">*</span></label>
@@ -73,6 +73,43 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
+
+	$("form[name='stock_form']").validate({
+	    rules: {
+	    	variant: "required",
+	    	quantity: {
+	    		required: true,
+	    		number: true
+	    	},
+	    	quantity_allocated: {
+	    		required: true,
+	    		number: true
+	    	},
+	    	cost_price: {
+	    		required: true,
+	    		number: true
+	    	}
+	    },
+	    messages: {
+	    	variant: "Please select a variant",
+	    	quantity: {
+	    		required:"Please enter the variant quantity",
+	    		number:"Please enter a number"
+	    	},
+	    	quantity_allocated: {
+	    		required:"Please enter the quantity already allocated",
+	    		number:"Please enter a number"
+	    	},
+	    	cost_price: {
+	    		required:"Please select a price",
+	    		number:"Please enter a number"
+	    	}
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
+
 
 });    
 </script>

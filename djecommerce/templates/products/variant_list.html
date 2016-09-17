@@ -8,17 +8,17 @@
 			<li role="presentation"><a href="{{product.get_absolute_url}}">Product</a></li>
 			<li role="presentation" class="active">
 				<a href="{{product.get_variants_url}}">
-					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Variants
+					{% if not product.get_variant_count %}<span style="margin-bottom:2px;" data-original-title="No Variants added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Variants
 				</a>
 			</li>
 			<li role="presentation">
 				<a href="{{product.get_stocks_url}}">
-					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Stock
+					{% if not product.get_stock_count %}<span style="margin-bottom:2px;" data-original-title="No Stocks added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Stock
 				</a>
 			</li>
 			<li role="presentation">
 				<a href="{{product.get_images_url}}">
-					{% if not product.get_image_count %}<span style="margin-bottom:2px;" class="badge">!</span> {% endif %}Images
+					{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images
 				</a>
 			</li>
 			<li style="margin-left:10px; !important">

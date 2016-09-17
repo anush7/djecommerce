@@ -23,7 +23,7 @@ if settings.DEBUG:
       private_key=settings.BRAINTREE_PRIVATE)
 
 
-class CartView(LoginRequiredMixin, SingleObjectMixin, View):
+class CartView(SingleObjectMixin, View):
 	model = Cart
 	template = "carts/cart.html"
 
@@ -110,7 +110,7 @@ class CartView(LoginRequiredMixin, SingleObjectMixin, View):
 		return render(request, self.template, context)
 
 
-class CheckoutView(LoginRequiredMixin, CartOrderMixin, FormMixin, DetailView):
+class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 	model = Cart
 	form_class = UserSignUpForm
 	template_name = "carts/checkout.html"
@@ -179,7 +179,7 @@ class CheckoutFinalView(LoginRequiredMixin, CartOrderMixin, View):
 
 
 
-class CartCountView(LoginRequiredMixin, View):
+class CartCountView(View):
 	def get(self, request, *args, **kwargs):
 		if request.is_ajax():
 			cart_id = self.request.session.get("cart_id")

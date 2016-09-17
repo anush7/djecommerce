@@ -5,7 +5,7 @@
 
 <div class="container-fluid">
 	<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if catalog_obj %}Edit{% else %}Add{% endif %} Catalog:</strong></h3>
-	<form method='post' enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
+	<form method='post' name="catalog_form" class="form-horizontal">{% csrf_token %}
 		<div class="form-group">
 			<label for="id_title" class="col-sm-2 control-label">Name</label>
 			<div class="col-xs-4">
@@ -37,5 +37,26 @@
 </div>
 
 <script type="text/javascript">
+
+$(document).ready(function(){
+
+	$("form[name='catalog_form']").validate({
+	    rules: {
+	    	name: "required",
+	    	description: "required",
+	    	categories: "required"
+	    },
+	    messages: {
+	    	name: "Please enter the name",
+	    	description: "Please enter the description",
+	    	categories: "Please select a categories"
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
+
+});
+
 </script>
 {% endblock %}
