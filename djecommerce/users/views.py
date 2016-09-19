@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth import authenticate, login
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django.core.mail import send_mail
@@ -16,6 +17,7 @@ from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
+from catalog.mixins import AdminRequiredMixin
 
 def home(request,template='account/home.html'):
     return render(request, template)
@@ -213,5 +215,42 @@ class UserProfileUpdateView(UpdateView):
 	# def form_valid(self, form, *args, **kwargs):
 	# 	form.instance.user = self.request.user
 	# 	return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
+
+
+class StaffPermissionView(AdminRequiredMixin, TemplateView):
+    template_name = 'users/permissions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StaffPermissionView, self).get_context_data(**kwargs)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.getlist('category'):
+            messages.error(request, "Please select a category")
+            return render(request, self.template_name, {})
+
+        messages.success(request, "Import Complete")
+        return render(request, self.template_name, {})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

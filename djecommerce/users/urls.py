@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^login/$', views.user_signin, name='user_signin'),
 
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
+    url(r'^staff-permissions$', views.StaffPermissionView.as_view(), name='staff_permissions'),
 
 	url(r'^settings/?$', views.account_settings, name='account_settings'),
     url(r'^settings/change-password$', views.change_password, name='change-password'),
