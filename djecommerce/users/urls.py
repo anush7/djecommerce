@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^login/$', views.user_signin, name='user_signin'),
 
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
-    url(r'^user-management$', views.UserManagementView.as_view(), name='user_management'),
+    url(r'^staff-management$', views.StaffManagementView.as_view(), name='staff_management'),
     url(r'^staff-permissions$', views.StaffPermissionView.as_view(), name='staff_permissions'),
 
 	url(r'^settings/?$', views.account_settings, name='account_settings'),
