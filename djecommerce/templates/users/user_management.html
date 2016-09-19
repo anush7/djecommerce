@@ -3,14 +3,93 @@
 {% block content %}
 
 <div class="container">
-
-
+    <div class="row">
+        <div class="col-md-2" style="width:13.1% !important">
+            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'staff-attribute-add' %}">Invite Staff</a>
+        </div>
+        <div class="col-md-9" style="margin-top:15px;">
+            <input id="id_search_staff" type="text" class="form-control" placeholder="Search staff" style="margin-top:-15px;margin-bottom:10px;width:300px;float: left;">
+            <select id="status_type" class="form-control" style="float:left;width:200px;margin-top:-15px;margin-left:10px;">
+                <option value="A">Active</option>
+                <option value="I">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-12" style="margin-top:15px;">
+            <div id="ajax_staff_list" style="clear: left;">
+                <div class="row">
+				    <div id="MainMenu" class="col-sm-4 col-lg-10 col-md-4" >
+				        <div class="list-group">
+				            {% for staff in object_list %}
+				                <div id="id_staff_{{staff.id}}">
+				                    <div class="col-lg-8" >
+				                        <li class="list-group-item">
+				                            {{staff.get_full_name}}
+				                        </li>
+				                        <a href="{% url 'staff-staff-edit' staff.id %}" title="Edit staff" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+				                        <a onclick="delete_staff({{staff.id}})" href="javascript:void(0);" title="Delete staff" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+				                    </div>
+				                    <div class="col-lg-2" >
+				                        <button id="id_active_{{staff.id}}" onclick="change_status({{staff.id}},'I');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if staff.status == 'I' %}display:none;{% endif %}">Active</button>
+				                        <button id="id_inactive_{{staff.id}}" onclick="change_status({{staff.id}},'A');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if staff.status == 'A' %}display:none;{% endif %}">Inactive</button>
+				                    </div>
+				                </div>
+				            {% endfor %}
+				        </div>
+				    </div>
+				</div>
+            </div>
+        </div>
+    </div>
 </div>
 
-
+<input type="hidden" name="search" id="id_search">
+<input type="hidden" name="status" id="id_status">
 <script type="text/javascript">
 $(document).ready(function(){
 
-});    
+    $('#id_search_attribute').on('keyup',function() {
+        var search_key = $('#id_search_attribute').val();
+        $('#id_search').val(search_key);
+        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        dataString+='&q='+search_key;
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-attribute-list" %}',
+            success: function(data){
+                $('#ajax_attribute_list').empty().append(data['html']);
+            }
+        });
+    });
+
+    $('#status_type').on('change',function() {
+        $('#id_search_attribute').val('');
+        clear_filter();
+        $('#id_category').prop('selectedIndex',0);
+
+        var status = $('#status_type option:selected').val();
+        $('#id_status').val(status);
+        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        dataString+='&s='+status;
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff-ajax-attribute-list" %}',
+            success: function(data){
+                $('#ajax_attribute_list').empty().append(data['html']);
+            }
+        });
+    });
+});
+
+function clear_filter(argument) {
+    $('#id_search').val('');
+    $('#id_status').val('');
+}
 </script>
 {% endblock %}
