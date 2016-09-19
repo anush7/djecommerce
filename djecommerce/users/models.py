@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.core.mail import send_mail
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Permission, Group
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -18,6 +18,9 @@ if settings.DEBUG:
 
 def generate_uuid():
     return str(uuid.uuid4()).replace("-", "")
+
+class EGroup(Group):
+    categories = models.ManyToManyField('catalog.CatalogCategory',blank=True)
 
 class EcUserManager(BaseUserManager):
     use_in_migrations = True
