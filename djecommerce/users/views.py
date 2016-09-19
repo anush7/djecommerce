@@ -217,6 +217,22 @@ class UserProfileUpdateView(UpdateView):
 	# 	return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
 
+class UserManagementView(AdminRequiredMixin, TemplateView):
+    template_name = 'users/user_management.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserManagementView, self).get_context_data(**kwargs)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.getlist('category'):
+            messages.error(request, "Please select a category")
+            return render(request, self.template_name, {})
+
+        messages.success(request, "Import Complete")
+        return render(request, self.template_name, {})
+
+
 class StaffPermissionView(AdminRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
 
