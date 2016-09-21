@@ -1,14 +1,15 @@
 import re
 import json
 import uuid
-from django.http import HttpResponse, HttpResponseRedirect  
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.contrib import messages
+from django.db.models import Q, Value
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth import authenticate, login
-from django.views.generic.base import TemplateView
+from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 from django.core.mail import send_mail
@@ -217,20 +218,75 @@ class UserProfileUpdateView(UpdateView):
 	# 	return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
 
-class StaffManagementView(AdminRequiredMixin, TemplateView):
-    template_name = 'users/user_management.html'
+class StaffManagementView(AdminRequiredMixin, ListView):
+	template_name = 'users/user_management.html'
+	paginate_by = 1
 
-    def get_context_data(self, **kwargs):
-        context = super(StaffManagementView, self).get_context_data(**kwargs)
-        return context
+	def get_queryset(self):
+		key = {'is_staff':True,'is_superuser':False}
+		user_status = self.request.GET.get('s','A')
+		if user_status == 'A':key['is_active'] = True
+		else:key['is_active'] = False
+		staffs = User.objects.filter(**key).order_by('first_name')
+		return staffs
 
-    def post(self, request, *args, **kwargs):
-        if request.POST.getlist('category'):
-            messages.error(request, "Please select a category")
-            return render(request, self.template_name, {})
+	def get_context_data(self, **kwargs):
+	    context = super(StaffManagementView, self).get_context_data(**kwargs)
+	    return context
 
-        messages.success(request, "Import Complete")
-        return render(request, self.template_name, {})
+	def get(self, request, *args, **kwargs):
+		self.object_list = self.get_queryset()
+
+		if request.is_ajax():
+			html_data = {}
+			staff_id = request.GET.get('staff_id')
+			skey = request.GET.get('key')
+			if staff_id:
+				staff = User.objects.get(id=staff_id)
+				if request.GET.get('status'):
+					if request.GET.get('status','A') == 'A':staff.is_active = True
+					else: staff.is_active = False
+					staff.save()
+					html_data['status'] = 1
+				elif request.GET.get('delete'):
+					staff.delete()
+
+			if skey:
+				self.object_list = self.get_queryset().filter(
+					Q(first_name__startswith=skey)|Q(last_name__startswith=skey)|Q(email__startswith=skey)
+				)
+
+			context = self.get_context_data(**kwargs)
+			html_data['html'] = render_to_string('users/part_staff_users.html',context,context_instance=RequestContext(request))
+			return JsonResponse(html_data)
+
+		context = self.get_context_data(**kwargs)
+		return self.render_to_response(context)
+
+	def post(self, request, *args, **kwargs):
+		self.object_list = self.get_queryset()
+		
+		if request.is_ajax():
+			html_data = {}
+
+			context = self.get_context_data(**kwargs)
+			html_data['html'] = render_to_string('users/part_staff_users.html',context,context_instance=RequestContext(request))
+			return JsonResponse(html_data)
+
+		messages.error(request, "Please select a category")
+		messages.success(request, "Import Complete")
+		context = self.get_context_data(**kwargs)
+		return render(request, self.template_name, {})
+
+
+class StaffInviteView(AdminRequiredMixin, View):
+
+	def post(self, request, *args, **kwargs):
+		invite_emails = request.POST.getlist('invite_email')
+		print "11111111111111111111111111111111111111111111"
+		print request.POST.getlist('invite_email')
+		print "11111111111111111111111111111111111111111111"
+		return JsonResponse({'status':1})
 
 
 class StaffPermissionView(AdminRequiredMixin, TemplateView):

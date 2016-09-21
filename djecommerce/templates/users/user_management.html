@@ -4,42 +4,69 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-2" style="width:13.1% !important">
-            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'staff-attribute-add' %}">Invite Staff</a>
+        <div class="col-md-2" xstyle="width:13.1% !important">
+            <a data-toggle="modal" data-target="#myModal" style="margin-bottom:10px;" class="btn btn-primary" xhref="{% url 'staff-attribute-add' %}">Invite Staff</a>
         </div>
-        <div class="col-md-9" style="margin-top:15px;">
+        <div class="col-md-3" style="margin-top:15px;">
             <input id="id_search_staff" type="text" class="form-control" placeholder="Search staff" style="margin-top:-15px;margin-bottom:10px;width:300px;float: left;">
+        </div>
+        <div class="col-md-3" style="margin-top:15px;">
             <select id="status_type" class="form-control" style="float:left;width:200px;margin-top:-15px;margin-left:10px;">
                 <option value="A">Active</option>
                 <option value="I">Inactive</option>
             </select>
         </div>
-        <div class="col-md-12" style="margin-top:15px;">
+        <div class="col-md-offset-1 col-md-1">
+            <h3 style="margin-top:0px;padding-top:0px;">Roles</h3>
+        </div>
+        <div class="col-md-2">
+            <a href="javascript:void(0);" style="float:right;" class="btn btn-default">Add Role</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8" >
             <div id="ajax_staff_list" style="clear: left;">
-                <div class="row">
-				    <div id="MainMenu" class="col-sm-4 col-lg-10 col-md-4" >
-				        <div class="list-group">
-				            {% for staff in object_list %}
-				                <div id="id_staff_{{staff.id}}">
-				                    <div class="col-lg-8" >
-				                        <li class="list-group-item">
-				                            {{staff.get_full_name}}
-				                        </li>
-				                        <a href="{% url 'staff-staff-edit' staff.id %}" title="Edit staff" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-				                        <a onclick="delete_staff({{staff.id}})" href="javascript:void(0);" title="Delete staff" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
-				                    </div>
-				                    <div class="col-lg-2" >
-				                        <button id="id_active_{{staff.id}}" onclick="change_status({{staff.id}},'I');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if staff.status == 'I' %}display:none;{% endif %}">Active</button>
-				                        <button id="id_inactive_{{staff.id}}" onclick="change_status({{staff.id}},'A');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if staff.status == 'A' %}display:none;{% endif %}">Inactive</button>
-				                    </div>
-				                </div>
-				            {% endfor %}
-				        </div>
-				    </div>
-				</div>
+                {% include 'users/part_staff_users.html' %}
+            </div>
+        </div>
+        <div class="col-md-offset-1 col-md-3">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    sdvds
+                    <a href="javascript:void(0);" style="display:inline-block;float:right;" title="Delete Role">
+                        <span class="glyphicon glyphicon-trash" ></span>
+                    </a>
+                    <a href="javascript:void(0);" style="display:inline-block;float:right;margin-right:7px;" title="Update Role">
+                        <span class="glyphicon glyphicon-pencil" ></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Staff Invite</h4>
+                </div>
+                <form id="invite_form" action="{% url 'staff_invite' %}" method="POST">
+                    <div class="modal-body">
+                        <input type="text" name="invite_email" class="form-control" placeholder="Email address">
+                        <input type="text" name="invite_email" style="margin-top:10px;" class="form-control" placeholder="Email address">
+                        <input type="text" name="invite_email" style="margin-top:10px;" class="form-control" placeholder="Email address">
+                        <input type="text" name="invite_email" style="margin-top:10px;" class="form-control" placeholder="Email address">
+                    </div>
+                    <div class="modal-footer">
+                        <button id="invite_submit_btn" type="submit" class="btn btn-default">Invite</button>
+                        <a id="invite_msg" style="display:none;" href="javascript:void(0);" style="cursor:default;" class="btn btn-default">Invites Sent!</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
 </div>
 
 <input type="hidden" name="search" id="id_search">
@@ -47,11 +74,11 @@
 <script type="text/javascript">
 $(document).ready(function(){
 
-    $('#id_search_attribute').on('keyup',function() {
-        var search_key = $('#id_search_attribute').val();
+    $('#id_search_staff').on('keyup',function() {
+        var search_key = $('#id_search_staff').val();
         $('#id_search').val(search_key);
-        var dataString='csrfmiddlewaretoken={{csrf_token}}';
-        dataString+='&q='+search_key;
+        var dataString='';
+        dataString+='&key='+search_key;
         if($('#id_status').val()!='' && $('#id_status').val()!=null){
             dataString+="&s="+$('#id_status').val();
         }
@@ -59,37 +86,80 @@ $(document).ready(function(){
             type: 'GET',
             dataType: 'json',
             data: dataString,
-            url: '{% url "staff-ajax-attribute-list" %}',
+            url: '{% url "staff_management" %}',
             success: function(data){
-                $('#ajax_attribute_list').empty().append(data['html']);
+                $('#ajax_staff_list').empty().append(data['html']);
             }
         });
     });
 
     $('#status_type').on('change',function() {
-        $('#id_search_attribute').val('');
+        $('#id_search_staff').val('');
         clear_filter();
-        $('#id_category').prop('selectedIndex',0);
-
         var status = $('#status_type option:selected').val();
         $('#id_status').val(status);
-        var dataString='csrfmiddlewaretoken={{csrf_token}}';
+        var dataString='';
         dataString+='&s='+status;
         $.ajax({
             type: 'GET',
             dataType: 'json',
             data: dataString,
-            url: '{% url "staff-ajax-attribute-list" %}',
+            url: '{% url "staff_management" %}',
             success: function(data){
-                $('#ajax_attribute_list').empty().append(data['html']);
+                $('#ajax_staff_list').empty().append(data['html']);
             }
         });
     });
+
+    $("#invite_form").submit(function(e) {
+        e.preventDefault();
+        var dataString='&csrfmiddlewaretoken={{csrf_token}}';
+        $.ajax({
+            type: "POST",
+            url: '{% url "staff_invite" %}',
+            data: $("#invite_form").serialize()+dataString,
+            success: function(data){
+                if(data.status == 1){
+                    $('#invite_submit_btn').hide();
+                    $('#invite_msg').fadeIn('slow');
+                    setTimeout(function(){
+                        $('#myModal').modal('hide');
+                        $('#invite_msg').hide();
+                        $('#invite_submit_btn').fadeIn('slow');
+                    }, 1000);
+                }
+            }
+        });
+    }); 
 });
+
 
 function clear_filter(argument) {
     $('#id_search').val('');
     $('#id_status').val('');
+}
+
+function pagination(p){
+    var dataString='';
+    dataString+="page="+p;
+    if($('#id_search').val()!='' && $('#id_search').val()!=null){
+        dataString+="&q="+$('#id_search').val();
+    }
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        url: '{% url "staff_management" %}',
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        success:function(data){
+            $('#ajax_staff_list').empty().append(data['html']);
+        },
+        error:function(data){
+            console.log(data.error)
+        }
+    });
 }
 </script>
 {% endblock %}

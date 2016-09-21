@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^login/$', views.user_signin, name='user_signin'),
 
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
+
+    url(r'^staff-invite$', views.StaffInviteView.as_view(), name='staff_invite'),
     url(r'^staff-management$', views.StaffManagementView.as_view(), name='staff_management'),
     url(r'^staff-permissions$', views.StaffPermissionView.as_view(), name='staff_permissions'),
 

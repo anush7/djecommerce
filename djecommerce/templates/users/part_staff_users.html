@@ -1,0 +1,92 @@
+
+<div class="row">
+    <ul class="list-group">
+        {% for staff in object_list %}
+            <div class="" id="staff_{{staff.id}}">
+                <li class="list-group-item">
+                    {{staff.get_full_name}} <b>|</b> {{staff.email}}
+                    <a  {% if staff.is_superuser %}onclick="event.preventDefault();"{% else %}onclick="delete_staff({{staff.id}})"{% endif %} style="display:inline-block;float:right;{% if staff.is_superuser %}opacity: 0.25;{% endif %}" href="javascript:void(0);" title="Delete staff">
+                        <span class="glyphicon glyphicon-trash" ></span>
+                    </a>
+                    <button id="id_active_{{staff.id}}" onclick="change_status({{staff.id}},'I');" style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;{% if not staff.is_active %}display:none;{% endif %}">Active</button>
+                    <button id="id_inactive_{{staff.id}}" onclick="change_status({{staff.id}},'A');" style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;{% if staff.is_active %}display:none;{% endif %}">Inactive</button>
+                    <select style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;"">
+                        <option>Role1</option>
+                        <option>Role2</option>
+                    </select>
+                </li>
+            </div>
+        {% empty %}
+            <p style="margin-left:15px;margin-top:25px;">No staff Found!</p>
+        {% endfor %}
+    </ul>
+</div>
+<div class="row">
+    {% if page_obj.paginator.num_pages > 1 %}
+        <nav>
+            <ul class="pager">
+                {% if page_obj.has_previous %}
+                    <li><a onclick="pagination({{page_obj.previous_page_number}});" href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                {% endif %}
+                <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</li>
+                {% if page_obj.has_next %}
+                    <li><a onclick="pagination({{page_obj.next_page_number}});" href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+<script type="text/javascript">
+
+function change_status(cid, status){
+    var dataString='';
+    dataString+=''
+    dataString+='&staff_id='+cid+'&status='+status
+    if($('#id_status').val()!='' && $('#id_status').val()!=null){
+        dataString+="&s="+$('#id_status').val();
+    }
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: '{% url "staff_management" %}'+'?page='+{{page_obj.number}},
+        success: function(data){
+            if(data.status == 1){
+                if(status == 'A'){
+                    $('#id_active_'+cid).show();
+                    $('#id_inactive_'+cid).hide();
+                }else{
+                    $('#id_inactive_'+cid).show();
+                    $('#id_active_'+cid).hide();
+                }
+                $('#staff_'+cid).fadeOut('slow');
+                $('#ajax_staff_list').empty().append(data['html']);
+            }else{
+                alert('oops! not able to process your request. Please try again later.')
+            }
+        }
+    });
+}
+
+function delete_staff(sid){
+    var is_delete = confirm("Are you sure you want to delete this staff user?");
+    if (is_delete){
+        var dataString='';
+        dataString+=''
+        dataString+='&staff_id='+sid+'&delete='+true
+        if($('#id_status').val()!='' && $('#id_status').val()!=null){
+            dataString+="&s="+$('#id_status').val();
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff_management" %}'+'?page='+{{page_obj.number}},
+            success: function(data){
+                $('#ajax_staff_list').empty().append(data['html']);
+            }
+        });
+    }
+}
+
+</script>
