@@ -113,7 +113,7 @@
 	{% endwith %}
 	{% if messages %}
 		<div class='container'>
-			<div class='alert alert-success text-center alert-dismissible'>
+			<div class='alert alert-success text-center alert-dismissible main-alert-success'>
 		 		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				{% for message in messages %}
 		  			<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p><br/>
@@ -153,6 +153,10 @@
     }
     $(document).ready(function(){
      	updateCartItemCount();
+
+     	setTimeout(function(){ 
+			$(".main-alert-success").fadeOut();
+		}, 2000);
 
      	$('[data-toggle="tooltip"]').tooltip({
 	        placement: 'top'

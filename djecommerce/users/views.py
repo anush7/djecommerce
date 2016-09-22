@@ -8,6 +8,8 @@ from django.shortcuts import render, render_to_response, get_list_or_404,get_obj
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.contrib.auth.models import Permission, Group
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate, login
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -297,15 +299,41 @@ class StaffPermissionView(AdminRequiredMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if request.POST.getlist('category'):
-            messages.error(request, "Please select a category")
-            return render(request, self.template_name, {})
+    	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    	print request.POST.getlist('perms',[])
+    	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    	perms = request.POST.getlist('perms',[])
+    	group = request.POST.get('group',False)
 
-        messages.success(request, "Import Complete")
+    	Permission.objects.filter(codename__in=perms)
+
+
+        # if request.POST.getlist('category'):
+        #     messages.error(request, "Please select a category")
+        #     return render(request, self.template_name, {})
+
+        messages.success(request, "Permissions Updated.")
         return render(request, self.template_name, {})
 
 
+# class StaffRoleCreateView(CreateView):
+# 	form_class = UserAddressForm
+# 	template_name = "orders/add_address.html"
+# 	success_url = reverse_lazy("order_address")
 
+# 	def form_valid(self, form, *args, **kwargs):
+# 		form.instance.user = self.request.user
+# 		return super(UserAddressCreateView, self).form_valid(form, *args, **kwargs)
+
+# class StaffRoleUpdateView(UpdateView):
+# 	model = UserAddress
+# 	form_class = UserAddressForm
+# 	template_name = "orders/add_address.html"
+# 	success_url = reverse_lazy("order_address")
+
+# 	def form_valid(self, form, *args, **kwargs):
+# 		form.instance.user = self.request.user
+# 		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
 
 
