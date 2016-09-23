@@ -5,12 +5,14 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http40
 from django.contrib import messages
 from django.db.models import Q, Value
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
+from django.core.paginator import InvalidPage, Paginator
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate, login
+from django.utils.translation import ugettext as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
@@ -18,9 +20,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
+from users.models import EGroup
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
 from catalog.mixins import AdminRequiredMixin
+from catalog.models import Catalog, CatalogCategory
 
 def home(request,template='account/home.html'):
     return render(request, template)
@@ -234,7 +238,37 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 
 	def get_context_data(self, **kwargs):
 	    context = super(StaffManagementView, self).get_context_data(**kwargs)
+	    context['roles'] = EGroup.objects.all()
 	    return context
+
+	def paginate_queryset(self, queryset, page_size):
+	    """
+	    Paginate the queryset, if needed.
+	    """
+	    paginator = self.get_paginator(
+	        queryset, page_size, orphans=self.get_paginate_orphans(),
+	        allow_empty_first_page=self.get_allow_empty())
+	    page_kwarg = self.page_kwarg
+	    page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
+	    try:
+	        page_number = int(page)
+	    except ValueError:
+	        if page == 'last':
+	            page_number = paginator.num_pages
+	        else:
+	            raise Http404(_("Page is not 'last', nor can it be converted to an int."))
+	    try:
+	        page = paginator.page(page_number)
+	        return (paginator, page, page.object_list, page.has_other_pages())
+	    except InvalidPage as e:
+	    	try:
+	    		page = paginator.page(page_number-1)
+	    		return (paginator, page, page.object_list, page.has_other_pages())
+	    	except:
+		        raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
+		            'page_number': page_number,
+		            'message': str(e)
+				})
 
 	def get(self, request, *args, **kwargs):
 		self.object_list = self.get_queryset()
@@ -281,6 +315,18 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 		return render(request, self.template_name, {})
 
 
+class StaffRoleDeleteView(AdminRequiredMixin, View):
+
+	def post(self, request, *args, **kwargs):
+		data = {}
+		roleId = request.POST.get('role_id')
+		try:
+			if roleId:
+				EGroup.objects.get(id=roleId).delete()
+				return JsonResponse({'status':1})
+		except:pass
+		return JsonResponse({'status':0})
+
 class StaffInviteView(AdminRequiredMixin, View):
 
 	def post(self, request, *args, **kwargs):
@@ -291,29 +337,62 @@ class StaffInviteView(AdminRequiredMixin, View):
 		return JsonResponse({'status':1})
 
 
-class StaffPermissionView(AdminRequiredMixin, TemplateView):
+class StaffRoleView(AdminRequiredMixin, TemplateView):
     template_name = 'users/permissions.html'
 
     def get_context_data(self, **kwargs):
-        context = super(StaffPermissionView, self).get_context_data(**kwargs)
+        context = super(StaffRoleView, self).get_context_data(**kwargs)
+        context['parent_cats'] = CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
         return context
 
+    def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+
+		if request.is_ajax() and request.GET.get('delete') and request.GET.get('role_id'):
+			data = {}
+			try:
+				role = EGroup.objects.get(id=int(request.GET.get('role_id')))
+				role.delete()
+				data['status'] = 1
+			except:data['status'] = 0
+			return JsonResponse(data)
+
+		if kwargs.get('pk'):
+			role = EGroup.objects.get(id=kwargs['pk'])
+			context['role'] = role
+			context['permissions'] = role.permissions.values_list('codename', flat=True)
+		
+		return self.render_to_response(context)
+
     def post(self, request, *args, **kwargs):
+    	context = self.get_context_data(**kwargs)
     	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
-    	print request.POST.getlist('perms',[])
+    	print request.POST
     	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+
     	perms = request.POST.getlist('perms',[])
-    	group = request.POST.get('group',False)
+    	pcats = request.POST.getlist('parent_category',[])
+    	grp_id = request.POST.get('grp_id',False)
+    	grp_name = request.POST.get('role_name',False)
 
-    	Permission.objects.filter(codename__in=perms)
+    	if grp_id:
+    		grp = EGroup.objects.get(id=grp_id)
+    		grp.name = grp_name
+    		grp.save()
+    		grp.permissions.clear()
+    		grp.categories.clear()
+    		messages.success(request, "Role updated successfully!")
+    	else:
+    		grp = EGroup.objects.create(name=grp_name)
+    		messages.success(request, "Role added successfully!")
 
+    	grp.permissions = Permission.objects.filter(codename__in=perms)
+    	grp.categories = CatalogCategory.objects.filter(id__in=pcats)
 
-        # if request.POST.getlist('category'):
-        #     messages.error(request, "Please select a category")
-        #     return render(request, self.template_name, {})
+    	context['role'] = grp
+    	context['permissions'] = grp.permissions.values_list('codename', flat=True)
 
-        messages.success(request, "Permissions Updated.")
-        return render(request, self.template_name, {})
+        return render(request, self.template_name, context)
 
 
 # class StaffRoleCreateView(CreateView):

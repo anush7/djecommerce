@@ -20,7 +20,7 @@
             <h3 style="margin-top:0px;padding-top:0px;">Roles</h3>
         </div>
         <div class="col-md-2">
-            <a href="{% url 'staff_permissions' %}" style="float:right;" class="btn btn-primary">Add Role</a>
+            <a href="{% url 'staff_role' %}" style="float:right;" class="btn btn-primary">Add Role</a>
         </div>
     </div>
     <div class="row">
@@ -31,15 +31,13 @@
         </div>
         <div class="col-md-offset-1 col-md-3">
             <ul class="list-group">
-                <li class="list-group-item">
-                    sdvds
-                    <a href="javascript:void(0);" style="display:inline-block;float:right;" title="Delete Role">
-                        <span class="glyphicon glyphicon-trash" ></span>
-                    </a>
-                    <a href="javascript:void(0);" style="display:inline-block;float:right;margin-right:7px;" title="Update Role">
-                        <span class="glyphicon glyphicon-pencil" ></span>
-                    </a>
-                </li>
+                {% for role in roles %}
+                    <li class="list-group-item" id="role_{{role.id}}">
+                        {{role.name}}
+                        <a onclick="delete_role({{role.id}})" href="javascript:void(0);" style="display:inline-block;float:right;" title="Delete Role"><span class="glyphicon glyphicon-trash" ></span></a>
+                        <a href="{% url 'staff_role_action' role.id %}" style="display:inline-block;float:right;margin-right:7px;" title="Update Role"><span class="glyphicon glyphicon-pencil" ></span></a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </div>
@@ -133,10 +131,31 @@ $(document).ready(function(){
     }); 
 });
 
-
 function clear_filter(argument) {
     $('#id_search').val('');
     $('#id_status').val('');
+}
+
+function delete_role(rid){
+    var is_delete = confirm("Are you sure you want to delete this role? Staff assigned to this role will not have proper access.");
+    if (is_delete){
+        var dataString='';
+        dataString+=''
+        dataString+='&role_id='+rid+'&delete='+true
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff_role" %}',
+            success: function(data){
+                if(data.status){
+                    $('#role_'+rid).remove();
+                }else{
+                    alert('oops! not able to process your request. Please try again later.')
+                }
+            }
+        });
+    }
 }
 
 function pagination(p){
