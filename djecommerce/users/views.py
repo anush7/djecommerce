@@ -284,6 +284,11 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 					else: staff.is_active = False
 					staff.save()
 					html_data['status'] = 1
+				elif request.GET.get('role_id'):
+					grp = EGroup.objects.get(id=int(request.GET.get('role_id')))
+					staff.groups.clear()
+					staff.groups.add(grp)
+					return JsonResponse({'status':1})
 				elif request.GET.get('delete'):
 					staff.delete()
 
@@ -378,6 +383,8 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
     	if grp_id:
     		grp = EGroup.objects.get(id=grp_id)
     		grp.name = grp_name
+    		grp.is_import = 'access_import' in perms
+    		grp.is_export = 'access_export' in perms
     		grp.save()
     		grp.permissions.clear()
     		grp.categories.clear()

@@ -118,12 +118,13 @@ $(document).ready(function(){
             data: $("#invite_form").serialize()+dataString,
             success: function(data){
                 if(data.status == 1){
-                    $('#invite_submit_btn').hide();
-                    $('#invite_msg').fadeIn('slow');
+                    // $('#invite_submit_btn').hide();
+                    // $('#invite_msg').fadeIn('slow');
                     setTimeout(function(){
+                        showFlashMessage('Invites sent successfully!');
                         $('#myModal').modal('hide');
-                        $('#invite_msg').hide();
-                        $('#invite_submit_btn').fadeIn('slow');
+                        // $('#invite_msg').hide();
+                        // $('#invite_submit_btn').fadeIn('slow');
                     }, 1000);
                 }
             }

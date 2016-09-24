@@ -30,7 +30,7 @@
                             <tbody>
                                 <tr class="odd gradeX">
                                     <td>Product</td>
-                                    <td><input type="checkbox" value="access_product" name="perms"></td>
+                                    <td><input type="checkbox" value="access_product" {% if 'access_product' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_product" {% if 'add_product' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="change_product" {% if 'change_product' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="delete_product" {% if 'delete_product' in permissions %}checked{% endif %} name="perms"></td>
@@ -65,14 +65,14 @@
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Import</td>
-                                    <td><input type="checkbox" value="access_import" name="perms"></td>
+                                    <td><input type="checkbox" value="access_import" {% if role.is_import %}checked{% endif %} name="perms"></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Export</td>
-                                    <td><input type="checkbox" value="access_export" name="perms"></td>
+                                    <td><input type="checkbox" value="access_export" {% if role.is_export %}checked{% endif %} name="perms"></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -99,7 +99,7 @@
                             <button type="submit" name="submit" class="btn btn-default">Save</button>
                         </div>
                     </div>
-
+                    
                 </div>
                 <input type="hidden" {% if role %}value="{{role.id}}"{% endif %} name="grp_id">
                 </form>

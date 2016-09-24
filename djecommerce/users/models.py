@@ -21,6 +21,8 @@ def generate_uuid():
 
 class EGroup(Group):
     categories = models.ManyToManyField('catalog.CatalogCategory',blank=True)
+    is_import = models.BooleanField(default=False)
+    is_export = models.BooleanField(default=False)
 
 class EcUserManager(BaseUserManager):
     use_in_migrations = True
@@ -90,7 +92,10 @@ class EcUser(AbstractBaseUser, PermissionsMixin):
         """
         Sends an email to this User.
         """
-        send_mail(subject, message, from_email, [self.email]) 
+        send_mail(subject, message, from_email, [self.email])
+
+    def get_roles(self):
+        return self.groups.values_list('id',flat=True)
 
     @property
     def get_braintree_id(self):
