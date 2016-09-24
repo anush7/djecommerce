@@ -29,7 +29,7 @@
                         <tbody>
                             <tr class="odd gradeX">
                                 <td>Product</td>
-                                <td><input type="checkbox" value="access_product" name="perms"></td>
+                                <td><input type="checkbox" value="access_product" {% if 'access_product' in permissions %}checked{% endif %} name="perms"></td>
                                 <td><input type="checkbox" value="add_product" {% if 'add_product' in permissions %}checked{% endif %} name="perms"></td>
                                 <td><input type="checkbox" value="change_product" {% if 'change_product' in permissions %}checked{% endif %} name="perms"></td>
                                 <td><input type="checkbox" value="delete_product" {% if 'delete_product' in permissions %}checked{% endif %} name="perms"></td>
@@ -80,7 +80,7 @@
                     </table>
 
                     <div class="form-group">
-						<label for="id_title" class="col-sm-2 control-label">Categories to which Products can be added.<span style="color:red;">*</span></label>
+						<label for="id_title" class="col-sm-2 control-label">User assigned with role can add products to these categories.<span style="color:red;">*</span></label>
 						<div class="col-xs-3">
 							<select multiple id="id_parent_category" name="parent_category" class="form-control">
 					            {% for cat in parent_cats %}

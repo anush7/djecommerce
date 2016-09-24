@@ -284,6 +284,11 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 					else: staff.is_active = False
 					staff.save()
 					html_data['status'] = 1
+				elif request.GET.get('role_id'):
+					grp = EGroup.objects.get(id=int(request.GET.get('role_id')))
+					staff.groups.clear()
+					staff.groups.add(grp)
+					return JsonResponse({'status':1})
 				elif request.GET.get('delete'):
 					staff.delete()
 
