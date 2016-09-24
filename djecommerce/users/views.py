@@ -383,6 +383,8 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
     	if grp_id:
     		grp = EGroup.objects.get(id=grp_id)
     		grp.name = grp_name
+    		grp.is_import = 'access_import' in perms
+    		grp.is_export = 'access_export' in perms
     		grp.save()
     		grp.permissions.clear()
     		grp.categories.clear()

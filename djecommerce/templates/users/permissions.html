@@ -64,14 +64,14 @@
                             </tr>
                             <tr class="odd gradeX">
                                 <td>Import</td>
-                                <td><input type="checkbox" value="access_import" name="perms"></td>
+                                <td><input type="checkbox" value="access_import" {% if role.is_import %}checked{% endif %} name="perms"></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                             </tr>
                             <tr class="odd gradeX">
                                 <td>Export</td>
-                                <td><input type="checkbox" value="access_export" name="perms"></td>
+                                <td><input type="checkbox" value="access_export" {% if role.is_export %}checked{% endif %} name="perms"></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
