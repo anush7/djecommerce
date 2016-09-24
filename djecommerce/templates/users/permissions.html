@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
-            	<form method="post">{% csrf_token %}
+            	<form name="role_form" method="post">{% csrf_token %}
             	<div class="panel-heading">
                     Role Name: <input {% if role %}value="{{role.name}}"{% endif %} name="role_name" type="text" maxlength="17" style="display:inline-block;">
                 </div>
@@ -81,7 +81,7 @@
                         </table>
                     </div>
                     <div class="row">
-                        <label style="padding-left:20px;padding-top:20px;">Categories to which Products can be added.<span style="color:red;">*</span></label>
+                        <label style="padding-left:20px;padding-top:20px;">Staff assigned to this role can add products to these categories:</label>
                         <div style="padding-left:20px;padding-top:10px;display:inline-block;">
                             <select multiple id="id_parent_category" name="parent_category" class="form-control">
                                 {% for cat in parent_cats %}
@@ -111,12 +111,29 @@
 <script type="text/javascript">
 $(document).ready(function(){
 
+    $("form[name='role_form']").validate({
+        rules: {
+            role_name: "required",
+        },
+        messages: {
+            role_name: "Please enter the role name",
+        },
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+
 	$('#id_parent_category').multiselect({
 		includeSelectAllOption: true,
 		enableFiltering: true,
         maxHeight: 800,
         dropUp: true,
-        buttonWidth: '280px'
+        buttonWidth: '280px',
+        buttonText: function(options, select) {
+            if (options.length === 0) {
+                return 'None';
+            }
+        }
 	});
 	{% if not role %}
 		$('#id_parent_category').multiselect('selectAll', false);
