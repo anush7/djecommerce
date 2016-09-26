@@ -238,7 +238,7 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 
 	def get_context_data(self, **kwargs):
 	    context = super(StaffManagementView, self).get_context_data(**kwargs)
-	    context['roles'] = EGroup.objects.all()
+	    context['roles'] = EGroup.objects.all().order_by('name')
 	    return context
 
 	def paginate_queryset(self, queryset, page_size):

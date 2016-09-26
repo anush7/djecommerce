@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-
-{% block content %}
 {% load staticfiles %}
 
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/bootstrap-switch.min.css' %}">
+<script src="{% static 'js/bootstrap-switch.min.js' %}"></script>
 <div class="container">
 	<div class="row">
 		<ul class="nav nav-tabs">
@@ -16,8 +17,11 @@
 			<li role="presentation">
 				<a {% if product %}href="{{product.get_images_url}}"{% endif %}>{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images</a>
 			</li>
-			<li style="margin-left:10px; !important">
+			<!-- <li style="margin-left:10px; !important">
 				<h4>| {% if product %}{% if product.status == 'A' %} Status: Active{% else %} Status: InActive{% endif %}{% else %}Status: InActive{% endif %}</h4>
+			</li> -->
+			<li style="margin-left:10px; !important">
+				<input {% if product %}{% if product.status == 'A' %}checked productId={{product.id}}{% endif %}{% endif %} name="status" id="status" type="checkbox">
 			</li>
 		</ul>
 	</div>
@@ -102,6 +106,34 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
+
+	$("[name='status']").bootstrapSwitch({
+		'onText': 'Active',
+		'offText': 'InActive',
+		'onColor': 'success',
+		'onSwitchChange': function(event, state) {
+			console.log(this.productId);
+			{% if product %}
+				var dataString='product_id='+this.product-id;
+				if(status){
+					dataString += '&status=A'
+				}else{
+					dataString += '&status=I'
+				}
+				$.ajax({
+		            type: 'POST',
+		            dataType: 'json',
+		            data: dataString,
+		            url: '{% url "product_status" %}',
+		            success: function(data){
+		            	if(data['status'] == 1){
+		            	}else{
+		            	}
+		            }
+		        });
+			{% endif %}
+		}
+	});
 
 	$("form[name='product_form']").validate({
 	    rules: {

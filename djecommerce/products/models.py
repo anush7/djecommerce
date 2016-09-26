@@ -81,6 +81,14 @@ class Product(models.Model):
     def get_image_count(self):
         return ProductImage.objects.filter(variant__in=self.variants.all()).exists()
 
+    def activate(self):
+        self.status = 'A'
+        self.save()
+
+    def deactivate(self):
+        self.status = 'I'
+        self.save()
+
 class ProductVariant(models.Model):
     sku = models.CharField(max_length=32, unique=True)
     default = models.BooleanField(default=False)

@@ -164,6 +164,16 @@ class ProductUpdateView(StaffRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 @staff_required
+def product_status(request, pk):
+    data = {}
+    try:
+        product = Product.objects.get(id=pk)
+        product.delete()
+        data['status'] = 1
+    except:data['status'] = 0
+    return HttpResponse(json.dumps(data))
+
+@staff_required
 def delete_product(request, pk):
     data = {}
     try:
