@@ -11,6 +11,9 @@ urlpatterns = [
 	url(r'^products/edit/(?P<pk>\d+)$', staffviews.ProductUpdateView.as_view(), name='staff-product-edit'),
 	url(r'^products/delete/(?P<pk>\d+)$', staffviews.delete_product, name='staff-product-delete'),
 	url(r'^products/(?P<pk>\d+)$', staffviews.ProductDetailView.as_view(), name='staff-product-detail'),
+	
+	url(r'^products/status$', staffviews.product_status, name='product_status'),
+
 	url(r'^products/load_subcats$', staffviews.get_sub_cats, name='staff-ajax-load-prod-subcats'),
 	url(r'^products/import$', staffviews.ProductImportView.as_view(), name='staff-products-import'),
 	url(r'^products/export$', staffviews.ProductExportView.as_view(), name='staff-products-export'),
