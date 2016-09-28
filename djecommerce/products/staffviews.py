@@ -164,12 +164,18 @@ class ProductUpdateView(StaffRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 @staff_required
-def product_status(request, pk):
+def product_status(request):
     data = {}
     try:
-        product = Product.objects.get(id=pk)
-        product.delete()
-        data['status'] = 1
+        productId = request.POST.get('product_id')
+        status = request.POST.get('status')
+        if productId and status:
+            product = Product.objects.get(id=int(productId))
+            if status == 'A':
+                product.activate()
+            else:product.deactivate()
+            data['status'] = 1
+        else:data['status'] = 0
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
@@ -269,7 +275,6 @@ class VariantUpdateView(StaffRequiredMixin, UpdateView):
         self.object.product = product = Product.objects.get(id=self.kwargs['pid'])
         data = {}
         for attr in product.attributes.all():
-            print self.request.POST.get(str(attr.id))
             data[attr.id] = self.request.POST.get(str(attr.id))
         self.object.attributes = data
         if form.cleaned_data['default']:

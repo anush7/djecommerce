@@ -17,12 +17,11 @@
 			<li role="presentation">
 				<a {% if product %}href="{{product.get_images_url}}"{% endif %}>{% if not product.get_image_count %}<span style="margin-bottom:2px;" data-original-title="No Images added!" data-toggle="tooltip" class="badge">!</span> {% endif %}Images</a>
 			</li>
-			<!-- <li style="margin-left:10px; !important">
-				<h4>| {% if product %}{% if product.status == 'A' %} Status: Active{% else %} Status: InActive{% endif %}{% else %}Status: InActive{% endif %}</h4>
-			</li> -->
-			<li style="margin-left:10px; !important">
-				<input {% if product %}{% if product.status == 'A' %}checked productId={{product.id}}{% endif %}{% endif %} name="status" id="status" type="checkbox">
-			</li>
+			{% if product %}
+				<li style="margin-left:10px; !important">
+					<input {% if product.status == 'A' %}checked{% endif %} name="status" id="status" type="checkbox">
+				</li>
+			{% endif %}
 		</ul>
 	</div>
 	<div class="row" style="margin-top:15px;">
@@ -112,10 +111,9 @@ $(document).ready(function(){
 		'offText': 'InActive',
 		'onColor': 'success',
 		'onSwitchChange': function(event, state) {
-			console.log(this.productId);
 			{% if product %}
-				var dataString='product_id='+this.product-id;
-				if(status){
+				var dataString='csrfmiddlewaretoken={{csrf_token}}&product_id='+{{product.id}};
+				if(state){
 					dataString += '&status=A'
 				}else{
 					dataString += '&status=I'
@@ -127,7 +125,9 @@ $(document).ready(function(){
 		            url: '{% url "product_status" %}',
 		            success: function(data){
 		            	if(data['status'] == 1){
+		            		showFlashMessage('Status Updated');
 		            	}else{
+		            		alert('Oops not able process your request. Please try again later.')
 		            	}
 		            }
 		        });

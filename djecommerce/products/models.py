@@ -189,7 +189,7 @@ def update_product_status(sender, instance, created=False, **kwargs):
         stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exclude(id=instance.id).count()
         if not stocks:
             if instance.quantity <= instance.quantity_allocated:instance.variant.product.status = 'I'
-            else:instance.variant.product.status = 'A'
+            #else:instance.variant.product.status = 'A'
             instance.variant.product.save()
     else:
         variants = instance.variant.product.variants.all()
