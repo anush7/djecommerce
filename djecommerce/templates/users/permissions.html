@@ -132,6 +132,11 @@ $(document).ready(function(){
         buttonText: function(options, select) {
             if (options.length === 0) {
                 return 'None';
+            }else if(options.length === 1){
+                return options.length+' Category';
+            }
+            else{
+                return options.length+' Categories';
             }
         }
 	});
