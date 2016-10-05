@@ -17,7 +17,7 @@ from carts.models import Cart, CartItem
 from catalog.mixins import LoginRequiredMixin
 
 if settings.DEBUG:
-	braintree.Configuration.configure(braintree.Environment.Sandbox,
+	braintree.Configuration.configure(environment=braintree.Environment.Sandbox,
       merchant_id=settings.BRAINTREE_MERCHANT_ID,
       public_key=settings.BRAINTREE_PUBLIC,
       private_key=settings.BRAINTREE_PRIVATE)
