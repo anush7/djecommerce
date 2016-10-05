@@ -133,28 +133,14 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 		return context
 
 	def get(self, request, *args, **kwargs):
-		try:
-			print "111111111111111111111111111111111111"
-			get_data = super(CheckoutView, self).get(request, *args, **kwargs)
-			print "2222222222222222222222222222222222"
-			cart = self.get_object()
-			print "3333333333333333333333333333333333333333"
-			if cart == None or not cart.total:
-				return redirect("add-to-cart")
-			print "444444444444444444444444444444444444444444"
-			if self.request.user.is_authenticated():
-				print "55555555555555555555555555555555555"
-				new_order = self.get_order()
-				print "66666666666666666666666666666666666"
-				if new_order.billing_address == None or new_order.shipping_address == None:
-					print "77777777777777777777777777777777777"
-				 	return redirect("order_address")
-			print "8888888888888888888888888888888888"
-		except:
-			import sys
-			print "eeeeeeeeeeeeeeeeeee"
-			print sys.exc_info()
-			print "eeeeeeeeeeeeeeeeeee"
+		get_data = super(CheckoutView, self).get(request, *args, **kwargs)
+		cart = self.get_object()
+		if cart == None or not cart.total:
+			return redirect("add-to-cart")
+		if self.request.user.is_authenticated():
+			new_order = self.get_order()
+			if new_order.billing_address == None or new_order.shipping_address == None:
+			 	return redirect("order_address")
 		return get_data
 
 
