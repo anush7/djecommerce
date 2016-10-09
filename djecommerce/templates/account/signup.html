@@ -7,7 +7,7 @@
     <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <div class="panel-title">Sign Up</div>
+                <div class="panel-title" {% if staff %}style="color:green;font-size:20px;"{% endif %}>{% if staff %}Staff {% endif %}Sign Up</div>
                 <div style="float:right; font-size: 85%; position: relative; top:-10px">
                 	<a id="signinlink" href="{% url 'user_signin' %}" >Sign In</a>
                	</div>
@@ -69,6 +69,7 @@
                             <!--span style="margin-left:8px;">or</span-->  
                         </div>
                     </div>
+                    <input type="hidden" name="staff" value={{staff}}>
                     <!--div style="border-top: 1px solid #999; padding-top:20px"  class="form-group">
                     	<div class="col-md-offset-3 col-md-9">
                             <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up with Facebook</button>

@@ -1,6 +1,8 @@
 import re
 import json
 import uuid
+import requests
+import jwt
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.contrib import messages
 from django.db.models import Q, Value
@@ -25,6 +27,7 @@ from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
 from catalog.mixins import AdminRequiredMixin
 from catalog.models import Catalog, CatalogCategory
+from users.utils import send_mg_email
 
 def home(request,template='account/home.html'):
     return render(request, template)
@@ -36,6 +39,7 @@ def account_settings(request,template='account/settings.html'):
     return render(request, template)
 
 def user_signup(request, template='account/signup.html'):
+	data = {}
 	if request.method == 'POST':
 		form = UserSignUpForm(request.POST)
 		if form.is_valid():
@@ -46,6 +50,13 @@ def user_signup(request, template='account/signup.html'):
 				first_name=form.cleaned_data['first_name'],
 				last_name=form.cleaned_data['last_name'],
 			)
+			if request.POST.get('staff',False):
+				try:
+					email = jwt.decode(request.POST.get('staff'), settings.SECRET_KEY , algorithms=['HS256'])['email']
+					if user.email == email:
+						user.is_staff = True
+						user.save()
+				except:pass
 			user=authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
 			login(request, user)
 			try:next_url = request.GET['next']
@@ -55,7 +66,16 @@ def user_signup(request, template='account/signup.html'):
 			return HttpResponseRedirect(next_url)
 	else:
 		form = UserSignUpForm()
-	return render(request, template, {'form': form})
+		if request.GET.get('staff',False):
+			try:
+				encodedData = request.GET.get('staff')
+				email = jwt.decode(encodedData, settings.SECRET_KEY , algorithms=['HS256'])['email']
+				form = UserSignUpForm(initial={'email': email})
+				form.fields["email"].widget.attrs.update({'disabled': True})
+				data['staff'] = encodedData
+			except:form = UserSignUpForm()
+	data['form'] = form
+	return render(request, template, data)
 
 def user_signin(request, template='account/signin.html'):
 	if request.method == 'POST':
@@ -336,9 +356,21 @@ class StaffInviteView(AdminRequiredMixin, View):
 
 	def post(self, request, *args, **kwargs):
 		invite_emails = request.POST.getlist('invite_email')
-		print "11111111111111111111111111111111111111111111"
-		print request.POST.getlist('invite_email')
-		print "11111111111111111111111111111111111111111111"
+		sign_up_url = 'http://127.0.0.1:8000/accounts/signup/'
+		from_name = request.user.first_name
+
+		subject = 'Staff Sign up Invite'
+		body = 'Hi, <br><br>'
+		body += 'You have been invited to sign up as staff by %s<br><br>' % request.user.first_name
+		body += 'Click the link below to sign up<br>'
+
+		for email in request.POST.getlist('invite_email',[]):
+			if email:
+				encoded = jwt.encode({'email': email}, settings.SECRET_KEY, algorithm='HS256')
+				staff_sign_up_url = sign_up_url+'?staff=%s' % encoded
+				body += '<a target="_blank" href="%s">Staff Sign Up</a><br>' % staff_sign_up_url
+				send_mg_email(subject, body, from_name=from_name, to_email=[email])
+
 		return JsonResponse({'status':1})
 
 
