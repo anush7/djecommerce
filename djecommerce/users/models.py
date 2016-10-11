@@ -24,6 +24,11 @@ class EGroup(Group):
     is_import = models.BooleanField(default=False)
     is_export = models.BooleanField(default=False)
 
+    def check_permission(model_permission):
+        permission = Permission.objects.get(codename=model_permission)
+        if permission in self.permissions.all():return True
+        else:return False
+
 class EcUserManager(BaseUserManager):
     use_in_migrations = True
 

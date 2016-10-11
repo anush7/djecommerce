@@ -1,12 +1,17 @@
 {% load staticfiles %}
 {% load category_tags %}
+{% load permission_tags %}
 <!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Contacts</title>
 	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/sb-admin.css' %}">
+	<!-- <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}"> -->
+	<link rel="stylesheet" href="{% static 'custom-font-awesome/css/font-awesome.min.css' %}">
+
+
 	<link rel="stylesheet" href="{% static 'css/custom.navigation.css' %}">
 	<link rel="stylesheet" href="{% static 'css/bootstrap-multiselect.css' %}"/>
 	<link rel="stylesheet" href="{% static 'css/custom.css' %}">
@@ -33,15 +38,8 @@
       				<li><a class="navbar-brand" href="{% url 'product-list' %}">Ecommerce</a></li>
 			        {% if 'staff' in url_name %}
 				        {% if user.is_authenticated %}
-				        	{% if user.is_superuser %}
-				        		<li><a href="{% url 'staff-catalog-list' %}">Catalog</a></li>
-						        <li><a href="{% url 'staff-category-list' %}">Category</a></li>
-						        <li><a href="{% url 'staff-tax-list' %}">Tax</a></li>
-						    {% endif %}
-					        {% if user.is_staff %}
-						        <li><a href="{% url 'staff-product-list' %}">Product</a></li>
-				        		<li><a href="{% url 'staff-attribute-list' %}">Attributes</a></li>
-					        {% endif %}
+				        	<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
+				        	{% get_staff_nav_bar user %}
 					        {% if user.is_superuser %}
 					        	<li><a href="{% url 'staff-products-import' %}">Import/Export</a></li>
 					        {% endif %}
@@ -94,7 +92,7 @@
 				      		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{user.email}} <span class="caret"></span></a>
 				      		<ul class="dropdown-menu" style="min-width: 181px;">
 				      			{% if user.is_staff %}
-				      				<li><a href="{% url 'staff-product-list' %}">Dashboard</a></li>
+				      				<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
 				      			{% endif %}
 				      			{% if user.is_admin %}
 					            	<li><a href="{% url 'staff_management' %}">Staff Management</a></li>

@@ -32,6 +32,12 @@ from users.utils import send_mg_email
 def home(request,template='account/home.html'):
     return render(request, template)
 
+def access_denied(request,template='users/no-permission.html'):
+    return render(request, template)
+
+def dashboard(request,template='users/dashboard.html'):
+    return render(request, template)
+
 def landing(request,template='account/landing.html'):
     return render(request, template)
 

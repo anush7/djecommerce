@@ -25,5 +25,8 @@ urlpatterns = [
     url(r'^address/update/(?P<pk>\d+)$', views.UserAddressUpdateView.as_view(), name='user-address-update'),
     url(r'^address/delete/(?P<pk>\d+)$', views.delete_address, name='user-address-delete'),
 
+    url(r'^access-denied$', views.access_denied, name='user-access-denied'),
+    url(r'^dashboard$', views.dashboard, name='staff-dashboard'),
+
     url(r'^check-username-email$', views.check_username_email, name='check-username-email'),
 ]

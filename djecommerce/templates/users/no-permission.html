@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+	<div class="alert alert-danger">
+	  <strong>Access Denied!</strong> You do not have permission to access this page. Please contact the website owner or admin for more details.
+	</div>
+	<a class="btn btn-default" href="{% url 'staff-dashboard' %}" role="button">Dashboard</a>
+</div>
+
+
+
+{% endblock %}

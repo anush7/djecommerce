@@ -35,6 +35,7 @@ from products.utils import image_cropper, get_unique_slug, get_rows
 class ProductListView(StaffRequiredMixin, ListView):
     paginate_by = 1
     template_name = 'products/product_list.html'
+    permissions = ['access_product']
 
     def get_queryset(self):
         return Product.objects.filter(status='A').order_by('created_on')
@@ -97,6 +98,7 @@ class ProductCreateView(StaffRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_form.html'
+    permissions = ['add_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-variant-list',args=[self.object.id])
@@ -134,6 +136,7 @@ class ProductUpdateView(StaffRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_form.html'
+    permissions = ['change_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-variant-list',args=[self.object.id])

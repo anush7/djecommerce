@@ -29,9 +29,10 @@ from catalog.forms import CatalogForm, CatalogCategoryForm, AttributeForm, Attri
 from catalog.utils import image_cropper, get_unique_slug
 
 """########################### CATALOG VIEWS ############################"""
-class CatalogListView(AdminRequiredMixin, ListView):
+class CatalogListView(StaffRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/catalog_list.html'
+    permissions = ['access_catalog']
 
     def get_queryset(self):
         return Catalog.objects.all().order_by('created_on')

@@ -48,9 +48,19 @@ class StaffRequiredMixin(object):
 	@method_decorator(login_required)
 	def dispatch(self, request, *args, **kwargs):
 		if request.user.is_staff:
-			return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
-		else:
-			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+			role_permissions = []
+			map(lambda x: role_permissions.extend(x.permissions.values_list('codename',flat=True)), request.user.groups.all())
+			print role_permissions
+			if all(map(lambda x: x in role_permissions, self.permissions)) or request.user.is_admin:
+				return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
+		# return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+		return HttpResponseRedirect(reverse('user-access-denied'))
+
+
+		# if request.user.is_staff:
+		# 	return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
+		# else:
+		# 	return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
 
 class LoginRequiredMixin(object):
 	@classmethod
