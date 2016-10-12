@@ -11,7 +11,7 @@ from django.core.paginator import InvalidPage, Paginator
 from django.template.loader import render_to_string
 from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate, login
 from django.utils.translation import ugettext as _
@@ -22,7 +22,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
-from users.models import EGroup
+from users.models import GroupDetails
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
 from catalog.mixins import AdminRequiredMixin
@@ -264,7 +264,7 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 
 	def get_context_data(self, **kwargs):
 	    context = super(StaffManagementView, self).get_context_data(**kwargs)
-	    context['roles'] = EGroup.objects.all().order_by('name')
+	    context['roles'] = Group.objects.all().order_by('name')
 	    return context
 
 	def paginate_queryset(self, queryset, page_size):
@@ -311,7 +311,7 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 					staff.save()
 					html_data['status'] = 1
 				elif request.GET.get('role_id'):
-					grp = EGroup.objects.get(id=int(request.GET.get('role_id')))
+					grp = Group.objects.get(id=int(request.GET.get('role_id')))
 					staff.groups.clear()
 					staff.groups.add(grp)
 					return JsonResponse({'status':1})
@@ -353,7 +353,7 @@ class StaffRoleDeleteView(AdminRequiredMixin, View):
 		roleId = request.POST.get('role_id')
 		try:
 			if roleId:
-				EGroup.objects.get(id=roleId).delete()
+				Group.objects.get(id=roleId).delete()
 				return JsonResponse({'status':1})
 		except:pass
 		return JsonResponse({'status':0})
@@ -394,14 +394,14 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 		if request.is_ajax() and request.GET.get('delete') and request.GET.get('role_id'):
 			data = {}
 			try:
-				role = EGroup.objects.get(id=int(request.GET.get('role_id')))
+				role = Group.objects.get(id=int(request.GET.get('role_id')))
 				role.delete()
 				data['status'] = 1
 			except:data['status'] = 0
 			return JsonResponse(data)
 
 		if kwargs.get('pk'):
-			role = EGroup.objects.get(id=kwargs['pk'])
+			role = Group.objects.get(id=kwargs['pk'])
 			context['role'] = role
 			context['permissions'] = role.permissions.values_list('codename', flat=True)
 		
@@ -409,9 +409,6 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
     	context = self.get_context_data(**kwargs)
-    	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
-    	print request.POST
-    	print "pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
 
     	perms = request.POST.getlist('perms',[])
     	pcats = request.POST.getlist('parent_category',[])
@@ -419,20 +416,21 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
     	grp_name = request.POST.get('role_name',False)
 
     	if grp_id:
-    		grp = EGroup.objects.get(id=grp_id)
+    		grp = Group.objects.get(id=grp_id)
     		grp.name = grp_name
-    		grp.is_import = 'access_import' in perms
-    		grp.is_export = 'access_export' in perms
+    		grp.details.is_import = 'access_import' in perms
+    		grp.details.is_export = 'access_export' in perms
     		grp.save()
     		grp.permissions.clear()
-    		grp.categories.clear()
+    		grp.details.categories.clear()
     		messages.success(request, "Role updated successfully!")
     	else:
-    		grp = EGroup.objects.create(name=grp_name)
+    		grp = Group.objects.create(name=grp_name)
+    		GroupDetails.objects.create(group=grp)
     		messages.success(request, "Role added successfully!")
 
     	grp.permissions = Permission.objects.filter(codename__in=perms)
-    	grp.categories = CatalogCategory.objects.filter(id__in=pcats)
+    	grp.details.categories = CatalogCategory.objects.filter(id__in=pcats)
 
     	context['role'] = grp
     	context['permissions'] = grp.permissions.values_list('codename', flat=True)

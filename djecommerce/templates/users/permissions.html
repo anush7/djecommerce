@@ -32,35 +32,50 @@
                                     <td>Product</td>
                                     <td><input type="checkbox" value="access_product" {% if 'access_product' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_product" {% if 'add_product' in permissions %}checked{% endif %} name="perms"></td>
-                                    <td><input type="checkbox" value="change_product" {% if 'change_product' in permissions %}checked{% endif %} name="perms"></td>
+                                    <td>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_product"  {% if 'change_product' in permissions %}checked{% endif %} name="perms"><span>all products</span></label></div>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_owned_product"  {% if 'change_owned_product' in permissions %}checked{% endif %} name="perms"><span>products created by staff</span></label></div>
+                                    </td>
                                     <td><input type="checkbox" value="delete_product" {% if 'delete_product' in permissions %}checked{% endif %} name="perms"></td>
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Attribute</td>
                                     <td><input type="checkbox" value="access_productattribute" {% if 'access_productattribute' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_productattribute" {% if 'add_productattribute' in permissions %}checked{% endif %} name="perms"></td>
-                                    <td><input type="checkbox" value="change_productattribute" {% if 'change_productattribute' in permissions %}checked{% endif %} name="perms"></td>
+                                    <td>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_productattribute" {% if 'change_productattribute' in permissions %}checked{% endif %} name="perms">all attributes</label></div>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_owned_productattribute" {% if 'change_owned_productattribute' in permissions %}checked{% endif %} name="perms">attributes created by staff</label></div>
+                                    </td>
                                     <td><input type="checkbox" value="delete_productattribute" {% if 'delete_productattribute' in permissions %}checked{% endif %} name="perms"></td>
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Category</td>
                                     <td><input type="checkbox" value="access_catalogcategory" {% if 'access_catalogcategory' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_catalogcategory" {% if 'add_catalogcategory' in permissions %}checked{% endif %} name="perms"></td>
-                                    <td><input type="checkbox" value="change_catalogcategory" {% if 'change_catalogcategory' in permissions %}checked{% endif %} name="perms"></td>
+                                    <td>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_catalogcategory" {% if 'change_catalogcategory' in permissions %}checked{% endif %} name="perms">all categories</label></div>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_owned_catalogcategory" {% if 'change_owned_catalogcategory' in permissions %}checked{% endif %} name="perms">categories created by staff</label></div>
+                                    </td>
                                     <td><input type="checkbox" value="delete_catalogcategory" {% if 'delete_catalogcategory' in permissions %}checked{% endif %} name="perms"></td>
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Catalog</td>
                                     <td><input type="checkbox" value="access_catalog" {% if 'access_catalog' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_catalog" {% if 'add_catalog' in permissions %}checked{% endif %} name="perms"></td>
-                                    <td><input type="checkbox" value="change_catalog" {% if 'change_catalog' in permissions %}checked{% endif %} name="perms"></td>
+                                    <td>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_catalog" {% if 'change_catalog' in permissions %}checked{% endif %} name="perms">all catalogs</label></div>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_owned_catalog" {% if 'change_owned_catalog' in permissions %}checked{% endif %} name="perms">catalogs created by staff</label></div>
+                                    </td>
                                     <td><input type="checkbox" value="delete_catalog" {% if 'delete_catalog' in permissions %}checked{% endif %} name="perms"></td>
                                 </tr>
                                 <tr class="odd gradeX">
                                     <td>Tax</td>
                                     <td><input type="checkbox" value="access_tax" {% if 'access_tax' in permissions %}checked{% endif %} name="perms"></td>
                                     <td><input type="checkbox" value="add_tax" {% if 'add_tax' in permissions %}checked{% endif %} name="perms"></td>
-                                    <td><input type="checkbox" value="change_tax" {% if 'change_tax' in permissions %}checked{% endif %} name="perms"></td>
+                                    <td>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_tax" {% if 'change_tax' in permissions %}checked{% endif %} name="perms">all taxes</label></div>
+                                        <div class="checkbox" style="margin:0px; !important"><label><input type="checkbox" value="change_owned_tax" {% if 'change_owned_tax' in permissions %}checked{% endif %} name="perms">taxes created by staff</label></div>
+                                    </td>
                                     <td><input type="checkbox" value="delete_tax" {% if 'delete_tax' in permissions %}checked{% endif %} name="perms"></td>
                                 </tr>
                                 <tr class="odd gradeX">
@@ -85,7 +100,7 @@
                         <div style="padding-left:20px;padding-top:10px;display:inline-block;">
                             <select multiple id="id_parent_category" name="parent_category" class="form-control">
                                 {% for cat in parent_cats %}
-                                    <option {% if cat in role.categories.all %}selected{% endif %} 
+                                    <option {% if cat in role.details.categories.all %}selected{% endif %} 
                                         value="{{cat.id}}">{{cat.name}}
                                     </option>
                                 {% endfor %}

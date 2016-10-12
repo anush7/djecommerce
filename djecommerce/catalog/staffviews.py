@@ -85,6 +85,7 @@ class CatalogCreateView(AdminRequiredMixin, CreateView):
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
     template_name = 'catalog/catalog_form.html'
+    permissions = ['add_catalog']
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -100,6 +101,7 @@ class CatalogUpdateView(AdminRequiredMixin, UpdateView):
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
     template_name = 'catalog/catalog_form.html'
+    permissions = ['change_catalog']
 
     def get_context_data(self, **kwargs):
         context = super(CatalogUpdateView, self).get_context_data(**kwargs)

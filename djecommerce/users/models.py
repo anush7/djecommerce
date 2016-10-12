@@ -19,6 +19,12 @@ if settings.DEBUG:
 def generate_uuid():
     return str(uuid.uuid4()).replace("-", "")
 
+class GroupDetails(models.Model):
+    group = models.OneToOneField(Group, related_name='details')
+    categories = models.ManyToManyField('catalog.CatalogCategory',blank=True)
+    is_import = models.BooleanField(default=False)
+    is_export = models.BooleanField(default=False)
+
 class EGroup(Group):
     categories = models.ManyToManyField('catalog.CatalogCategory',blank=True)
     is_import = models.BooleanField(default=False)

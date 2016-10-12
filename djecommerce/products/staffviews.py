@@ -25,6 +25,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
 
 from users.models import EcUser as User
+from users.mixins import StaffUpdateRequiredMixin
+from users.decorators import staff_update_required
 from catalog.models import Catalog, CatalogCategory
 from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -41,7 +43,7 @@ class ProductListView(StaffRequiredMixin, ListView):
         return Product.objects.filter(status='A').order_by('created_on')
 
 @csrf_exempt
-@staff_required
+@staff_required(['access_product'])
 def ajax_product_list(request, template='products/part_product_list.html'):
     data = {}
     html_data = {}
@@ -132,11 +134,11 @@ class ProductCreateView(StaffRequiredMixin, CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-class ProductUpdateView(StaffRequiredMixin, UpdateView):
+class ProductUpdateView(StaffUpdateRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_form.html'
-    permissions = ['change_product']
+    permissions = ['change_product','change_owned_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-variant-list',args=[self.object.id])
@@ -166,7 +168,7 @@ class ProductUpdateView(StaffRequiredMixin, UpdateView):
                 ProductCategory.objects.create(product=self.object, category=subcat)
         return HttpResponseRedirect(self.get_success_url())
 
-@staff_required
+@staff_update_required(['change_product','change_owned_product'])
 def product_status(request):
     data = {}
     try:
@@ -182,7 +184,7 @@ def product_status(request):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
-@staff_required
+@staff_required(['delete_product'])
 def delete_product(request, pk):
     data = {}
     try:
@@ -199,7 +201,6 @@ class ProductDetailView(DetailView):
     def get_queryset(self):
         return Product.objects.all()
 
-@staff_required
 def get_sub_cats(request, template="products/load_sub_cats.html"):
     data = {}
     html_data = {}
@@ -224,6 +225,7 @@ def get_sub_cats(request, template="products/load_sub_cats.html"):
 
 class VariantListView(StaffRequiredMixin, ListView):
     template_name = 'products/variant_list.html'
+    permissions = ['access_product']
 
     def get_queryset(self):
         return ProductVariant.objects.filter(product_id=self.kwargs['pid']).order_by('name')
@@ -237,6 +239,7 @@ class VariantCreateView(StaffRequiredMixin, CreateView):
     model = ProductVariant
     form_class = VariantForm
     template_name = 'products/variant_form.html'
+    permissions = ['add_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-variant-list',args=[self.kwargs['pid']])
@@ -264,6 +267,7 @@ class VariantUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductVariant
     form_class = VariantForm
     template_name = 'products/variant_form.html'
+    permissions = ['change_product','change_owned_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-variant-list',args=[self.kwargs['pid']])
@@ -285,7 +289,7 @@ class VariantUpdateView(StaffRequiredMixin, UpdateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-@staff_required
+@staff_required(['delete_product'])
 def VariantDeleteView(request, pid):
     data = {}
     try:
@@ -300,6 +304,7 @@ def VariantDeleteView(request, pid):
 
 class StockListView(StaffRequiredMixin, ListView):
     template_name = 'products/stock_list.html'
+    permissions = ['access_product']
 
     def get_queryset(self):
         return Stock.objects.filter(variant__product_id=self.kwargs['pid'])
@@ -314,6 +319,7 @@ class StockCreateView(StaffRequiredMixin, CreateView):
     model = Stock
     form_class = StockForm
     template_name = 'products/stock_form.html'
+    permissions = ['add_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-stock-list',args=[self.kwargs['pid']])
@@ -333,6 +339,7 @@ class StockUpdateView(StaffRequiredMixin, UpdateView):
     model = Stock
     form_class = StockForm
     template_name = 'products/stock_form.html'
+    permissions = ['change_product','change_owned_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-stock-list',args=[self.kwargs['pid']])
@@ -346,7 +353,7 @@ class StockUpdateView(StaffRequiredMixin, UpdateView):
         context['form'].fields["variant"].queryset = variants
         return context
 
-@staff_required
+@staff_required(['delete_product'])
 def StockDeleteView(request, pid):
     data = {}
     try:
@@ -361,6 +368,7 @@ def StockDeleteView(request, pid):
 
 class ProductImageView(StaffRequiredMixin, ListView):
     template_name = 'products/image_list.html'
+    permissions = ['access_product']
 
     def get_queryset(self):
         return ProductImage.objects.filter(variant__product_id=self.kwargs['pid'])
@@ -374,6 +382,7 @@ class ProductImageCreateView(StaffRequiredMixin, CreateView):
     model = ProductImage
     form_class = ProductImageForm
     template_name = 'products/image_form.html'
+    permissions = ['add_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-image-list',args=[self.kwargs['pid']])
@@ -396,6 +405,7 @@ class ProductImageUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductImage
     form_class = StockForm
     template_name = 'products/image_form.html'
+    permissions = ['change_product','change_owned_product']
 
     def get_success_url(self):
         return reverse_lazy('staff-image-list',args=[self.kwargs['pid']])
@@ -414,7 +424,7 @@ class ProductImageUpdateView(StaffRequiredMixin, UpdateView):
         image = image_cropper(self.request.POST, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
-@staff_required
+@staff_required(['delete_product'])
 def ProductImageDeleteView(request, pid):
     data = {}
     try:
@@ -435,6 +445,7 @@ class Echo(object):
 
 class ProductImportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/import.html'
+    permissions = ['import']
 
     def get_context_data(self, **kwargs):
         context = super(ProductImportView, self).get_context_data(**kwargs)
