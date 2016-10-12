@@ -15,7 +15,10 @@ from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,DetailView,
 )
 from django.contrib.auth.decorators import login_required
-from catalog.mixins import *
+
+from users.mixins import StaffRequiredMixin, StaffUpdateRequiredMixin
+from users.decorators import staff_required, staff_update_required
+
 from django.utils.decorators import method_decorator
 from django.db.models import Q, Count
 from django.views.decorators.csrf import csrf_exempt
@@ -38,7 +41,7 @@ class CatalogListView(StaffRequiredMixin, ListView):
         return Catalog.objects.all().order_by('created_on')
 
 @csrf_exempt
-@admin_required
+@staff_required(['access_catalog'])
 def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     data = {}
     html_data = {}
@@ -80,7 +83,7 @@ def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CatalogCreateView(AdminRequiredMixin, CreateView):
+class CatalogCreateView(StaffRequiredMixin, CreateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
@@ -96,12 +99,12 @@ class CatalogCreateView(AdminRequiredMixin, CreateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
-class CatalogUpdateView(AdminRequiredMixin, UpdateView):
+class CatalogUpdateView(StaffRequiredMixin, UpdateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
     template_name = 'catalog/catalog_form.html'
-    permissions = ['change_catalog']
+    permissions = ['change_catalog','change_owned_catalog']
 
     def get_context_data(self, **kwargs):
         context = super(CatalogUpdateView, self).get_context_data(**kwargs)
@@ -116,7 +119,7 @@ class CatalogUpdateView(AdminRequiredMixin, UpdateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
-@admin_required
+@staff_required(['delete_catalog'])
 def delete_catalog(request, pk):
     data = {}
     try:
@@ -126,7 +129,8 @@ def delete_catalog(request, pk):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
-@admin_required
+
+@staff_update_required(['change_catalog','change_owned_catalog'])
 def change_catalog_status(request, pk):
     data = {}
     try:
@@ -141,9 +145,10 @@ def change_catalog_status(request, pk):
 
 """############################### CATEGORY VIEWS #################################"""
 
-class CategoryListView(AdminRequiredMixin, ListView):
+class CategoryListView(StaffRequiredMixin, ListView):
     paginate_by = 10
     template_name = 'catalog/category_list.html'
+    permissions = ['access_catalogcategory']
 
     def get_queryset(self):
         key = {}
@@ -152,7 +157,7 @@ class CategoryListView(AdminRequiredMixin, ListView):
         return CatalogCategory.objects.filter(**key).prefetch_related('children').order_by('name')
 
 @csrf_exempt
-@admin_required
+@staff_required(['access_catalogcategory'])
 def ajax_category_list(request, template='catalog/part_category_list.html'):
     data = {}
     html_data = {}
@@ -195,11 +200,12 @@ def ajax_category_list(request, template='catalog/part_category_list.html'):
     html_data['page'] = 1
     return HttpResponse(json.dumps(html_data))
 
-class CategoryCreateView(AdminRequiredMixin, CreateView):
+class CategoryCreateView(StaffRequiredMixin, CreateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
     template_name = 'catalog/category_form.html'
+    permissions = ['add_catalogcategory']
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -209,11 +215,12 @@ class CategoryCreateView(AdminRequiredMixin, CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-class CategoryUpdateView(AdminRequiredMixin, UpdateView):
+class CategoryUpdateView(StaffRequiredMixin, UpdateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
     template_name = 'catalog/category_form.html'
+    permissions = ['change_catalogcategory','change_owned_catalogcategory']
 
     def get_context_data(self, **kwargs):
         context = super(CategoryUpdateView, self).get_context_data(**kwargs)
@@ -227,7 +234,7 @@ class CategoryUpdateView(AdminRequiredMixin, UpdateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-@admin_required
+@staff_required(['delete_catalogcategory'])
 def delete_category(request, pk):
     data = {}
     try:
@@ -237,7 +244,7 @@ def delete_category(request, pk):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
-@admin_required
+@staff_update_required(['change_catalogcategory','change_owned_catalogcategory'])
 def change_category_status(request, pk):
     data = {}
     try:
@@ -255,6 +262,7 @@ def change_category_status(request, pk):
 class AttributeListView(StaffRequiredMixin, ListView):
     paginate_by = 5
     template_name = 'catalog/attribute_list.html'
+    permissions = ['access_productattribute']
 
     def get_context_data(self, **kwargs):
         context = super(AttributeListView, self).get_context_data(**kwargs)
@@ -272,6 +280,7 @@ class AttributeListView(StaffRequiredMixin, ListView):
         return ProductAttribute.objects.filter(status='A').order_by('name')
 
 @csrf_exempt
+@staff_required(['access_productattribute'])
 def ajax_attribute_list(request, template='catalog/part_attribute_list.html'):
     data = {}
     html_data = {}
@@ -319,6 +328,7 @@ class AttributeCreateView(StaffRequiredMixin, CreateView):
     form_class = AttributeForm
     success_url = reverse_lazy('staff-attribute-list')
     template_name = 'catalog/attribute_form.html'
+    permissions = ['add_productattribute']
 
     def get_context_data(self, **kwargs):
         context = super(AttributeCreateView, self).get_context_data(**kwargs)
@@ -340,6 +350,7 @@ class AttributeUpdateView(StaffRequiredMixin, UpdateView):
     form_class = AttributeForm
     success_url = reverse_lazy('staff-attribute-list')
     template_name = 'catalog/attribute_form.html'
+    permissions = ['change_productattribute','change_owned_productattribute']
 
     def get_context_data(self, **kwargs):
         context = super(AttributeUpdateView, self).get_context_data(**kwargs)
@@ -355,6 +366,7 @@ class AttributeUpdateView(StaffRequiredMixin, UpdateView):
             ProductAttributeValue.objects.create(attribute_value=val,attribute=self.object)
         return HttpResponseRedirect(self.get_success_url())
 
+@staff_required(['delete_productattribute'])
 def delete_attribute(request, pk):
     data = {}
     try:
@@ -364,6 +376,7 @@ def delete_attribute(request, pk):
     except:data['status'] = 0
     return HttpResponse(json.dumps(data))
 
+@staff_update_required(['change_productattribute','change_owned_productattribute'])
 def change_attribute_status(request, pk):
     data = {}
     try:
@@ -407,16 +420,18 @@ def get_sub_cats(request, template="catalog/load_subcats.html"):
 """#################################################################################################"""
 
 
-class TaxListView(AdminRequiredMixin, ListView):
+class TaxListView(StaffRequiredMixin, ListView):
     template_name = 'catalog/tax_list.html'
+    permissions = ['access_tax']
 
     def get_queryset(self):
         return Tax.objects.all().order_by('name')
 
-class TaxFormView(AdminRequiredMixin, FormView):
+class TaxFormView(StaffRequiredMixin, FormView):
     template_name = 'catalog/tax_form.html'
     form_class = TaxForm
     success_url = reverse_lazy('staff-tax-list')
+    permissions = ['add_tax']
 
     def get_form_kwargs(self):
         kwargs = super(TaxFormView, self).get_form_kwargs()
@@ -433,7 +448,8 @@ class TaxFormView(AdminRequiredMixin, FormView):
         else:
             return self.form_invalid(form)
 
-class TaxDeleteView(AdminRequiredMixin, View):
+class TaxDeleteView(StaffRequiredMixin, View):
+    permissions = ['delete_tax']
 
     def get(self, request, *args, **kwargs):
         if request.is_ajax():

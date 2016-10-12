@@ -6,6 +6,18 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
+class StaffRequiredMixin(object):
+
+	@method_decorator(login_required)
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_staff:
+			role_permissions = []
+			map(lambda x: role_permissions.extend(x.permissions.values_list('codename',flat=True)), request.user.groups.all())
+			if request.user.is_admin or all(map(lambda x: x in role_permissions, self.permissions)):
+				return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
+		return HttpResponseRedirect(reverse('user-access-denied'))
+
+
 class StaffUpdateRequiredMixin(object):
 
 	@method_decorator(login_required)
@@ -36,24 +48,26 @@ class StaffUpdateRequiredMixin(object):
 			return super(StaffUpdateRequiredMixin, self).dispatch(request, *args, **kwargs)
 		return HttpResponseRedirect(reverse('user-access-denied'))
 
-
-class StaffImportRequiredMixin(object):
+class LoginRequiredMixin(object):
+	
+	@classmethod
+	def as_view(self, *args, **kwargs):
+		view = super(LoginRequiredMixin, self).as_view(*args, **kwargs)
+		return login_required(view)
 
 	@method_decorator(login_required)
 	def dispatch(self, request, *args, **kwargs):
-		if not request.user.is_staff:
-			return HttpResponseRedirect(reverse('user-access-denied'))
+		return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+
+class AdminRequiredMixin(object):
+	@classmethod
+	def as_view(self, *args, **kwargs):
+		view = super(AdminRequiredMixin, self).as_view(*args, **kwargs)
+		return login_required(view)
+
+	@method_decorator(login_required)
+	def dispatch(self, request, *args, **kwargs):
 		if request.user.is_admin:
-			return super(StaffImportRequiredMixin, self).dispatch(request, *args, **kwargs)
-
-		role_permissions = set([])
-		for role in request.user.groups.all():
-			if role.details.is_import:role_permissions.add('import')
-			if role.details.is_export:role_permissions.add('export')
-
-		if self.permission and self.permission[0] in role_permissions:
-			return super(StaffImportRequiredMixin, self).dispatch(request, *args, **kwargs)
+			return super(AdminRequiredMixin, self).dispatch(request, *args, **kwargs)
 		else:
-			return HttpResponseRedirect(reverse('user-access-denied'))
-
-
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])

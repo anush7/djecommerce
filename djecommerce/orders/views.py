@@ -10,7 +10,7 @@ from users.models import EcUser as User
 from .forms import AddressForm, UserAddressForm
 from .mixins import CartOrderMixin
 from .models import UserAddress, Order
-from catalog.mixins import StaffRequiredMixin
+from users.mixins import StaffRequiredMixin
 
 class OrderList(StaffRequiredMixin, ListView):
 	queryset = Order.objects.all()

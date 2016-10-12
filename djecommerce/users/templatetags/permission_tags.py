@@ -18,8 +18,6 @@ def get_staff_nav_bar(user):
 			[per.split('access_')[1] for per in x.permissions.filter(codename__startswith='access')\
 			.values_list('codename',flat=True) if per in role_permissions]
 		)
-		# if x.is_import: modules.append('import')
-		# if x.is_export: modules.append('export')
 
 	for i,mod in enumerate(modules):
 		if mod == 'catalogcategory':

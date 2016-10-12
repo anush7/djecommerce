@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 
-role_permissions = ['access_catalog','access_catalogcategory','access_tax','access_product','access_productattribute']
+role_permissions = ['access_catalog','access_catalogcategory','access_tax','access_product','access_productattribute','access_import','access_export']
 
 modulesData = {
 	'catalog': reverse('staff-catalog-list'),

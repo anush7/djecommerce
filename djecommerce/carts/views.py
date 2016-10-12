@@ -14,7 +14,7 @@ from users.forms import UserSignUpForm
 from users.models import EcUser as User
 from products.models import Product, ProductVariant
 from carts.models import Cart, CartItem
-from catalog.mixins import LoginRequiredMixin
+from users.mixins import LoginRequiredMixin
 
 if settings.DEBUG:
 	braintree.Configuration.configure(environment=braintree.Environment.Sandbox,

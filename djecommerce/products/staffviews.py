@@ -25,10 +25,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
 
 from users.models import EcUser as User
-from users.mixins import StaffUpdateRequiredMixin
-from users.decorators import staff_update_required
+from users.mixins import StaffRequiredMixin, StaffUpdateRequiredMixin
+from users.decorators import staff_required, staff_update_required
+
 from catalog.models import Catalog, CatalogCategory
-from catalog.mixins import StaffRequiredMixin, LoginRequiredMixin, staff_required
 from django.contrib.admin.views.decorators import staff_member_required
 from products.models import Product, ProductAttribute, ProductCategory, ProductAttributeValue, ProductVariant, Stock, ProductImage
 from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
@@ -445,7 +445,7 @@ class Echo(object):
 
 class ProductImportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/import.html'
-    permissions = ['import']
+    permissions = ['access_import']
 
     def get_context_data(self, **kwargs):
         context = super(ProductImportView, self).get_context_data(**kwargs)
@@ -489,8 +489,9 @@ class ProductImportView(StaffRequiredMixin, TemplateView):
 
 class ProductExportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/export.html'
+    permissions = ['access_export']
 
-@staff_required
+@staff_required(['access_export'])
 def ProductExportCsv(request):
     cats = []
     key= {}

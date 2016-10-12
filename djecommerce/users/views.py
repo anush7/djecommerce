@@ -25,7 +25,7 @@ from users.models import EcUser as User
 from users.models import GroupDetails
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
-from catalog.mixins import AdminRequiredMixin
+from users.mixins import AdminRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from users.utils import send_mg_email
 
@@ -418,8 +418,6 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
     	if grp_id:
     		grp = Group.objects.get(id=grp_id)
     		grp.name = grp_name
-    		grp.details.is_import = 'access_import' in perms
-    		grp.details.is_export = 'access_export' in perms
     		grp.save()
     		grp.permissions.clear()
     		grp.details.categories.clear()
