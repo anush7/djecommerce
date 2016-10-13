@@ -1,6 +1,8 @@
+{% load permission_tags %}
 <div class="row">
     <div id="MainMenu" class="col-sm-4 col-lg-10 col-md-4" >
         <div class="list-group">
+            {% check_permission user 'delete_catalogcategory' as can_delete %}
             {% for category in object_list %}
                 <div id="id_category_{{category.id}}">
                     <div class="col-lg-8" >
@@ -10,23 +12,37 @@
                                 <span style="float:right;margin-top:7px;margin-right:50px;" class="caret"></span>
                             {% endif %}
                         </a>
-                        <a href="{% url 'staff-category-edit' category.id %}" title="Edit Category" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a onclick="delete_category({{category.id}})" href="javascript:void(0);" title="Delete Category" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                        {% check_update_permission user category.created_by 'change_catalogcategory,change_owned_catalogcategory' as can_update_parent %}
+                        {% if can_update_parent %}
+                            <a href="{% url 'staff-category-edit' category.id %}" title="Edit Category" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+                        {% endif %}
+                        {% if can_delete %}
+                            <a onclick="delete_category({{category.id}})" href="javascript:void(0);" title="Delete Category" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                        {% endif %}
                         <div class="collapse" id="demo{{category.id}}">
                             {% for subcat in category.children.all %}
+                                {% check_update_permission user subcat.created_by 'change_catalogcategory,change_owned_catalogcategory' as can_update %}
                                 <a href="javascript:;" id="id_category_{{subcat.id}}" class="list-group-item list-group-item-success">{{subcat.name}}
-                                    <button id="id_active_{{subcat.id}}" onclick="change_status({{subcat.id}},'I');" style="display:inline-block;float:right;margin-right:55px;margin-top:-3px;{% if subcat.status == 'I' %}display:none;{% endif %}">Active</button>
-                                    <button id="id_inactive_{{subcat.id}}" onclick="change_status({{subcat.id}},'A');" style="display:inline-block;float:right;margin-right:55px;margin-top:-3px;{% if subcat.status == 'A' %}display:none;{% endif %}">Inactive</button>
+                                    {% if can_update %}
+                                        <button id="id_active_{{subcat.id}}" onclick="change_status({{subcat.id}},'I');" style="display:inline-block;float:right;margin-right:55px;margin-top:-3px;{% if subcat.status == 'I' %}display:none;{% endif %}">Active</button>
+                                        <button id="id_inactive_{{subcat.id}}" onclick="change_status({{subcat.id}},'A');" style="display:inline-block;float:right;margin-right:55px;margin-top:-3px;{% if subcat.status == 'A' %}display:none;{% endif %}">Inactive</button>
+                                    {% endif %}
                                 </a>
-                                <a href="{% url 'staff-category-edit' subcat.id %}" title="Edit Category" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-                                <a onclick="delete_category({{category.id}})" title="Delete Category" href="javascript:void(0);" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                                {% if can_update %}
+                                    <a href="{% url 'staff-category-edit' subcat.id %}" title="Edit Category" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+                                {% endif %}
+                                {% if can_delete %}
+                                    <a onclick="delete_category({{category.id}})" title="Delete Category" href="javascript:void(0);" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>
+                    {% if can_update_parent %}
                     <div class="col-lg-2" >
                         <button id="id_active_{{category.id}}" onclick="change_status({{category.id}},'I');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if category.status == 'I' %}display:none;{% endif %}">Active</button>
                         <button id="id_inactive_{{category.id}}" onclick="change_status({{category.id}},'A');" style="display:inline-block;float:right;margin-right:75px;margin-top:7px;{% if category.status == 'A' %}display:none;{% endif %}">Inactive</button>
                     </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

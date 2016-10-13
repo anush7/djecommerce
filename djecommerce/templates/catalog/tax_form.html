@@ -41,19 +41,22 @@
 
 $(document).ready(function(){
 
-	$("form[name='tax_form']").validate({
-	    rules: {
-	    	name: "required",
-	    	tax_percentage: "required"
-	    },
-	    messages: {
-	    	name: "Please enter the Tax name",
-	    	tax_percentage: "Please enter the tax percentage"
-	   	},
-	    submitHandler: function(form) {
-	    	form.submit();
-	    }
-	});
+	// $("form[name='tax_form']").validate({
+	//     rules: {
+	//     	name: "required",
+	//     	tax_percentage: {
+	//     		required: true,
+	//     		number: true
+	//     	}
+	//     },
+	//     messages: {
+	//     	name: "Please enter the Tax name",
+	//     	tax_percentage: "Please enter the tax percentage"
+	//    	},
+	//     submitHandler: function(form) {
+	//     	form.submit();
+	//     }
+	// });
 
 });
 

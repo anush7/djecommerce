@@ -40,6 +40,11 @@
 
 $(document).ready(function(){
 
+	$('#id_categories').multiselect({
+		includeSelectAllOption: true,
+		enableFiltering: true
+	});
+
 	$("form[name='catalog_form']").validate({
 	    rules: {
 	    	name: "required",

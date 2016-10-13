@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% load permission_tags %}
+{% check_permission user 'delete_tax' as can_delete %}
 <div class="container">
     <div class="row">
         <div class="col-md-2">
@@ -16,8 +18,13 @@
                                     <li class="list-group-item">
                                         {{tax.name}} | Tax Rate: {{tax.tax_percentage|floatformat:2}} | {% if tax.is_active %}Active{% else %}Inactive{% endif %}
                                     </li>
-                                    <a href="{% url 'staff-tax-update' tax.id %}" title="Edit tax" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-                                    <a onclick="delete_tax({{tax.id}})" href="javascript:void(0);" title="Delete tax" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                                    {% check_update_permission user tax.created_by 'change_tax,change_owned_tax' as can_update %}
+                                    {% if can_update %}
+                                        <a href="{% url 'staff-tax-update' tax.id %}" title="Edit tax" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    {% endif %}
+                                    {% if can_delete %}
+                                        <a onclick="delete_tax({{tax.id}})" href="javascript:void(0);" title="Delete tax" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

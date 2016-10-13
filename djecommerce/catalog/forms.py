@@ -9,7 +9,7 @@ class CatalogForm(forms.ModelForm):
     name = forms.CharField(required=True,max_length=200, error_messages={'required': 'Please enter the catalog title'},widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off'}))
     description = forms.CharField(required=True,max_length=1000, error_messages={'required': 'Please enter the catalog description'},widget=forms.Textarea(attrs={'class': 'form-control', 'autocomplete':'off', 'cols': 3, 'rows': 6}))
     categories = forms.ModelMultipleChoiceField(
-                        widget=forms.Select(attrs={'class':'form-control'}),
+                        widget=forms.SelectMultiple(attrs={'class':'form-control'}),
                         required=True,
                         queryset=CatalogCategory.objects.filter(parent__isnull=True).order_by('name')
                 )
