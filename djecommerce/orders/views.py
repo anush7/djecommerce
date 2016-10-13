@@ -10,15 +10,15 @@ from users.models import EcUser as User
 from .forms import AddressForm, UserAddressForm
 from .mixins import CartOrderMixin
 from .models import UserAddress, Order
-from users.mixins import StaffRequiredMixin
+from users.mixins import StaffRequiredMixin, LoginRequiredMixin
 
-class OrderList(StaffRequiredMixin, ListView):
+class OrderList(LoginRequiredMixin, ListView):
 	queryset = Order.objects.all()
 
 	def get_queryset(self):
 		return super(OrderList, self).get_queryset().filter(user=self.request.user)
 
-class OrderDetail(StaffRequiredMixin, DetailView):
+class OrderDetail(LoginRequiredMixin, DetailView):
 	model = Order
 
 	def dispatch(self, request, *args, **kwargs):
@@ -28,7 +28,7 @@ class OrderDetail(StaffRequiredMixin, DetailView):
 		else:
 			raise Http404
 
-class AddressSelectFormView(StaffRequiredMixin, CartOrderMixin, FormView):
+class AddressSelectFormView(LoginRequiredMixin, CartOrderMixin, FormView):
 	form_class = AddressForm
 	template_name = "orders/address_select.html"
 
@@ -79,7 +79,7 @@ class AddressSelectFormView(StaffRequiredMixin, CartOrderMixin, FormView):
 		return reverse("checkout")
 
 
-class UserAddressCreateView(StaffRequiredMixin, CreateView):
+class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
 	success_url = reverse_lazy("order_address")

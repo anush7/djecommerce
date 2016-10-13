@@ -23,9 +23,10 @@ from django.conf import settings
 from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
 from users.models import GroupDetails
+from django.contrib.auth.decorators import login_required
 from orders.models import UserAddress
 from orders.forms import AddressForm, UserAddressForm
-from users.mixins import AdminRequiredMixin
+from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from users.utils import send_mg_email
 
@@ -201,13 +202,13 @@ def check_username_email(request):
 	return HttpResponse(json.dumps(data))
 
 
-class UserAddressListView(ListView):
+class UserAddressListView(LoginRequiredMixin, ListView):
     template_name = 'users/addresses.html'
 
     def get_queryset(self):
         return UserAddress.objects.filter(user=self.request.user)
 
-class UserAddressCreateView(CreateView):
+class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
 	success_url = reverse_lazy("order_address")
@@ -216,7 +217,7 @@ class UserAddressCreateView(CreateView):
 		form.instance.user = self.request.user
 		return super(UserAddressCreateView, self).form_valid(form, *args, **kwargs)
 
-class UserAddressUpdateView(UpdateView):
+class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 	model = UserAddress
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
@@ -226,6 +227,7 @@ class UserAddressUpdateView(UpdateView):
 		form.instance.user = self.request.user
 		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
+@login_required
 def delete_address(request, pk):
 	data = {}
 	try:
@@ -236,7 +238,7 @@ def delete_address(request, pk):
 	return HttpResponse(json.dumps(data))
 
 
-class UserProfileUpdateView(UpdateView):
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 	model = User
 	form_class = UserProfileForm
 	template_name = "account/profile.html"
