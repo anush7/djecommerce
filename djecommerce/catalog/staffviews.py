@@ -99,7 +99,7 @@ class CatalogCreateView(StaffRequiredMixin, CreateView):
         form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
-class CatalogUpdateView(StaffRequiredMixin, UpdateView):
+class CatalogUpdateView(StaffUpdateRequiredMixin, UpdateView):
     model = Catalog
     form_class = CatalogForm
     success_url = reverse_lazy('staff-catalog-list')
@@ -215,7 +215,7 @@ class CategoryCreateView(StaffRequiredMixin, CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
-class CategoryUpdateView(StaffRequiredMixin, UpdateView):
+class CategoryUpdateView(StaffUpdateRequiredMixin, UpdateView):
     model = CatalogCategory
     form_class = CatalogCategoryForm
     success_url = reverse_lazy('staff-category-list')
@@ -345,7 +345,7 @@ class AttributeCreateView(StaffRequiredMixin, CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-class AttributeUpdateView(StaffRequiredMixin, UpdateView):
+class AttributeUpdateView(StaffUpdateRequiredMixin, UpdateView):
     model = ProductAttribute
     form_class = AttributeForm
     success_url = reverse_lazy('staff-attribute-list')
