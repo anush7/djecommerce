@@ -30,7 +30,7 @@ from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from users.utils import send_mg_email
 
-def home(request,template='account/home.html'):
+def home(request,template='users/home.html'):
     return render(request, template)
 
 def access_denied(request,template='users/no-permission.html'):
@@ -39,13 +39,10 @@ def access_denied(request,template='users/no-permission.html'):
 def dashboard(request,template='users/dashboard.html'):
     return render(request, template)
 
-def landing(request,template='account/landing.html'):
+def landing(request,template='users/landing.html'):
     return render(request, template)
 
-def account_settings(request,template='account/settings.html'):
-    return render(request, template)
-
-def user_signup(request, template='account/signup.html'):
+def user_signup(request, template='users/signup.html'):
 	data = {}
 	if request.method == 'POST':
 		form = UserSignUpForm(request.POST)
@@ -84,7 +81,7 @@ def user_signup(request, template='account/signup.html'):
 	data['form'] = form
 	return render(request, template, data)
 
-def user_signin(request, template='account/signin.html'):
+def user_signin(request, template='users/signin.html'):
 	if request.method == 'POST':
 		data = {}
 		if request.POST.get('email',False) and request.POST.get('password',False):
@@ -126,9 +123,9 @@ def change_password(request):
 			else:data['msg'] = 'New passwords do not match!'
 		else:data['msg'] = 'Please enter all fields!'
 		return HttpResponse(json.dumps(data))
-	return render(request, 'account/settings.html')
+	return render(request, 'users/change-password.html')
 
-def forgot_password(request, template="account/forgot-password.html"):
+def forgot_password(request, template="users/forgot-password.html"):
 	data={}
 	if request.POST:
 		if request.POST.get('email',False):
@@ -142,7 +139,7 @@ def forgot_password(request, template="account/forgot-password.html"):
 					user.save()
 				email_data['user'] = user
 				email_data['reset_link'] = 'http://localhost:8000/accounts/reset-password/?uuid='+user.uuid
-				html_content = body = render_to_string('account/reset-email.html',email_data,context_instance=RequestContext(request))
+				html_content = body = render_to_string('users/reset-email.html',email_data,context_instance=RequestContext(request))
 				send_mail('Password Reset Link - ContactMgmt App', body, from_email, to_email,fail_silently=False, html_message=html_content,)
 				data['msg'] = 'Please check your email for password rest link'
 			except:
@@ -153,7 +150,7 @@ def forgot_password(request, template="account/forgot-password.html"):
 			data['msg'] = 'Please enter your registered email address'
 	return render(request, template, {'data': data})
 
-def reset_password(request, template="account/reset-password.html"):
+def reset_password(request, template="users/reset-password.html"):
 	data={}
 	if request.POST:
 		if request.POST.get('pass1',False) and request.POST.get('pass2',False):
@@ -247,7 +244,7 @@ def delete_address(request, pk):
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 	model = User
 	form_class = UserProfileForm
-	template_name = "account/profile.html"
+	template_name = "users/profile.html"
 
 	def get_success_url(self):
 		messages.success(self.request, "Profile Updated!")

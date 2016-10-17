@@ -1,0 +1,12 @@
+<html>
+<head><title>Reset password</title></head>
+<body>
+	Hi {% if user.first_name %}{{user.first_name}}{% else %}{{user.username}}{% endif %}<br><br>
+
+	Click on the below link to reset your password<br>
+	<a href="{{reset_link}}" target="_blank">{{reset_link}}</a><br><br>
+
+	Thanks,<br>
+	ContactMgmt App
+</body>
+</html>

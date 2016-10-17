@@ -11,8 +11,6 @@ urlpatterns = [
     url(r'^staff-management$', views.StaffManagementView.as_view(), name='staff_management'),
     url(r'^staff-role$', views.StaffRoleView.as_view(), name='staff_role'),
     url(r'^staff-role/(?P<pk>\d+)$', views.StaffRoleView.as_view(), name='staff_role_action'),
-
-    url(r'^settings/?$', views.change_password, name='account_settings'),
     
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
     url(r'^change-password$', views.change_password, name='change-password'),
