@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users import views
 from carts.views import CartView, CartCountView, CheckoutView, CheckoutFinalView
-from orders.views import OrderList, OrderDetail, AddressSelectFormView, UserAddressCreateView
+from orders.views import AddressSelectFormView
 
 urlpatterns = [
 
