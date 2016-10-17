@@ -21,9 +21,7 @@ urlpatterns = [
     url(r'^checkout/address$', AddressSelectFormView.as_view(), name='order_address'),
     url(r'^checkout$', CheckoutView.as_view(), name='checkout'),
     url(r'^checkout/final/$', CheckoutFinalView.as_view(), name='checkout_final'),
-
-    url(r'^account/orders$', OrderList.as_view(), name='orders'),
-    url(r'^account/orders/(?P<pk>\d+)$', OrderDetail.as_view(), name='order_detail'),
+    
     
     url(r'^signout$', logout, {'template_name': 'users/signin.html','next_page':'/'},name='signout'),
 
