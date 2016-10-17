@@ -24,17 +24,21 @@ from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
 from users.models import GroupDetails
 from django.contrib.auth.decorators import login_required
-from orders.models import UserAddress
+from orders.models import UserAddress, Order
 from orders.forms import AddressForm, UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
+from products.models import Product
 from users.utils import send_mg_email
 
 def access_denied(request,template='users/no-permission.html'):
     return render(request, template)
 
 def dashboard(request,template='users/dashboard.html'):
-    return render(request, template)
+	data={}
+	data['product_count'] = Product.objects.filter(status='A').count()
+	data['order_count'] = Order.objects.filter(status='paid').count()
+	return render(request, template, data)
 
 def user_signup(request, template='users/signup.html'):
 	data = {}
