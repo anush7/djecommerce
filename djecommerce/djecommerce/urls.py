@@ -13,6 +13,7 @@ urlpatterns = [
 
     url(r'^signup$', views.user_signup, name='user_signup'),
     url(r'^login$', views.user_signin, name='user_signin'),
+    url(r'^logout$', logout, {'template_name': 'users/signin.html','next_page':'/'},name='signout'),
     url(r'^forgot-password$', views.forgot_password, name='forgot_password'),
     url(r'^reset-password$', views.reset_password, name='rest_password'),
     
@@ -20,6 +21,7 @@ urlpatterns = [
 
     url(r'^account/', include('users.urls')),
     url(r'^staff/', include('djecommerce.staffurls')),
+    url(r'^admin/', include('djecommerce.adminurls')),
 
     url(r'^cart$', CartView.as_view(), name='add-to-cart'),
     url(r'^cart/count$', CartCountView.as_view(), name='cart_count'),
@@ -27,9 +29,7 @@ urlpatterns = [
     url(r'^checkout$', CheckoutView.as_view(), name='checkout'),
     url(r'^checkout/final/$', CheckoutFinalView.as_view(), name='checkout_final'),
     
-    
-    url(r'^signout$', logout, {'template_name': 'users/signin.html','next_page':'/'},name='signout'),
-
+    url(r'^access-denied$', views.access_denied, name='user-access-denied'),
 
 ]
 
