@@ -97,7 +97,7 @@
 				      			{% if user.is_admin %}
 					            	<li><a href="{% url 'staff_management' %}">Staff Management</a></li>
 				      			{% endif %}
-					            <li><a href="{% url 'account_settings' %}">Account</a></li>
+					            <li><a href="{% url 'user_profile' user.id %}">Account</a></li>
 					        </ul>
 				        </li>
 			        	<li><a href="{% url 'signout' %}">Logout</a></li>

@@ -112,19 +112,21 @@ def user_signin(request, template='account/signin.html'):
 
 def change_password(request):
 	data={}
-	if request.POST.get('old',False) and request.POST.get('new',False) and request.POST.get('confirm',False):
-		if request.POST.get('new',False) == request.POST.get('confirm',False):
-			if request.user.check_password(request.POST['old']):
-				username = request.user.username
-				request.user.set_password(request.POST['new'])
-				request.user.save()
-				user=authenticate(username=username, password=request.POST['new'])
-				login(request, user)
-				data['msg'] = 'Password Reset Successful!'
-			else:data['msg'] = 'Please enter your correct password!'
-		else:data['msg'] = 'New passwords do not match!'
-	else:data['msg'] = 'Please enter all fields!'
-	return HttpResponse(json.dumps(data))
+	if request.POST:
+		if request.POST.get('old',False) and request.POST.get('new',False) and request.POST.get('confirm',False):
+			if request.POST.get('new',False) == request.POST.get('confirm',False):
+				if request.user.check_password(request.POST['old']):
+					username = request.user.username
+					request.user.set_password(request.POST['new'])
+					request.user.save()
+					user=authenticate(username=username, password=request.POST['new'])
+					login(request, user)
+					data['msg'] = 'Password Reset Successful!'
+				else:data['msg'] = 'Please enter your correct password!'
+			else:data['msg'] = 'New passwords do not match!'
+		else:data['msg'] = 'Please enter all fields!'
+		return HttpResponse(json.dumps(data))
+	return render(request, 'account/settings.html')
 
 def forgot_password(request, template="account/forgot-password.html"):
 	data={}
@@ -211,7 +213,12 @@ class UserAddressListView(LoginRequiredMixin, ListView):
 class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
-	success_url = reverse_lazy("order_address")
+	#success_url = reverse_lazy("order_address")
+
+	def get_success_url(self, *args, **kwargs):
+		if self.request.GET.get('checkout',False):
+			return reverse("checkout")
+		return reverse("user_address_list")
 
 	def form_valid(self, form, *args, **kwargs):
 		form.instance.user = self.request.user
@@ -227,7 +234,6 @@ class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 		form.instance.user = self.request.user
 		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
-@login_required
 def delete_address(request, pk):
 	data = {}
 	try:
