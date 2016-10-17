@@ -8,8 +8,6 @@ from carts.views import CartView, CartCountView, CheckoutView, CheckoutFinalView
 from orders.views import OrderList, OrderDetail, AddressSelectFormView, UserAddressCreateView
 
 urlpatterns = [
-    url(r'^dd$', views.home, name="home"),
-    url(r'^landing$', views.landing, name="landing"),
 
     url(r'^signup$', views.user_signup, name='user_signup'),
     url(r'^login$', views.user_signin, name='user_signin'),

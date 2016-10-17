@@ -30,16 +30,10 @@ from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from users.utils import send_mg_email
 
-def home(request,template='users/home.html'):
-    return render(request, template)
-
 def access_denied(request,template='users/no-permission.html'):
     return render(request, template)
 
 def dashboard(request,template='users/dashboard.html'):
-    return render(request, template)
-
-def landing(request,template='users/landing.html'):
     return render(request, template)
 
 def user_signup(request, template='users/signup.html'):
