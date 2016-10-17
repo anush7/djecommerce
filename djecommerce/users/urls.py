@@ -5,20 +5,15 @@ from orders.views import OrderList, OrderDetail
 
 urlpatterns = [
 	
-	url(r'^signup$', views.user_signup, name='user_signup'),
-    url(r'^login$', views.user_signin, name='user_signin'),
-    url(r'^forgot-password$', views.forgot_password, name='forgot_password'),
-    url(r'^reset-password$', views.reset_password, name='rest_password'),
-
     url(r'^staff-invite$', views.StaffInviteView.as_view(), name='staff_invite'),
     url(r'^staff-management$', views.StaffManagementView.as_view(), name='staff_management'),
     url(r'^staff-role$', views.StaffRoleView.as_view(), name='staff_role'),
     url(r'^staff-role/(?P<pk>\d+)$', views.StaffRoleView.as_view(), name='staff_role_action'),
     
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
-    url(r'^change-password$', views.change_password, name='change-password'),
     url(r'^orders$', OrderList.as_view(), name='orders'),
     url(r'^orders/(?P<pk>\d+)$', OrderDetail.as_view(), name='order_detail'),
+    url(r'^change-password$', views.change_password, name='change-password'),
 
 	url(r'^addresses$', views.UserAddressListView.as_view(), name='user_address_list'),
     url(r'^address/add$', views.UserAddressCreateView.as_view(), name='user-address-add'),

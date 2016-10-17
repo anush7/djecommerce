@@ -138,7 +138,7 @@ def forgot_password(request, template="users/forgot-password.html"):
 					user.uuid = str(uuid.uuid4()).replace('-','')
 					user.save()
 				email_data['user'] = user
-				email_data['reset_link'] = 'http://localhost:8000/account/reset-password/?uuid='+user.uuid
+				email_data['reset_link'] = 'http://localhost:8000/reset-password/?uuid='+user.uuid
 				html_content = body = render_to_string('users/reset-email.html',email_data,context_instance=RequestContext(request))
 				send_mail('Password Reset Link - ContactMgmt App', body, from_email, to_email,fail_silently=False, html_message=html_content,)
 				data['msg'] = 'Please check your email for password rest link'
@@ -367,7 +367,7 @@ class StaffInviteView(AdminRequiredMixin, View):
 
 	def post(self, request, *args, **kwargs):
 		invite_emails = request.POST.getlist('invite_email')
-		sign_up_url = 'http://127.0.0.1:8000/account/signup/'
+		sign_up_url = 'http://127.0.0.1:8000/signup'
 		from_name = request.user.first_name
 
 		subject = 'Staff Sign up Invite'
