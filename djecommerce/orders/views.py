@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.views.generic.edit import CreateView, FormView
@@ -36,10 +36,10 @@ class AddressSelectFormView(LoginRequiredMixin, CartOrderMixin, FormView):
 		b_address, s_address = self.get_addresses()
 		if b_address.count() == 0:
 			messages.success(self.request, "Please add a billing address before continuing")
-			return redirect("user-address-add")
+			return HttpResponseRedirect(reverse("user-address-add")+'?checkout=True')
 		elif s_address.count() == 0:
 			messages.success(self.request, "Please add a shipping address before continuing")
-			return redirect("user-address-add")
+			return HttpResponseRedirect(reverse("user-address-add")+'?checkout=True')
 		else:
 			return super(AddressSelectFormView, self).dispatch(*args, **kwargs)
 

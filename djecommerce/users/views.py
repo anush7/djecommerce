@@ -24,28 +24,23 @@ from users.forms import UserSignUpForm, UserProfileForm
 from users.models import EcUser as User
 from users.models import GroupDetails
 from django.contrib.auth.decorators import login_required
-from orders.models import UserAddress
+from orders.models import UserAddress, Order
 from orders.forms import AddressForm, UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
+from products.models import Product
 from users.utils import send_mg_email
-
-def home(request,template='account/home.html'):
-    return render(request, template)
 
 def access_denied(request,template='users/no-permission.html'):
     return render(request, template)
 
 def dashboard(request,template='users/dashboard.html'):
-    return render(request, template)
+	data={}
+	data['product_count'] = Product.objects.filter(status='A').count()
+	data['order_count'] = Order.objects.filter(status='paid').count()
+	return render(request, template, data)
 
-def landing(request,template='account/landing.html'):
-    return render(request, template)
-
-def account_settings(request,template='account/settings.html'):
-    return render(request, template)
-
-def user_signup(request, template='account/signup.html'):
+def user_signup(request, template='users/signup.html'):
 	data = {}
 	if request.method == 'POST':
 		form = UserSignUpForm(request.POST)
@@ -84,7 +79,7 @@ def user_signup(request, template='account/signup.html'):
 	data['form'] = form
 	return render(request, template, data)
 
-def user_signin(request, template='account/signin.html'):
+def user_signin(request, template='users/signin.html'):
 	if request.method == 'POST':
 		data = {}
 		if request.POST.get('email',False) and request.POST.get('password',False):
@@ -112,21 +107,23 @@ def user_signin(request, template='account/signin.html'):
 
 def change_password(request):
 	data={}
-	if request.POST.get('old',False) and request.POST.get('new',False) and request.POST.get('confirm',False):
-		if request.POST.get('new',False) == request.POST.get('confirm',False):
-			if request.user.check_password(request.POST['old']):
-				username = request.user.username
-				request.user.set_password(request.POST['new'])
-				request.user.save()
-				user=authenticate(username=username, password=request.POST['new'])
-				login(request, user)
-				data['msg'] = 'Password Reset Successful!'
-			else:data['msg'] = 'Please enter your correct password!'
-		else:data['msg'] = 'New passwords do not match!'
-	else:data['msg'] = 'Please enter all fields!'
-	return HttpResponse(json.dumps(data))
+	if request.POST:
+		if request.POST.get('old',False) and request.POST.get('new',False) and request.POST.get('confirm',False):
+			if request.POST.get('new',False) == request.POST.get('confirm',False):
+				if request.user.check_password(request.POST['old']):
+					username = request.user.username
+					request.user.set_password(request.POST['new'])
+					request.user.save()
+					user=authenticate(username=username, password=request.POST['new'])
+					login(request, user)
+					data['msg'] = 'Password Reset Successful!'
+				else:data['msg'] = 'Please enter your correct password!'
+			else:data['msg'] = 'New passwords do not match!'
+		else:data['msg'] = 'Please enter all fields!'
+		return HttpResponse(json.dumps(data))
+	return render(request, 'users/change-password.html')
 
-def forgot_password(request, template="account/forgot-password.html"):
+def forgot_password(request, template="users/forgot-password.html"):
 	data={}
 	if request.POST:
 		if request.POST.get('email',False):
@@ -139,8 +136,8 @@ def forgot_password(request, template="account/forgot-password.html"):
 					user.uuid = str(uuid.uuid4()).replace('-','')
 					user.save()
 				email_data['user'] = user
-				email_data['reset_link'] = 'http://localhost:8000/accounts/reset-password/?uuid='+user.uuid
-				html_content = body = render_to_string('account/reset-email.html',email_data,context_instance=RequestContext(request))
+				email_data['reset_link'] = 'http://localhost:8000/reset-password/?uuid='+user.uuid
+				html_content = body = render_to_string('users/reset-email.html',email_data,context_instance=RequestContext(request))
 				send_mail('Password Reset Link - ContactMgmt App', body, from_email, to_email,fail_silently=False, html_message=html_content,)
 				data['msg'] = 'Please check your email for password rest link'
 			except:
@@ -151,7 +148,7 @@ def forgot_password(request, template="account/forgot-password.html"):
 			data['msg'] = 'Please enter your registered email address'
 	return render(request, template, {'data': data})
 
-def reset_password(request, template="account/reset-password.html"):
+def reset_password(request, template="users/reset-password.html"):
 	data={}
 	if request.POST:
 		if request.POST.get('pass1',False) and request.POST.get('pass2',False):
@@ -211,7 +208,12 @@ class UserAddressListView(LoginRequiredMixin, ListView):
 class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
-	success_url = reverse_lazy("order_address")
+	#success_url = reverse_lazy("order_address")
+
+	def get_success_url(self, *args, **kwargs):
+		if self.request.GET.get('checkout',False):
+			return reverse("checkout")
+		return reverse("user_address_list")
 
 	def form_valid(self, form, *args, **kwargs):
 		form.instance.user = self.request.user
@@ -227,7 +229,6 @@ class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 		form.instance.user = self.request.user
 		return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
-@login_required
 def delete_address(request, pk):
 	data = {}
 	try:
@@ -241,7 +242,7 @@ def delete_address(request, pk):
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 	model = User
 	form_class = UserProfileForm
-	template_name = "account/profile.html"
+	template_name = "users/profile.html"
 
 	def get_success_url(self):
 		messages.success(self.request, "Profile Updated!")
@@ -364,7 +365,7 @@ class StaffInviteView(AdminRequiredMixin, View):
 
 	def post(self, request, *args, **kwargs):
 		invite_emails = request.POST.getlist('invite_email')
-		sign_up_url = 'http://127.0.0.1:8000/accounts/signup/'
+		sign_up_url = 'http://127.0.0.1:8000/signup'
 		from_name = request.user.first_name
 
 		subject = 'Staff Sign up Invite'

@@ -28,6 +28,7 @@ def staff_required(permissions):
 def staff_update_required(permissions):
 	def staff_update_required_dec(view_func):
 		def wrapped_view_func(request, *args, **kwargs):
+			from users.constants import updatePermissionType
 			if request.user.is_authenticated():
 				if request.user.is_admin: return view_func(request, *args, **kwargs)
 				if request.user.is_staff:
