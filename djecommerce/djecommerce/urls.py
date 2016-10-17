@@ -13,7 +13,7 @@ urlpatterns = [
     
     url(r'^', include('products.urls')),
 
-    url(r'^accounts/', include('users.urls')),
+    url(r'^account/', include('users.urls')),
     url(r'^staff/', include('djecommerce.staffurls')),
 
     url(r'^cart$', CartView.as_view(), name='add-to-cart'),

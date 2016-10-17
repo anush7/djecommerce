@@ -76,7 +76,7 @@
                 type: 'POST',
                 dataType: 'json',
                 data: dataString,
-                url: '/accounts/address/delete/'+aid,
+                url: '/account/address/delete/'+aid,
                 success: function(data){
                     if(data.status == 1){
                         $('#id_addr_'+aid).remove();
