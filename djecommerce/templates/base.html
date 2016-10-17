@@ -41,7 +41,7 @@
 				        	<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
 				        	{% get_staff_nav_bar user %}
 					        {% if user.is_superuser %}
-					        	<li><a href="{% url 'staff-products-import' %}">Import/Export</a></li>
+					        	<!-- <li><a href="{% url 'staff-products-import' %}">Import/Export</a></li> -->
 					        {% endif %}
 					    {% endif %}
 				    {% else %}
