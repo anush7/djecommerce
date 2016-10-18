@@ -6,6 +6,7 @@ from orders.views import OrderList, OrderDetail
 urlpatterns = [
 
     url(r'^dashboard$', views.dashboard, name='staff-dashboard'),
+    url(r'^product-stats$', views.product_stats, name='products-stats'),
     
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
     url(r'^orders$', OrderList.as_view(), name='orders'),

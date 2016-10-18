@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12">
@@ -11,6 +13,9 @@
         </div>
 
         <div class="row">
+            <div id="container" style="width: 600px; height: 400px; margin: 0 auto; float:left;"></div>
+
+
             <div class="col-lg-3 col-md-6">
                 <div class="panel panel-green">
                     <div class="panel-heading">
@@ -98,8 +103,8 @@
                         </div>
                     </a>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
+        </div> 
 
 
         <!-- <div class="row">
@@ -239,5 +244,58 @@
         </div> -->
 
     </div>
+<script type="text/javascript">
+$(function () {
+    var dataString = '';
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: "{% url 'products-stats' %}",
+        success: function(data){
+            $('#container').highcharts({
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: 'Products added last week'
+                },
+                xAxis: {
+                    allowDecimals: false,
+                    categories: data.categories
+                },
+                yAxis: {
+                    title: {
+                        text: 'Product Count'
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value;
+                        }
+                    }
+                },
+                plotOptions: {
+                    area: {
+                        marker: {
+                            enabled: false,
+                            symbol: 'circle',
+                            radius: 2,
+                            states: {
+                                hover: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Products',
+                    data: data.series
+                }]
+            });
+        }
+    });
+});
+</script>
 
 {% endblock %}

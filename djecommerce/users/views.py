@@ -3,6 +3,8 @@ import json
 import uuid
 import requests
 import jwt
+import pytz
+from datetime import datetime
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.contrib import messages
 from django.db.models import Q, Value
@@ -29,16 +31,57 @@ from orders.forms import AddressForm, UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from products.models import Product
-from users.utils import send_mg_email
+from users.utils import send_mg_email, get_duration_labels
 
 def access_denied(request,template='users/no-permission.html'):
     return render(request, template)
 
 def dashboard(request,template='users/dashboard.html'):
 	data={}
-	data['product_count'] = Product.objects.filter(status='A').count()
-	data['order_count'] = Order.objects.filter(status='paid').count()
+	stat_duration = request.GET.get('duration','week')
+	indtz = pytz.timezone('Asia/Kolkata')
+	now = datetime.now(tz=indtz)
+	dates, q = get_duration_labels(now, stat_duration)
+
+	products = Product.objects.filter(status='A').aggregate(**q)
+	labels = []
+	series = []
+	for dt in dates:
+		if stat_duration == 'week':
+			labels.append(dt.split('-')[2])
+		elif stat_duration == 'month':
+			labels.append(dt.split('-')[1])
+		series.append(products[dt])
+
+	data['categories'] = labels
+	data['series'] = series
+
+	print data
+
 	return render(request, template, data)
+
+def product_stats(request):
+	data={}
+	stat_duration = request.GET.get('duration','week')
+	indtz = pytz.timezone('Asia/Kolkata')
+	now = datetime.now(tz=indtz)
+	dates, q = get_duration_labels(now, stat_duration)
+
+	products = Product.objects.filter(status='A').aggregate(**q)
+	labels = []
+	series = []
+	for dt in dates:
+		if stat_duration == 'week':
+			labels.append(dt.split('-')[2])
+		elif stat_duration == 'month':
+			labels.append(dt.split('-')[1])
+		series.append(products[dt])
+
+	data['categories'] = labels
+	data['series'] = series
+	return JsonResponse(data)
+
+
 
 def user_signup(request, template='users/signup.html'):
 	data = {}
