@@ -62,10 +62,13 @@ def dashboard(request,template='users/dashboard.html'):
 
 def product_stats(request):
 	data={}
-	stat_duration = request.GET.get('duration','week')
+	stat_duration = request.GET.get('duration','month')
 	indtz = pytz.timezone('Asia/Kolkata')
-	now = datetime.now(tz=indtz)
+	now = datetime.now()
 	dates, q = get_duration_labels(now, stat_duration)
+	print "qqqqqqqqqqqqqqqqqqqqqqq"
+	print q
+	print "qqqqqqqqqqqqqqqqqqqqqqq"
 
 	products = Product.objects.filter(status='A').aggregate(**q)
 	labels = []
