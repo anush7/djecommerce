@@ -7,63 +7,27 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 style="margin-top:10px; !important" class="page-header">
-                    Dashboard
+                    Product Stats
                 </h1>
             </div>
-        </div>
-
-        <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                <div id="container" xstyle="width: 600px; height: 400px; margin: 0 auto; float:left;"></div>
+                <div id="container1"></div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                <div id="container2" xstyle="width: 600px; height: 400px; margin: 0 auto; float:left;"></div>
+                <div id="container2"></div>
             </div>
 
-            <!-- <div class="col-lg-3 col-md-6">
-                <div class="panel panel-green">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-tasks fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">{{product_count}}</div>
-                                <div>Products</div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <span class="pull-left">View Details</span>
-                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
-                </div>
+            <div class="col-lg-12">
+                <h1 style="margin-top:10px; !important" class="page-header">
+                    Order Stats
+                </h1>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="panel panel-yellow">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-shopping-cart fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">{{order_count}}</div>
-                                <div>Orders</div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <span class="pull-left">View Details</span>
-                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
-                </div>
-            </div> -->
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
+                <div id="container3"></div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
+                <div id="container4"></div>
+            </div>
         </div> 
     </div>
 <script type="text/javascript">
@@ -75,20 +39,39 @@ $(function () {
         data: dataString,
         url: "{% url 'products-stats' %}",
         success: function(data){
-            create_chart('container', data.categories, data.series);
-            // create_chart('container2', data.categories, data.series);
+            create_product_stackchart('container1', data.categories, data.series);
+        }
+    });
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: "{% url 'products-cats' %}",
+        success: function(data){
+            create_product_piechart('container2', data.series);
+        }
+    });
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: "{% url 'orders-stats' %}",
+        success: function(data){
+            create_order_stackchart('container3', data.categories, data.series);
         }
     });
 });
 
-function create_chart(chart_id, categories, series){
+function create_order_stackchart(chart_id, categories, series){
 
     $('#'+chart_id).highcharts({
         chart: {
             type: 'area'
         },
         title: {
-            text: 'Products added & Orders placed'
+            text: 'Revenue'
         },
         xAxis: {
             allowDecimals: false,
@@ -96,7 +79,7 @@ function create_chart(chart_id, categories, series){
         },
         yAxis: {
             title: {
-                text: 'Product added & Order placed'
+                text: '$'
             },
             labels: {
                 formatter: function () {
@@ -120,7 +103,79 @@ function create_chart(chart_id, categories, series){
         },
         series: series
     });
+}
 
+function create_product_stackchart(chart_id, categories, series){
+
+    $('#'+chart_id).highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'Products added'
+        },
+        xAxis: {
+            allowDecimals: false,
+            categories: categories
+        },
+        yAxis: {
+            title: {
+                text: 'Products count'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
+            }
+        },
+        plotOptions: {
+            area: {
+                marker: {
+                    enabled: false,
+                    symbol: 'circle',
+                    radius: 2,
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
+                }
+            }
+        },
+        series: series
+    });
+}
+
+function create_product_piechart(chart_id, series){
+
+    $('#'+chart_id).highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Products in Categories'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: series
+    });
 }
 
 </script>

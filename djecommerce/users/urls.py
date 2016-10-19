@@ -1,12 +1,18 @@
 from django.conf import settings
 from django.conf.urls import include, url
-from users import views
+from users import views, stats
 from orders.views import OrderList, OrderDetail
 
 urlpatterns = [
 
     url(r'^dashboard$', views.dashboard, name='staff-dashboard'),
-    url(r'^product-stats$', views.product_stats, name='products-stats'),
+
+    #stats
+    url(r'^stats/product-added-stack$', stats.products_added_stats, name='products-stats'),
+    url(r'^stats/product-categories-pie$', stats.products_by_cats, name='products-cats'),
+
+    url(r'^stats/order-added-stack$', stats.orders_added_stats, name='orders-stats'),
+    #url(r'^stats/order-categories-pie$', stats.orders_by_stats, name='orders-cats'),
     
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
     url(r'^orders$', OrderList.as_view(), name='orders'),

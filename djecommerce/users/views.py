@@ -8,7 +8,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.contrib import messages
-from django.db.models import Q, Value
+from django.db.models import F, Count, Sum, Case, When, Q, Value, IntegerField
 from django.shortcuts import render, render_to_response, get_list_or_404,get_object_or_404
 from django.core.paginator import InvalidPage, Paginator
 from django.template.loader import render_to_string
@@ -32,53 +32,12 @@ from orders.forms import AddressForm, UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from products.models import Product
-from users.utils import send_mg_email, get_aggregate_query
-
+from users.utils import send_mg_email
+from collections import OrderedDict
 
 def dashboard(request,template='users/dashboard.html'):
 	data={}
 	return render(request, template, data)
-
-def product_stats(request):
-	data={}
-	key = {}
-	stat_duration = request.GET.get('duration','week')
-	category_id = request.GET.get('category_id',True)
-	if category_id:
-		cat = CatalogCategory.objects.filter(id=1)
-		key['categories__parent__in'] = cat
-
-	now = datetime.now()
-	dates, p_q, o_q = get_aggregate_query(now, stat_duration)
-
-	if stat_duration == 'month':
-		start_dt = now - relativedelta(months=6)
-	elif stat_duration == 'week':
-		start_dt = now - relativedelta(days=6)
-
-	products = Product.objects.values('status', 'created_on','categories')\
-					.filter(status='A', created_on__date__gte=start_dt.date(),**key).aggregate(**p_q)
-					
-	orders = Order.objects.values('status', 'order_placed')\
-					.filter(status='paid', order_placed__date__gte=start_dt.date()).aggregate(**o_q)
-
-	labels = []
-	series = [{'name':'Products','data':[]}]
-	if request.user.is_admin:series.append({'name':'Orders','data':[]})
-	for dt in dates:
-		if stat_duration == 'week':
-			labels.append(dt.split('-')[2])
-		elif stat_duration == 'month':
-			labels.append(dt.split('-')[1])
-		series[0]['data'].append(products[dt])
-		if request.user.is_admin:
-			series[1]['data'].append(orders[dt])
-
-	data['categories'] = labels
-	data['series'] = series
-	return JsonResponse(data)
-
-
 
 def user_signup(request, template='users/signup.html'):
 	data = {}
