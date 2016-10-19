@@ -20,39 +20,59 @@ def send_mg_email(subject, body, from_name=False, to_email=[]):
 	}
 	requests.post(mg_url, auth=("api", mg_key), data=msg_data)
 
-def get_duration_labels(st_dt, stat_type='month'):
+def get_aggregate_query(st_dt, stat_type='month'):
 	labels = []
-	q = OrderedDict()
+	p_q = OrderedDict()
+	o_q = OrderedDict()
 	if stat_type == 'month':
 		st_dt = ed_dt = st_dt - relativedelta(months=6)
 		for i in [0,1,1,1,1,1,1]:
 			ed_dt = ed_dt + relativedelta(months=i)
 			labels.append(ed_dt.strftime('%Y-%b-%a-%d'))
-			q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
-										Case(
-											When(
-							                    created_on__date=ed_dt.date(),
-							                    then=1
-							                ),
-							                default=Value('0'),
-							                output_field=IntegerField()
-							            )
-						            )
+			p_q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+													Case(
+														When(
+										                    created_on__date=ed_dt.date(),
+										                    then=1
+										                ),
+										                default=Value('0'),
+										                output_field=IntegerField()
+										            )
+									            )
+			o_q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+													Case(
+														When(
+										                    order_placed__date=ed_dt.date(),
+										                    then=1
+										                ),
+										                default=Value('0'),
+										                output_field=IntegerField()
+										            )
+									            )
 	elif stat_type == 'week':
 		st_dt = ed_dt = st_dt - relativedelta(days=6)
 		for i in [0,1,1,1,1,1,1]:
 			ed_dt = ed_dt + relativedelta(days=i)
 			labels.append(ed_dt.strftime('%Y-%b-%a-%d'))
-			q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
-										Case(
-											When(
-							                    created_on__date=ed_dt.date(),
-							                    then=1
-							                ),
-							                default=Value('0'),
-							                output_field=IntegerField()
-							            )
-						            )
+			p_q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+													Case(
+														When(
+										                    created_on__date=ed_dt.date(),
+										                    then=1
+										                ),
+										                default=Value('0'),
+										                output_field=IntegerField()
+										            )
+									            )
+			o_q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+													Case(
+														When(
+										                    order_placed__date=ed_dt.date(),
+										                    then=1
+										                ),
+										                default=Value('0'),
+										                output_field=IntegerField()
+										            )
+									            )
 
-	return (labels, q)
-
+	return (labels, p_q, o_q)
