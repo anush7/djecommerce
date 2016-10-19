@@ -27,9 +27,6 @@ def get_duration_labels(st_dt, stat_type='month'):
 		st_dt = ed_dt = st_dt - relativedelta(months=6)
 		for i in [0,1,1,1,1,1,1]:
 			ed_dt = ed_dt + relativedelta(months=i)
-			print "1111111111111111"
-			print ed_dt.date()
-			print "1111111111111111"
 			labels.append(ed_dt.strftime('%Y-%b-%a-%d'))
 			q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
 										Case(

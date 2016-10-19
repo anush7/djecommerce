@@ -33,42 +33,16 @@ from catalog.models import Catalog, CatalogCategory
 from products.models import Product
 from users.utils import send_mg_email, get_duration_labels
 
-def access_denied(request,template='users/no-permission.html'):
-    return render(request, template)
 
 def dashboard(request,template='users/dashboard.html'):
 	data={}
-	stat_duration = request.GET.get('duration','week')
-	indtz = pytz.timezone('Asia/Kolkata')
-	now = datetime.now(tz=indtz)
-	dates, q = get_duration_labels(now, stat_duration)
-
-	products = Product.objects.filter(status='A').aggregate(**q)
-	labels = []
-	series = []
-	for dt in dates:
-		if stat_duration == 'week':
-			labels.append(dt.split('-')[2])
-		elif stat_duration == 'month':
-			labels.append(dt.split('-')[1])
-		series.append(products[dt])
-
-	data['categories'] = labels
-	data['series'] = series
-
-	print data
-
 	return render(request, template, data)
 
 def product_stats(request):
 	data={}
 	stat_duration = request.GET.get('duration','month')
-	indtz = pytz.timezone('Asia/Kolkata')
 	now = datetime.now()
 	dates, q = get_duration_labels(now, stat_duration)
-	print "qqqqqqqqqqqqqqqqqqqqqqq"
-	print q
-	print "qqqqqqqqqqqqqqqqqqqqqqq"
 
 	products = Product.objects.filter(status='A').aggregate(**q)
 	labels = []
@@ -483,6 +457,10 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
     	context['permissions'] = grp.permissions.values_list('codename', flat=True)
 
         return render(request, self.template_name, context)
+
+
+def access_denied(request,template='users/no-permission.html'):
+    return render(request, template)
 
 
 # class StaffRoleCreateView(CreateView):
