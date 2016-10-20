@@ -19,3 +19,9 @@ updatePermissionType = {
 	'change_catalog':'all','change_owned_catalog':'owned',
 	'change_tax':'all','change_owned_tax':'owned'
 }
+
+month_count = {
+	'last_quarter': 3,
+	'last_six_months': 6,
+	'last_year': 12
+}

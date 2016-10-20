@@ -5,21 +5,36 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-12">
-                <h1 style="margin-top:10px; !important" class="page-header">
-                    Product Stats
-                </h1>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                <div id="container1"></div>
-            </div>
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                <div id="container2"></div>
-            </div>
+            {% if user.is_admin %}
+                <div class="col-lg-12">
+                    <h1 style="margin-top:10px; !important" class="page-header">
+                        Order Stats
+                    </h1>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                    <select id="stack_duration" class="form-control" style="width:150px;margin-left:25px;">
+                        <option value="week">Last Week</option>
+                        <option selected value="last_quarter">Last quarter</option>
+                        <option value="last_six_months">Last six months</option>
+                        <option value="last_year">Last Year</option>
+                    </select>
+                    <div id="container1"></div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
+                    <select id="pie_duration" class="form-control" style="width:150px;margin-left:25px;">
+                        <option value="all">All</option>
+                        <option value="week">Last Week</option>
+                        <option selected value="last_quarter">Last quarter</option>
+                        <option value="last_six_months">Last six months</option>
+                        <option value="last_year">Last Year</option>
+                    </select>
+                    <div id="container2"></div>
+                </div>
+            {% endif %}
 
             <div class="col-lg-12">
                 <h1 style="margin-top:10px; !important" class="page-header">
-                    Order Stats
+                    Product Stats
                 </h1>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
@@ -33,13 +48,27 @@
 <script type="text/javascript">
 $(function () {
     var dataString = '';
+    {% if user.is_admin %}
+        get_revenue_stats('both','');
+        $('#stack_duration').change(function() {
+            var dataString='duration='+$('#stack_duration option:selected').val();
+            dataString += '&chart_type=stack'
+            get_revenue_stats('stack', dataString);
+        });
+        $('#pie_duration').change(function() {
+            var dataString='duration='+$('#pie_duration option:selected').val();
+            dataString += '&chart_type=pie'
+            get_revenue_stats('pie', dataString);
+        });
+    {% endif %}
+
     $.ajax({
         type: 'GET',
         dataType: 'json',
         data: dataString,
         url: "{% url 'products-stats' %}",
         success: function(data){
-            create_product_stackchart('container1', data.categories, data.series);
+            create_product_stackchart('container3', data.categories, data.series);
         }
     });
 
@@ -49,20 +78,33 @@ $(function () {
         data: dataString,
         url: "{% url 'products-cats' %}",
         success: function(data){
-            create_product_piechart('container2', data.series);
+            create_product_piechart('container4', data.series);
         }
     });
 
+});
+
+function get_revenue_stats(chart_type, dataString){
     $.ajax({
         type: 'GET',
         dataType: 'json',
         data: dataString,
-        url: "{% url 'orders-stats' %}",
+        url: "{% url 'revenue-stats' %}",
         success: function(data){
-            create_order_stackchart('container3', data.categories, data.series);
+            if (chart_type == 'both'){
+                create_order_stackchart('container1', data.stack.categories, data.stack.series);
+                create_orders_piechart('container2', data.pie.series);
+            }else if (chart_type == 'stack'){
+                create_order_stackchart('container1', data.stack.categories, data.stack.series);
+            }else{
+                create_orders_piechart('container2', data.pie.series);
+            }
+
+            
+            
         }
     });
-});
+}
 
 function create_order_stackchart(chart_id, categories, series){
 
@@ -87,6 +129,9 @@ function create_order_stackchart(chart_id, categories, series){
                 }
             }
         },
+        tooltip: {
+            pointFormat: 'Revenue: ${point.y:,.0f}'
+        },
         plotOptions: {
             area: {
                 marker: {
@@ -97,6 +142,38 @@ function create_order_stackchart(chart_id, categories, series){
                         hover: {
                             enabled: true
                         }
+                    }
+                }
+            }
+        },
+        series: series
+    });
+}
+
+function create_orders_piechart(chart_id, series){
+
+    $('#'+chart_id).highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Revenue by Category'
+        },
+        tooltip: {
+            pointFormat: 'Revenue: ${point.y} <br>{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
                 }
             }
@@ -159,7 +236,7 @@ function create_product_piechart(chart_id, series){
             text: 'Products in Categories'
         },
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: 'Count: {point.y}<br>{point.name}: <b>{point.percentage:.1f}%</b>'
         },
         plotOptions: {
             pie: {
