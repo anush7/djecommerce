@@ -5,7 +5,7 @@ from django.db.models import F, Count, Sum, Case, When, Q, Value, IntegerField, 
 from django.http import JsonResponse
 from catalog.models import CatalogCategory
 from products.models import Product
-from users.utils import get_product_stack_query, get_product_pie_query, get_order_stack_query, get_order_pie_query, get_dates
+from users.utils import get_product_stack_query, get_product_pie_query, get_revenue_stack_query, get_revenue_pie_query, get_dates
 from collections import OrderedDict
 from orders.models import Order
 
@@ -27,11 +27,11 @@ def revenue_stats(request):
 	key['order_placed__lte'] = end
 
 	if stack_chart:
-		dates, q = get_order_stack_query(start, days, stat_duration)
+		dates, q = get_revenue_stack_query(start, days, stat_duration)
 		print dates
 
 	if pie_chart:
-		pq = get_order_pie_query()
+		pq = get_revenue_pie_query()
 		q.update(pq)
 	
 	orders = Order.objects.values('status','order_placed','cart','order_total')\
@@ -56,6 +56,7 @@ def revenue_stats(request):
 		categories = CatalogCategory.objects.filter(parent__isnull=True)
 		series = [{'name':'Revenue', 'colorByPoint': True, 'data':[]}]
 		for cat in categories:
+			if not orders[str(cat.id)]:orders[str(cat.id)]=0.0
 			series[0]['data'].append({'name':cat.name,'y':orders[str(cat.id)]})
 		data['pie']['series'] = series
 
@@ -106,6 +107,7 @@ def product_stats(request):
 		categories = CatalogCategory.objects.filter(parent__isnull=True)
 		series = [{'name':'Products', 'colorByPoint': True, 'data':[]}]
 		for cat in categories:
+			if not products[str(cat.id)]:products[str(cat.id)]=0.0
 			series[0]['data'].append({'name':cat.name,'y':products[str(cat.id)]})
 		data['pie']['series'] = series
 

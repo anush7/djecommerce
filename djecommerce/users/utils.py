@@ -81,7 +81,7 @@ def get_product_pie_query():
 	return q
 
 
-def get_order_stack_query(st_dt, days, duration_type='this_quarter'):
+def get_revenue_stack_query(st_dt, days, duration_type='this_quarter'):
 	from users.constants import month_count
 	labels = []
 	q = OrderedDict()
@@ -120,7 +120,7 @@ def get_order_stack_query(st_dt, days, duration_type='this_quarter'):
 			st_dt = st_dt + relativedelta(days=i)
 	return (labels, q)
 
-def get_order_pie_query():
+def get_revenue_pie_query():
 	categories = CatalogCategory.objects.filter(parent__isnull=True)
 	q = OrderedDict()
 	for cat in categories:
@@ -135,8 +135,6 @@ def get_order_pie_query():
 				            )
 				        )
 	return q
-
-
 
 
 def get_dates(duration):
