@@ -21,34 +21,36 @@ def send_mg_email(subject, body, from_name=False, to_email=[]):
 	}
 	requests.post(mg_url, auth=("api", mg_key), data=msg_data)
 
-def get_product_aggregate_query(st_dt, stat_type='month'):
+def get_product_aggregate_query(today, duration_type='last_six_months'):
+	from users.constants import month_count
 	labels = []
 	q = OrderedDict()
-	if stat_type == 'month':
-		st_dt = ed_dt = st_dt - relativedelta(months=6)
-		for i in [0,1,1,1,1,1,1]:
-			ed_dt = ed_dt + relativedelta(months=i)
-			labels.append(ed_dt.strftime('%Y-%b-%a-%d'))
-			q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+	if duration_type in ['last_quarter','last_six_months','last_year']:
+		mcount = month_count[duration_type]
+		st_dt = today - relativedelta(months=mcount)
+		for i in [0]+[1]*mcount:
+			st_dt = st_dt + relativedelta(months=i)
+			labels.append(st_dt.strftime('%Y-%b-%a-%d'))
+			q[st_dt.strftime('%Y-%b-%a-%d')] = Sum(
 													Case(
 														When(
-										                    created_on__month=int(ed_dt.strftime('%m')),
-										                    created_on__year=int(ed_dt.strftime('%Y')),
+										                    created_on__month=int(st_dt.strftime('%m')),
+										                    created_on__year=int(st_dt.strftime('%Y')),
 										                    then=1
 										                ),
 										                default=Value('0'),
 										                output_field=IntegerField()
 										            )
 									            )
-	elif stat_type == 'week':
-		st_dt = ed_dt = st_dt - relativedelta(days=6)
+	elif duration_type == 'week':
+		st_dt = today - relativedelta(days=6)
 		for i in [0,1,1,1,1,1,1]:
-			ed_dt = ed_dt + relativedelta(days=i)
-			labels.append(ed_dt.strftime('%Y-%b-%a-%d'))
-			q[ed_dt.strftime('%Y-%b-%a-%d')] = Sum(
+			st_dt = st_dt + relativedelta(days=i)
+			labels.append(st_dt.strftime('%Y-%b-%a-%d'))
+			q[st_dt.strftime('%Y-%b-%a-%d')] = Sum(
 													Case(
 														When(
-										                    created_on__date=ed_dt.date(),
+										                    created_on__date=st_dt.date(),
 										                    then=1
 										                ),
 										                default=Value('0'),
@@ -56,6 +58,23 @@ def get_product_aggregate_query(st_dt, stat_type='month'):
 										            )
 									            )
 	return (labels, q)
+
+def get_product_pie_query():
+	categories = CatalogCategory.objects.filter(parent__isnull=True)
+	q = OrderedDict()
+	for cat in categories:
+		q[str(cat.id)] = Sum(
+							Case(
+								When(
+				                    categories__parent__in=[cat],
+				                    then=1
+				                ),
+				                default=Value('0'),
+				                output_field=IntegerField()
+				            )
+				        )
+	return q
+
 
 def get_order_aggregate_query(today, duration_type='last_six_months'):
 	from users.constants import month_count

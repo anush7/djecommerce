@@ -12,7 +12,7 @@
                     </h1>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <select id="stack_duration" class="form-control" style="width:160px;margin-left:25px;">
+                    <select id="stack_rev_duration" class="form-control" style="width:160px;margin-left:25px;">
                         <option value="week">Last Week</option>
                         <option selected value="last_quarter">Last three months</option>
                         <option value="last_six_months">Last six months</option>
@@ -21,7 +21,7 @@
                     <div id="container1"></div>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                    <select id="pie_duration" class="form-control" style="width:160px;margin-left:25px;">
+                    <select id="pie_rev_duration" class="form-control" style="width:160px;margin-left:25px;">
                         <option value="all">All</option>
                         <option value="week">Last Week</option>
                         <option selected value="last_quarter">Last three months</option>
@@ -38,9 +38,22 @@
                 </h1>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
+                <select id="stack_pro_duration" class="form-control" style="width:160px;margin-left:25px;">
+                    <option value="week">Last Week</option>
+                    <option selected value="last_quarter">Last three months</option>
+                    <option value="last_six_months">Last six months</option>
+                    <option value="last_year">Last Year</option>
+                </select>
                 <div id="container3"></div>
             </div>
-            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <select id="pie_pro_duration" class="form-control" style="width:160px;margin-left:25px;">
+                    <option value="all">All</option>
+                    <option value="week">Last Week</option>
+                    <option selected value="last_quarter">Last three months</option>
+                    <option value="last_six_months">Last six months</option>
+                    <option value="last_year">Last Year</option>
+                </select>            
                 <div id="container4"></div>
             </div>
         </div> 
@@ -50,36 +63,28 @@ $(function () {
     var dataString = '';
     {% if user.is_admin %}
         get_revenue_stats('both','');
-        $('#stack_duration').change(function() {
-            var dataString='duration='+$('#stack_duration option:selected').val();
+        $('#stack_rev_duration').change(function() {
+            var dataString='duration='+$('#stack_rev_duration option:selected').val();
             dataString += '&chart_type=stack'
             get_revenue_stats('stack', dataString);
         });
-        $('#pie_duration').change(function() {
-            var dataString='duration='+$('#pie_duration option:selected').val();
+        $('#pie_rev_duration').change(function() {
+            var dataString='duration='+$('#pie_rev_duration option:selected').val();
             dataString += '&chart_type=pie'
             get_revenue_stats('pie', dataString);
         });
     {% endif %}
 
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        data: dataString,
-        url: "{% url 'products-stats' %}",
-        success: function(data){
-            create_product_stackchart('container3', data.categories, data.series);
-        }
+    get_product_stats('both','');
+    $('#stack_pro_duration').change(function() {
+        var dataString='duration='+$('#stack_pro_duration option:selected').val();
+        dataString += '&chart_type=stack'
+        get_product_stats('stack', dataString);
     });
-
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        data: dataString,
-        url: "{% url 'products-cats' %}",
-        success: function(data){
-            create_product_piechart('container4', data.series);
-        }
+    $('#pie_pro_duration').change(function() {
+        var dataString='duration='+$('#pie_pro_duration option:selected').val();
+        dataString += '&chart_type=pie'
+        get_product_stats('pie', dataString);
     });
 
 });
@@ -99,9 +104,25 @@ function get_revenue_stats(chart_type, dataString){
             }else{
                 create_orders_piechart('container2', data.pie.series);
             }
+        }
+    });
+}
 
-            
-            
+function get_product_stats(chart_type, dataString){
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        url: "{% url 'product-stats2' %}",
+        success: function(data){
+            if (chart_type == 'both'){
+                create_product_stackchart('container3', data.stack.categories, data.stack.series);
+                create_product_piechart('container4', data.pie.series);
+            }else if (chart_type == 'stack'){
+                create_product_stackchart('container3', data.stack.categories, data.stack.series);
+            }else{
+                create_product_piechart('container4', data.pie.series);
+            }
         }
     });
 }
@@ -233,7 +254,7 @@ function create_product_piechart(chart_id, series){
             type: 'pie'
         },
         title: {
-            text: 'Products in Categories'
+            text: 'Products by Categories'
         },
         tooltip: {
             pointFormat: 'Count: {point.y}<br>{point.name}: <b>{point.percentage:.1f}%</b>'

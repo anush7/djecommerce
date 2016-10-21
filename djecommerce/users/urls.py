@@ -8,10 +8,8 @@ urlpatterns = [
     url(r'^dashboard$', views.dashboard, name='staff-dashboard'),
 
     #stats
-    url(r'^stats/product-added-stack$', stats.products_added_stats, name='products-stats'),
-    url(r'^stats/product-categories-pie$', stats.products_by_cats, name='products-cats'),
-
     url(r'^stats/revenue-stats$', stats.revenue_stats, name='revenue-stats'),
+    url(r'^stats/product-stats$', stats.product_stats, name='product-stats2'),
     
     url(r'^profile/(?P<pk>\d+)$', views.UserProfileUpdateView.as_view(), name='user_profile'),
     url(r'^orders$', OrderList.as_view(), name='orders'),

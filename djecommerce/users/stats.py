@@ -5,7 +5,7 @@ from django.db.models import F, Count, Sum, Case, When, Q, Value, IntegerField, 
 from django.http import JsonResponse
 from catalog.models import CatalogCategory
 from products.models import Product
-from users.utils import get_product_aggregate_query, get_order_aggregate_query, get_order_pie_query
+from users.utils import get_product_aggregate_query, get_product_pie_query, get_order_aggregate_query, get_order_pie_query
 from collections import OrderedDict
 from orders.models import Order
 
@@ -61,61 +61,56 @@ def revenue_stats(request):
 
 	return JsonResponse(data)
 
-
-def products_by_cats(request):
-	data = {}
-
-	categories = CatalogCategory.objects.filter(parent__isnull=True)
+def product_stats(request):
+	from users.constants import month_count
+	key = {}
+	data = {'stack':{},'pie':{}}
 	q = OrderedDict()
-	for cat in categories:
-		q[str(cat.id)] = Sum(
-						Case(
-							When(
-			                    categories__parent__in=[cat],
-			                    then=1
-			                ),
-			                default=Value('0'),
-			                output_field=IntegerField()
-			            )
-			        )
 
-	products = Product.objects.values('status','categories').filter(status='A').aggregate(**q)
-	
-	series = [{'name':'Products', 'colorByPoint': True, 'data':[]}]
-	for cat in categories:
-		series[0]['data'].append({'name':cat.name,'y':products[str(cat.id)]})
+	chart_type = request.GET.get('chart_type','both')
+	stack_chart = True if (chart_type == 'both' or chart_type == 'stack') else False
+	pie_chart = True if (chart_type == 'both' or chart_type == 'pie') else False
 
-	data['series'] = series
-	return JsonResponse(data)
-
-def products_added_stats(request):
-	data={}
-	stat_duration = request.GET.get('duration','month')
-
+	stat_duration = request.GET.get('duration','last_quarter')
 	now = datetime.now()
-	dates, q = get_product_aggregate_query(now, stat_duration)
-
-	if stat_duration == 'month':
-		start_dt = now - relativedelta(months=6)
+	if stat_duration in ['last_quarter','last_six_months','last_year']:
+		start_dt = now - relativedelta(months=month_count[stat_duration])
+		key['created_on__date__gte'] = start_dt.date()
 	elif stat_duration == 'week':
 		start_dt = now - relativedelta(days=6)
+		key['created_on__date__gte'] = start_dt.date()
 
-	products = Product.objects.values('status', 'created_on')\
-					.filter(status='A', created_on__date__gte=start_dt.date()).aggregate(**q)
+	if stack_chart:
+		dates, q = get_product_aggregate_query(now, stat_duration)
 
-	labels = []
-	series = [{'name':'Products','data':[]}]
-	for dt in dates:
-		if stat_duration == 'week':
-			labels.append(dt.split('-')[2])
-		elif stat_duration == 'month':
-			labels.append(dt.split('-')[1])
-		series[0]['data'].append(products[dt])
+	if pie_chart:
+		pq = get_product_pie_query()
+		q.update(pq)
+	
+	products = Product.objects.values('status','created_on','categories')\
+					.filter(status='A', **key).aggregate(**q)
+	
+	if stack_chart:
+		labels = []
+		series = [{'name':'Products','data':[]}]
+		for dt in dates:
+			if stat_duration in ['last_quarter','last_six_months','last_year']:
+				labels.append(dt.split('-')[1])
+			elif stat_duration == 'week':
+				labels.append(dt.split('-')[2])
+			series[0]['data'].append(products[dt])
 
-	data['categories'] = labels
-	data['series'] = series
+		data['stack']['categories'] = labels
+		data['stack']['series'] = series
+
+	if pie_chart:
+		categories = CatalogCategory.objects.filter(parent__isnull=True)
+		series = [{'name':'Products', 'colorByPoint': True, 'data':[]}]
+		for cat in categories:
+			series[0]['data'].append({'name':cat.name,'y':products[str(cat.id)]})
+		data['pie']['series'] = series
+
 	return JsonResponse(data)
-
 
 
 
