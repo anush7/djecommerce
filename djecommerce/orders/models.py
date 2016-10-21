@@ -27,7 +27,7 @@ class UserAddress(models.Model):
 		return self.street+", "+self.city+", "+self.state+", "+self.zipcode+"."
 
 	def get_address(self):
-		return "%s, %s, %s %s" %(self.street, self.city, self.state, self.zipcode)
+		return "%s, %s, %s, %s %s" %(self.user.first_name+" "+self.user.last_name, self.street, self.city, self.state, self.zipcode)
 
 
 ORDER_STATUS_CHOICES = (
@@ -41,8 +41,8 @@ class Order(models.Model):
 	status = models.CharField(max_length=120, choices=ORDER_STATUS_CHOICES, default='created')
 	cart = models.ForeignKey(Cart)
 	user = models.ForeignKey(User, null=True)
-	billing_address = models.ForeignKey(UserAddress, related_name='billing_address', null=True)
-	shipping_address = models.ForeignKey(UserAddress, related_name='shipping_address', null=True)
+	billing_address = models.ForeignKey(UserAddress, related_name='billing_address', on_delete=models.SET_NULL, null=True)
+	shipping_address = models.ForeignKey(UserAddress, related_name='shipping_address', on_delete=models.SET_NULL, null=True)
 	shipping_total_price = models.DecimalField(max_digits=50, decimal_places=2, default=5.99)
 	order_total = models.DecimalField(max_digits=50, decimal_places=2, )
 	order_id = models.CharField(max_length=20, null=True, blank=True)

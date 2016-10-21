@@ -13,7 +13,7 @@
 	</div>
 	<div class="row">
 		<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if object %}Edit{% else %}Add{% endif %} Address:</strong></h3>
-		<form method='post' class="form-horizontal">{% csrf_token %}
+		<form method='post' name="address_form" class="form-horizontal">{% csrf_token %}
 			<div class="form-group">
 				<label for="id_title" class="col-md-2 control-label">Street <span style="color:red;">*</span></label>
 				<div class="col-xs-4">
@@ -68,4 +68,27 @@
 		</form>
 	</div>
 </div>
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$("form[name='address_form']").validate({
+	    rules: {
+	    	street: "required",
+	    	city: "required",
+	    	state: "required",
+	    	zipcode: "required"
+	    },
+	    messages: {
+	    	street: "Please enter the street",
+	    	city: "Please enter the city",
+	    	state: "Please select the state",
+	    	zipcode: "Please select the zipcode"
+	   	},
+	    submitHandler: function(form) {
+	    	form.submit();
+	    }
+	});
+});
+</script>
+
 {% endblock %}

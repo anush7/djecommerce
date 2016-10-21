@@ -71,11 +71,11 @@
 		<div class='col-md-6'>
 			<p>
 				<b>Billing to:</b><br/>
-				{{ order.billing_address.get_address }} - <a href="#">Edit</a>
+				{{ order.billing_address.get_address }}
 			</p>
 			<p>
 				<b>Shipping to:</b><br/>
-				{{ order.shipping_address.get_address }} - <a href="#">Edit</a>
+				{{ order.shipping_address.get_address }}
 			</p>
 			<p>
 		 		<a href='{% url "order_address" %}'>Change Address</a>

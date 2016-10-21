@@ -28,7 +28,7 @@ from users.models import EcUser as User
 from users.models import GroupDetails
 from django.contrib.auth.decorators import login_required
 from orders.models import UserAddress, Order
-from orders.forms import AddressForm, UserAddressForm
+from orders.forms import UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from products.models import Product
@@ -209,7 +209,6 @@ class UserAddressListView(LoginRequiredMixin, ListView):
 class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
-	#success_url = reverse_lazy("order_address")
 
 	def get_success_url(self, *args, **kwargs):
 		if self.request.GET.get('checkout',False):
@@ -218,13 +217,23 @@ class UserAddressCreateView(LoginRequiredMixin, CreateView):
 
 	def form_valid(self, form, *args, **kwargs):
 		form.instance.user = self.request.user
+		if form.instance.type == 'billing':
+			if not UserAddress.objects.filter(user=self.request.user,type='billing').exists():
+				form.instance.default=True
+		elif form.instance.type == 'shipping':
+			if not UserAddress.objects.filter(user=self.request.user,type='shipping').exists():
+				form.instance.default=True
 		return super(UserAddressCreateView, self).form_valid(form, *args, **kwargs)
 
 class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 	model = UserAddress
 	form_class = UserAddressForm
 	template_name = "orders/add_address.html"
-	success_url = reverse_lazy("order_address")
+
+	def get_success_url(self, *args, **kwargs):
+		if self.request.GET.get('selectaddress',False):
+			return reverse("order_address")
+		return reverse("user_address_list")
 
 	def form_valid(self, form, *args, **kwargs):
 		form.instance.user = self.request.user

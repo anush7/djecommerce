@@ -34,6 +34,8 @@ class ProductListView(ListView):
     template_name = 'products/frontend/products.html'
 
     def get_queryset(self):
+        # del self.request.session["cart_id"]
+        # del self.request.session["order_id"]
         key = {}
         html_data = {}
         key['status'] = 'A'

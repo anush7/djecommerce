@@ -94,6 +94,11 @@ class CartView(SingleObjectMixin, View):
 			try:total_items = cart_item.cart.items.count()
 			except:total_items = 0
 
+			if cart.items.count() == 0:
+				del self.request.session["cart_id"]
+				if self.request.session.get("order_id"): del self.request.session["order_id"]
+				cart.delete()
+
 			data["line_total"] = total,
 			data["subtotal"] = subtotal,
 			data["cart_total"] = cart_total,
