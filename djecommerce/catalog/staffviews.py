@@ -40,7 +40,6 @@ class CatalogListView(StaffRequiredMixin, ListView):
     def get_queryset(self):
         return Catalog.objects.all().order_by('created_on')
 
-@csrf_exempt
 @staff_required(['access_catalog'])
 def ajax_catalog_list(request, template='catalog/part_catalog_list.html'):
     data = {}
@@ -156,7 +155,6 @@ class CategoryListView(StaffRequiredMixin, ListView):
         key['status'] = 'A'
         return CatalogCategory.objects.filter(**key).prefetch_related('children').order_by('name')
 
-@csrf_exempt
 @staff_required(['access_catalogcategory'])
 def ajax_category_list(request, template='catalog/part_category_list.html'):
     data = {}
@@ -260,7 +258,7 @@ def change_category_status(request, pk):
 """############################### ATTRIBUTES VIEWS #################################"""
 
 class AttributeListView(StaffRequiredMixin, ListView):
-    paginate_by = 5
+    paginate_by = 10
     template_name = 'catalog/attribute_list.html'
     permissions = ['access_productattribute']
 
@@ -279,7 +277,6 @@ class AttributeListView(StaffRequiredMixin, ListView):
     def get_queryset(self):
         return ProductAttribute.objects.filter(status='A').order_by('name')
 
-@csrf_exempt
 @staff_required(['access_productattribute'])
 def ajax_attribute_list(request, template='catalog/part_attribute_list.html'):
     data = {}
@@ -297,7 +294,7 @@ def ajax_attribute_list(request, template='catalog/part_attribute_list.html'):
 
     try:page = request.GET.get('page')
     except:page = 1
-    paginator = Paginator(attribute_list, 5)
+    paginator = Paginator(attribute_list, 10)
     try:
         attribute_list = paginator.page(page)
     except PageNotAnInteger:

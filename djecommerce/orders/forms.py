@@ -2,6 +2,9 @@ from django import forms
 from .models import UserAddress
 from users.models import EcUser as User
 
+class MyModelChoiceField(forms.ModelChoiceField):
+    def get_instance_id(self, obj):
+        return str(obj.id)
 
 class AddressForm(forms.Form):
 	billing_address = forms.ModelChoiceField(
@@ -9,7 +12,7 @@ class AddressForm(forms.Form):
 			widget = forms.RadioSelect(attrs={'class':'pull-left','style':'margin-right:5px;margin-top:1px;'}),
 			empty_label = None
 			)
-	shipping_address = forms.ModelChoiceField(
+	shipping_address = MyModelChoiceField(
 		queryset=UserAddress.objects.filter(type="shipping"),
 		widget = forms.RadioSelect(attrs={'class':'pull-left','style':'margin-right:5px;margin-top:1px;'}),
 		empty_label = None

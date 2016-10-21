@@ -8,8 +8,9 @@ from products.models import Product
 from users.utils import get_product_stack_query, get_product_pie_query, get_revenue_stack_query, get_revenue_pie_query, get_dates
 from collections import OrderedDict
 from orders.models import Order
+from users.decorators import only_staff_required, admin_required
 
-
+@admin_required
 def revenue_stats(request):
 	from users.constants import month_count
 	key = {}
@@ -62,6 +63,7 @@ def revenue_stats(request):
 
 	return JsonResponse(data)
 
+@only_staff_required
 def product_stats(request):
 	from users.constants import month_count
 	key = {}
@@ -77,6 +79,8 @@ def product_stats(request):
 	start, end, days = get_dates(stat_duration)
 	key['created_on__gte'] = start
 	key['created_on__lte'] = end
+	if not request.user.is_admin:
+		key['created_by'] = request.user
 
 	if stack_chart:
 		dates, q = get_product_stack_query(start, days, stat_duration)

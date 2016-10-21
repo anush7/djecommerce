@@ -24,7 +24,7 @@
 				<div class="col-xs-8" style="margin-top:7px;">
 					{% for addr in form.shipping_address %}
 						<div>
-						    {{ addr }} <a href="#">Edit</a>
+						    {{ addr.tag }}{{addr.choice_label}} <a href="#">Edit</a>
 						</div>
 					{% endfor %}
 					<p style="color:red;">{{ form.shipping_address.errors.as_text }}</p>

@@ -35,14 +35,14 @@ from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
 from products.utils import image_cropper, get_unique_slug, get_rows
 
 class ProductListView(StaffRequiredMixin, ListView):
-    paginate_by = 6
+    paginate_by = 2
     template_name = 'products/product_list.html'
     permissions = ['access_product']
 
     def get_queryset(self):
         return Product.objects.filter(status='A').order_by('created_on')
 
-@csrf_exempt
+
 @staff_required(['access_product'])
 def ajax_product_list(request, template='products/part_product_list.html'):
     data = {}
@@ -70,7 +70,7 @@ def ajax_product_list(request, template='products/part_product_list.html'):
 
     try:page = request.GET.get('page')
     except:page = 1
-    paginator = Paginator(product_list, 6)
+    paginator = Paginator(product_list, 2)
     try:
         product_list = paginator.page(page)
     except PageNotAnInteger:

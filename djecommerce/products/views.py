@@ -55,7 +55,6 @@ class ProductListView(ListView):
         if q:context['search_key'] = q
         return context
 
-@csrf_exempt
 def ajax_product_list(request, template='products/frontend/part_product_list.html'):
     data = {}
     html_data = {}

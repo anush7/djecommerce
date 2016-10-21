@@ -34,7 +34,9 @@ from catalog.models import Catalog, CatalogCategory
 from products.models import Product
 from users.utils import send_mg_email
 from collections import OrderedDict
+from users.decorators import only_staff_required
 
+@only_staff_required
 def dashboard(request,template='users/dashboard.html'):
 	data={}
 	return render(request, template, data)
