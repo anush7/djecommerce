@@ -8,24 +8,31 @@
             {% if user.is_admin %}
                 <div class="col-lg-12">
                     <h1 style="margin-top:10px; !important" class="page-header">
-                        Order Stats
+                        Revenue Stats
                     </h1>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                    <select id="stack_rev_duration" class="form-control" style="width:160px;margin-left:25px;">
-                        <option value="week">Last Week</option>
-                        <option selected value="last_quarter">Last three months</option>
-                        <option value="last_six_months">Last six months</option>
+                    <select id="stack_rev_duration" class="resetSelect form-control" style="width:160px;margin-left:25px;">
+                        <option value="this_week">This week</option>
+                        <option value="last_week">Last week</option>
+                        <option value="this_month">This month</option>
+                        <option value="last_month">Last month</option>
+                        <option selected value="this_quarter">This quarter</option>
+                        <option value="last_quarter">Last quarter</option>
+                        <option value="this_year">This Year</option>
                         <option value="last_year">Last Year</option>
                     </select>
                     <div id="container1"></div>
                 </div>
                 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                    <select id="pie_rev_duration" class="form-control" style="width:160px;margin-left:25px;">
-                        <option value="all">All</option>
-                        <option value="week">Last Week</option>
-                        <option selected value="last_quarter">Last three months</option>
-                        <option value="last_six_months">Last six months</option>
+                    <select id="pie_rev_duration" class="resetSelect form-control" style="width:160px;margin-left:25px;">
+                        <option value="this_week">This week</option>
+                        <option value="last_week">Last week</option>
+                        <option value="this_month">This month</option>
+                        <option value="last_month">Last month</option>
+                        <option selected value="this_quarter">This quarter</option>
+                        <option value="last_quarter">Last quarter</option>
+                        <option value="this_year">This Year</option>
                         <option value="last_year">Last Year</option>
                     </select>
                     <div id="container2"></div>
@@ -38,20 +45,27 @@
                 </h1>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">            
-                <select id="stack_pro_duration" class="form-control" style="width:160px;margin-left:25px;">
-                    <option value="week">Last Week</option>
-                    <option selected value="last_quarter">Last three months</option>
-                    <option value="last_six_months">Last six months</option>
+                <select id="stack_pro_duration" class="resetSelect form-control" style="width:160px;margin-left:25px;">
+                    <option value="this_week">This week</option>
+                    <option value="last_week">Last week</option>
+                    <option value="this_month">This month</option>
+                    <option value="last_month">Last month</option>
+                    <option selected value="this_quarter">This quarter</option>
+                    <option value="last_quarter">Last quarter</option>
+                    <option value="this_year">This Year</option>
                     <option value="last_year">Last Year</option>
                 </select>
                 <div id="container3"></div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <select id="pie_pro_duration" class="form-control" style="width:160px;margin-left:25px;">
-                    <option value="all">All</option>
-                    <option value="week">Last Week</option>
-                    <option selected value="last_quarter">Last three months</option>
-                    <option value="last_six_months">Last six months</option>
+                <select id="pie_pro_duration" class="resetSelect form-control" style="width:160px;margin-left:25px;">
+                    <option value="this_week">This week</option>
+                    <option value="last_week">Last week</option>
+                    <option value="this_month">This month</option>
+                    <option value="last_month">Last month</option>
+                    <option selected value="this_quarter">This quarter</option>
+                    <option value="last_quarter">Last quarter</option>
+                    <option value="this_year">This Year</option>
                     <option value="last_year">Last Year</option>
                 </select>            
                 <div id="container4"></div>
@@ -60,7 +74,9 @@
     </div>
 <script type="text/javascript">
 $(function () {
-    var dataString = '';
+
+     $('.resetSelect').prop('selectedIndex',4);
+
     {% if user.is_admin %}
         get_revenue_stats('both','');
         $('#stack_rev_duration').change(function() {

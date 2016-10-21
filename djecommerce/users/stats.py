@@ -5,7 +5,7 @@ from django.db.models import F, Count, Sum, Case, When, Q, Value, IntegerField, 
 from django.http import JsonResponse
 from catalog.models import CatalogCategory
 from products.models import Product
-from users.utils import get_product_aggregate_query, get_product_pie_query, get_order_aggregate_query, get_order_pie_query
+from users.utils import get_product_stack_query, get_product_pie_query, get_order_stack_query, get_order_pie_query, get_dates
 from collections import OrderedDict
 from orders.models import Order
 
@@ -20,17 +20,15 @@ def revenue_stats(request):
 	stack_chart = True if (chart_type == 'both' or chart_type == 'stack') else False
 	pie_chart = True if (chart_type == 'both' or chart_type == 'pie') else False
 
-	stat_duration = request.GET.get('duration','last_quarter')
-	now = datetime.now()
-	if stat_duration in ['last_quarter','last_six_months','last_year']:
-		start_dt = now - relativedelta(months=month_count[stat_duration])
-		key['order_placed__date__gte'] = start_dt.date()
-	elif stat_duration == 'week':
-		start_dt = now - relativedelta(days=6)
-		key['order_placed__date__gte'] = start_dt.date()
+	stat_duration = request.GET.get('duration','this_quarter')
+
+	start, end, days = get_dates(stat_duration)
+	key['order_placed__gte'] = start
+	key['order_placed__lte'] = end
 
 	if stack_chart:
-		dates, q = get_order_aggregate_query(now, stat_duration)
+		dates, q = get_order_stack_query(start, days, stat_duration)
+		print dates
 
 	if pie_chart:
 		pq = get_order_pie_query()
@@ -41,12 +39,14 @@ def revenue_stats(request):
 	
 	if stack_chart:
 		labels = []
-		series = [{'name':'Orders','data':[]}]
+		series = [{'name':'Revenue','data':[]}]
 		for dt in dates:
-			if stat_duration in ['last_quarter','last_six_months','last_year']:
-				labels.append(dt.split('-')[1])
-			elif stat_duration == 'week':
+			if stat_duration in ['this_quarter','last_quarter','this_year','last_year']:
+				labels.append(dt.split('-')[1]+'-'+dt.split('-')[0])
+			elif stat_duration in ['this_week','last_week']:
 				labels.append(dt.split('-')[2])
+			elif stat_duration in ['this_month','last_month']:
+				labels.append(dt.split('-')[-1])
 			series[0]['data'].append(orders[dt])
 
 		data['stack']['categories'] = labels
@@ -54,7 +54,7 @@ def revenue_stats(request):
 
 	if pie_chart:
 		categories = CatalogCategory.objects.filter(parent__isnull=True)
-		series = [{'name':'Orders', 'colorByPoint': True, 'data':[]}]
+		series = [{'name':'Revenue', 'colorByPoint': True, 'data':[]}]
 		for cat in categories:
 			series[0]['data'].append({'name':cat.name,'y':orders[str(cat.id)]})
 		data['pie']['series'] = series
@@ -71,17 +71,14 @@ def product_stats(request):
 	stack_chart = True if (chart_type == 'both' or chart_type == 'stack') else False
 	pie_chart = True if (chart_type == 'both' or chart_type == 'pie') else False
 
-	stat_duration = request.GET.get('duration','last_quarter')
-	now = datetime.now()
-	if stat_duration in ['last_quarter','last_six_months','last_year']:
-		start_dt = now - relativedelta(months=month_count[stat_duration])
-		key['created_on__date__gte'] = start_dt.date()
-	elif stat_duration == 'week':
-		start_dt = now - relativedelta(days=6)
-		key['created_on__date__gte'] = start_dt.date()
+	stat_duration = request.GET.get('duration','this_quarter')
+
+	start, end, days = get_dates(stat_duration)
+	key['created_on__gte'] = start
+	key['created_on__lte'] = end
 
 	if stack_chart:
-		dates, q = get_product_aggregate_query(now, stat_duration)
+		dates, q = get_product_stack_query(start, days, stat_duration)
 
 	if pie_chart:
 		pq = get_product_pie_query()
@@ -94,10 +91,12 @@ def product_stats(request):
 		labels = []
 		series = [{'name':'Products','data':[]}]
 		for dt in dates:
-			if stat_duration in ['last_quarter','last_six_months','last_year']:
-				labels.append(dt.split('-')[1])
-			elif stat_duration == 'week':
+			if stat_duration in ['this_quarter','last_quarter','this_year','last_year']:
+				labels.append(dt.split('-')[1]+'-'+dt.split('-')[0])
+			elif stat_duration in ['this_week','last_week']:
 				labels.append(dt.split('-')[2])
+			elif stat_duration in ['this_month','last_month']:
+				labels.append(dt.split('-')[-1])
 			series[0]['data'].append(products[dt])
 
 		data['stack']['categories'] = labels

@@ -21,7 +21,10 @@ updatePermissionType = {
 }
 
 month_count = {
+	'this_week': 7,
+	'last_week': 7,
+	'this_quarter': 3,
 	'last_quarter': 3,
-	'last_six_months': 6,
+	'this_year': 12,
 	'last_year': 12
 }
