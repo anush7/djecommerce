@@ -35,11 +35,11 @@
 		<table class="table table-striped table-hover">
 	    	<thead>
 	    		<th></th>
+				<th>Variant Name</th>
 				<th>SKU</th>
 				{% for attr in product.attributes.all %}
 					<th>{{attr.name}}</th>
 				{% endfor %}
-				<th>Variant Name</th>
 				<th>Variant Price</th>
 				<th>Default Selected</th>
 			</thead>
@@ -49,11 +49,14 @@
 						<td>
 							<input type="checkbox" onclick="enable_delete();" value="{{variant.id}}" name="variantdelete">
 						</td>
+						<td>{% if variant.name %}
+							<a href="{% url 'staff-variant-update' product.id variant.id %}">{{variant.name}}</a>
+							{% else %}--{% endif %}
+						</td>
 						<td><a href="{% url 'staff-variant-update' product.id variant.id %}">{{variant.sku}}</a></td>
 						{% for attr in product.attributes.all %}
 							<td>{{variant.attributes|attr_json_filter:attr.id}}</td>
 						{% endfor %}
-						<td>{% if variant.name %}{{variant.name}}{% else %}--{% endif %}</td>
 						<td>{{variant.price}}</td>
 						<td>{{variant.default}}</td>
 					</tr>

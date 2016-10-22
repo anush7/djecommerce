@@ -28,7 +28,7 @@ class CartView(SingleObjectMixin, View):
 	template = "carts/cart.html"
 
 	def get_object(self, *args, **kwargs):
-		self.request.session.set_expiry(0) #5 minutes
+		self.request.session.set_expiry(0) #session expires on window close or 300 -> 5 min
 		cart_id = self.request.session.get("cart_id")
 		if cart_id == None:
 			cart = Cart()
@@ -39,12 +39,15 @@ class CartView(SingleObjectMixin, View):
 		if self.request.user.is_authenticated():
 			cart.user = self.request.user
 			cart.save()
+
 		citems = CartItem.objects.filter(cart=cart)
 		for citem in citems:
 			if citem.item.available_quantity <= 0:
 				citem.out_of_stock = True
 				citem.line_item_total = 0.0
-				citem.save()
+			else:
+				citem.out_of_stock = False
+			citem.save()
 		cart.update_subtotal()
 		return cart
 
@@ -57,12 +60,18 @@ class CartView(SingleObjectMixin, View):
 		if item_id:
 			item_instance = get_object_or_404(ProductVariant, id=item_id)
 			qty = request.GET.get("qty", 1)
+
+			if item_instance.available_quantity <= 0:
+				data['status'] = 'not_available'
+				delete_item = True
 			try:
 				if int(qty) < 1:
 					delete_item = True
 			except:
 				raise Http404
+
 			cart_item, created = CartItem.objects.get_or_create(cart=cart, item=item_instance)
+
 			if created:
 				flash_message = "Successfully added to cart"
 			if delete_item:
@@ -77,8 +86,7 @@ class CartView(SingleObjectMixin, View):
 				else:
 					cart_item.quantity = qty
 					cart_item.save()
-			if item_instance.available_quantity <= 0:
-				data['status'] = 'not_available'
+			
 			if not request.is_ajax():
 				return HttpResponseRedirect(reverse("add-to-cart"))
 		
@@ -96,7 +104,7 @@ class CartView(SingleObjectMixin, View):
 
 			if cart.items.count() == 0:
 				del self.request.session["cart_id"]
-				if self.request.session.get("order_id"): del self.request.session["order_id"]
+				if self.request.session.get("order_id"):del self.request.session["order_id"]
 				cart.delete()
 
 			data["line_total"] = total,

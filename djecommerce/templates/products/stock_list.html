@@ -45,11 +45,11 @@
 						<td>
 							<input type="checkbox" onclick="enable_delete();" value="{{stock.id}}" name="stockdelete">
 						</td>
-						<td>{{stock.variant.name}}</td>
 						<td>
-							<a href="{% url 'staff-stock-update' product.id stock.id %}">
-								{{stock.variant.sku}}
-							</a>
+							<a href="{% url 'staff-stock-update' product.id stock.id %}">{{stock.variant.name}}</a>
+						</td>
+						<td>
+							<a href="{% url 'staff-stock-update' product.id stock.id %}">{{stock.variant.sku}}</a>
 						</td>
 						<td>{{stock.quantity}}</td>
 						<td>{{stock.quantity_allocated}}</td>

@@ -89,7 +89,7 @@ $(document).ready(function(){
 	});
 	$('#checkout_btn').click(function() {
 		{% if object.check_for_out_of_stock_items %}
-			var cont = confirm("Out of stock products will be removed from the cart");
+			var cont = confirm("Out of stock products will be removed from the cart. Click OK to checkout.");
 			if(cont){
 				window.location='{% url "checkout" %}';
 			}

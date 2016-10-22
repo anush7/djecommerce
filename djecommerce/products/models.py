@@ -189,13 +189,11 @@ def update_product_status(sender, instance, created=False, **kwargs):
         stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exclude(id=instance.id).count()
         if not stocks:
             if instance.quantity <= instance.quantity_allocated:instance.variant.product.status = 'I'
-            #else:instance.variant.product.status = 'A'
             instance.variant.product.save()
     else:
         variants = instance.variant.product.variants.all()
-        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).count()
-        if stocks: instance.variant.product.status = 'A'
-        else: instance.variant.product.status = 'I'
+        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exists()
+        if not stocks: instance.variant.product.status = 'I'
         instance.variant.product.save()
 
 post_save.connect(update_product_status, sender=Stock)
