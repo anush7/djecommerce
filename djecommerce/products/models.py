@@ -109,9 +109,8 @@ class ProductVariant(models.Model):
     def available_quantity(self):
         stock = Stock.objects.get(variant=self.id)
         if  stock.quantity_allocated < stock.quantity:
-            ava_stock = stock.quantity - stock.quantity_allocated
-        else:ava_stock = 0
-        return ava_stock
+            return (stock.quantity - stock.quantity_allocated)
+        else: return 0
 
     def get_display_label(self):
         label = self.name+', '
@@ -183,21 +182,21 @@ class Stock(models.Model):
     cost_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     variant = models.ForeignKey(ProductVariant, related_name='stocks')
 
-def update_product_status(sender, instance, created=False, **kwargs):
-    if created:
-        variants = instance.variant.product.variants.all()
-        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exclude(id=instance.id).count()
-        if not stocks:
-            if instance.quantity <= instance.quantity_allocated:instance.variant.product.status = 'I'
-            instance.variant.product.save()
-    else:
-        variants = instance.variant.product.variants.all()
-        stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exists()
-        if not stocks: instance.variant.product.status = 'I'
-        instance.variant.product.save()
+# def update_product_status(sender, instance, created=False, **kwargs):
+#     if created:
+#         variants = instance.variant.product.variants.all()
+#         stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exclude(id=instance.id).count()
+#         if not stocks:
+#             if instance.quantity <= instance.quantity_allocated:instance.variant.product.status = 'I'
+#             instance.variant.product.save()
+#     else:
+#         variants = instance.variant.product.variants.all()
+#         stocks = Stock.objects.filter(quantity__gt=F('quantity_allocated'),variant__in=variants).exists()
+#         if not stocks: instance.variant.product.status = 'I'
+#         instance.variant.product.save()
 
-post_save.connect(update_product_status, sender=Stock)
-post_delete.connect(update_product_status, sender=Stock)
+# post_save.connect(update_product_status, sender=Stock)
+# post_delete.connect(update_product_status, sender=Stock)
 
 
 def get_product_image_path(instance, filename):

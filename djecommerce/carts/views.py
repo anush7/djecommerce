@@ -72,33 +72,36 @@ class CartView(SingleObjectMixin, View):
 
 			cart_item, created = CartItem.objects.get_or_create(cart=cart, item=item_instance)
 
-			if created:
-				flash_message = "Successfully added to cart"
+			#new code begin
 			if delete_item:
 				flash_message = "Item removed successfully."
 				cart_item.delete()
 			else:
-				if not created:
+				if created:
+					flash_message = "Successfully added to cart"
+				else:
 					flash_message = "Item Quantity has been updated successfully."
 				if int(qty) > cart_item.item.available_quantity:
 					flash_message = "Only "+str(cart_item.item.available_quantity)+" available"
 					data['max_qty'] = cart_item.item.available_quantity
+					cart_item.quantity = cart_item.item.available_quantity
 				else:
 					cart_item.quantity = qty
-					cart_item.save()
+				cart_item.save()
+			#new code end
 			
 			if not request.is_ajax():
 				return HttpResponseRedirect(reverse("add-to-cart"))
 		
 		if request.is_ajax():
-			try:total = cart_item.line_item_total
-			except:total = None
+			try:line_total = cart_item.line_item_total
+			except:line_total = None
 			try:subtotal = cart_item.cart.subtotal
 			except:subtotal = None
-			try:cart_total = cart_item.cart.total
-			except:cart_total = None
 			try:tax_total = cart_item.cart.tax_total
 			except:tax_total = None
+			try:cart_total = cart_item.cart.total
+			except:cart_total = None
 			try:total_items = cart_item.cart.items.count()
 			except:total_items = 0
 
@@ -107,10 +110,10 @@ class CartView(SingleObjectMixin, View):
 				if self.request.session.get("order_id"):del self.request.session["order_id"]
 				cart.delete()
 
-			data["line_total"] = total,
+			data["line_total"] = line_total,
 			data["subtotal"] = subtotal,
-			data["cart_total"] = cart_total,
 			data["tax_total"] = tax_total,
+			data["cart_total"] = cart_total,
 			data["flash_message"] = flash_message,
 			data["total_items"] = total_items,
 			data["deleted"] = delete_item
@@ -212,7 +215,22 @@ class CartCountView(View):
 
 
 
-
+# #old begin
+			# if created:
+			# 	flash_message = "Successfully added to cart"
+			# if delete_item:
+			# 	flash_message = "Item removed successfully."
+			# 	cart_item.delete()
+			# else:
+			# 	if not created:
+			# 		flash_message = "Item Quantity has been updated successfully."
+			# 	if int(qty) > cart_item.item.available_quantity:
+			# 		flash_message = "Only "+str(cart_item.item.available_quantity)+" available"
+			# 		data['max_qty'] = cart_item.item.available_quantity
+			# 	else:
+			# 		cart_item.quantity = qty
+			# 		cart_item.save()
+			# #old end
 
 
 

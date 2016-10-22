@@ -68,9 +68,9 @@ class Cart(models.Model):
 def cal_tax_and_total_receiver(sender, instance, *args, **kwargs):
 	subtotal = Decimal(instance.subtotal)
 	tax_total = 0
-	taxes = Tax.objects.all()
+	taxes = Tax.objects.filter(is_active=True)
 	for tax in taxes:
-		tax_total += round(subtotal * Decimal((tax.tax_percentage/100)), 2) #8.5%
+		tax_total += round(subtotal * Decimal((tax.tax_percentage/100)), 2)
 	total = round(subtotal + Decimal(tax_total), 2)
 	instance.tax_total = "%.2f" %(tax_total)
 	instance.total = "%.2f" %(total)

@@ -66,10 +66,6 @@ class Order(models.Model):
 		citems = CartItem.objects.filter(cart=self.cart)
 		for citem in citems:
 			stock = Stock.objects.get(variant=citem.item)
-			if citem.quantity <= stock.quantity:
-				stock.quantity -= citem.quantity
-			else:
-				stock.quantity = 0
 			stock.quantity_allocated += citem.quantity
 			stock.save()
 
