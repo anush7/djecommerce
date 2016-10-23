@@ -4,33 +4,25 @@
 
 <div class="container">
 	<div class="row">
-		<h3 style="margin-bottom:15px;"><strong>Select your Billing and Shipping address:</strong></h3>
+		<h3 style="margin-bottom:15px;"><strong>Select your Shipping address:</strong></h3>
 		<form method='post' class="form-horizontal">{% csrf_token %}
 
-			<div class="form-group">
-				<label for="id_title" class="col-md-2 control-label">Billing Address:</label>
-				<div class="col-xs-8" style="margin-top:7px;">
-					{% for addr in billing_address %}
-						<div>
-							<input type="radio" {% if addr.id == default_bill_address.id %}checked="checked"{% endif %} value="{{addr.id}}" style="margin-right:5px;margin-top:1px;" name="billing_address" class="pull-left">
-							{{addr.get_address}} <a href="{% url 'user-address-update' addr.id %}?selectaddress=true">Edit</a>
-						</div>
-					{% endfor %}
-					<p style="color:red;">{{ form.billing_address.errors.as_text }}</p>
-				</div>
-			</div>
-			<hr>
 			<div class="form-group">
 				<label for="id_content" class="col-sm-2 control-label">Shipping Address:</label>
 				<div class="col-xs-8" style="margin-top:7px;">
 					{% for addr in shipping_address %}
 						<div>
 						    <input type="radio" {% if addr.id == default_ship_address.id %}checked="checked"{% endif %} value="{{addr.id}}" style="margin-right:5px;margin-top:1px;" name="shipping_address" class="pull-left">
-							{{addr.get_address}} <a href="{% url 'user-address-update' addr.id %}?selectaddress=true">Edit</a>
+							{{addr.get_address}} <a href="{% url 'order-address-update' addr.id %}?address_type=shipping">Edit</a>
 						</div>
 					{% endfor %}
 					<p style="color:red;">{{ form.shipping_address.errors.as_text }}</p>
 				</div>
+			</div>
+			<div class="form-group">
+			    <div class="col-sm-offset-2 col-xs-3">
+			    	<a class="btn btn-default" href="{% url 'order-address-add' %}?address_type=shipping" role="button">Add New Shipping Address</a>
+			    </div>
 			</div>
 
 			<div class="form-group">

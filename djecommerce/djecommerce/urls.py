@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users import views
 from carts.views import CartView, CartCountView, CheckoutView, CheckoutFinalView
-from orders.views import AddressSelectFormView
+from orders.views import ShippingAddressSelectView, BillingAddressSelectView, OrderAddressCreateView, OrderAddressUpdateView
 
 urlpatterns = [
 
@@ -23,7 +23,10 @@ urlpatterns = [
 
     url(r'^cart$', CartView.as_view(), name='add-to-cart'),
     url(r'^cart/count$', CartCountView.as_view(), name='cart_count'),
-    url(r'^checkout/address$', AddressSelectFormView.as_view(), name='order_address'),
+    url(r'^checkout/shipping-address$', ShippingAddressSelectView.as_view(), name='shipping-order-address'),
+    url(r'^checkout/billing-address$', BillingAddressSelectView.as_view(), name='billing-order-address'),
+    url(r'^checkout/address/add$', OrderAddressCreateView.as_view(), name='order-address-add'),
+    url(r'^checkout/address/edit/(?P<pk>\d+)$', OrderAddressUpdateView.as_view(), name='order-address-update'),
     url(r'^checkout$', CheckoutView.as_view(), name='checkout'),
     url(r'^checkout/final/$', CheckoutFinalView.as_view(), name='checkout_final'),
     

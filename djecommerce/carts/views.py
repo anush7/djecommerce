@@ -155,8 +155,8 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 			return redirect("add-to-cart")
 		if self.request.user.is_authenticated():
 			new_order = self.get_order()
-			if new_order.billing_address == None or new_order.shipping_address == None:
-			 	return redirect("order_address")
+			if new_order.shipping_address == None or new_order.billing_address == None:
+			 	return redirect("shipping-order-address")
 		return get_data
 
 

@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import os
 import json
 import uuid
-from django.db.models import F
+from django.db.models import F, Count
 from django.db import models
 from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
@@ -66,6 +66,18 @@ class Product(models.Model):
         if images:image = images[0].image.url
         return image
 
+    def get_available_variants(self):
+        variants = ProductVariant.objects.filter(product_id=self.id)
+        stocks_available = False
+        for var in variants:
+            if var.available_quantity:
+                stocks_available = True
+                break
+        if stocks_available:
+            return variants
+        else:
+            return []
+
     def get_default_variant_images(self):
         image = []
         variant = ProductVariant.objects.get(default =True, product_id=self.id)
@@ -107,7 +119,10 @@ class ProductVariant(models.Model):
 
     @property
     def available_quantity(self):
-        stock = Stock.objects.get(variant=self.id)
+        try:
+            stock = Stock.objects.get(variant=self.id)
+        except:
+            return 0
         if  stock.quantity_allocated < stock.quantity:
             return (stock.quantity - stock.quantity_allocated)
         else: return 0
@@ -182,6 +197,29 @@ class Stock(models.Model):
     cost_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     variant = models.ForeignKey(ProductVariant, related_name='stocks')
 
+def get_product_image_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s-%s.%s" % (uuid.uuid4(), instance.id, ext)
+    return os.path.join('product/images', filename)
+
+class ProductImage(models.Model):
+    variant = models.ForeignKey(ProductVariant, related_name='images')
+    image = models.ImageField(upload_to=get_product_image_path, max_length=255)
+    caption = models.CharField(max_length=200, null=True, blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+
+
+
+
+
+
+
+
+
+
+
 # def update_product_status(sender, instance, created=False, **kwargs):
 #     if created:
 #         variants = instance.variant.product.variants.all()
@@ -197,16 +235,3 @@ class Stock(models.Model):
 
 # post_save.connect(update_product_status, sender=Stock)
 # post_delete.connect(update_product_status, sender=Stock)
-
-
-def get_product_image_path(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = "%s-%s.%s" % (uuid.uuid4(), instance.id, ext)
-    return os.path.join('product/images', filename)
-
-class ProductImage(models.Model):
-    variant = models.ForeignKey(ProductVariant, related_name='images')
-    image = models.ImageField(upload_to=get_product_image_path, max_length=255)
-    caption = models.CharField(max_length=200, null=True, blank=True)
-    display_order = models.PositiveIntegerField(default=0)
-    created_on = models.DateTimeField(auto_now_add=True)

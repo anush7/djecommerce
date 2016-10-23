@@ -3,6 +3,14 @@
 {% block content %}
 
 <div class="container">
+	<div>
+		<ul class="nav nav-tabs">
+			<li><a href="{% url 'user_profile' user.id %}" style="cursor: pointer; cursor: hand;">Profile</a></li>
+			<li><a href="{% url 'orders' %}" style="cursor: pointer; cursor: hand;">Your Orders</a></li>
+			<li class="active"><a href="{% url 'user_address_list' %}" style="cursor: pointer; cursor: hand;">Manage Addresses</a></li>
+			<li><a href="{% url 'change-password' %}" style="cursor: pointer; cursor: hand;">Change Password</a></li>
+		</ul>
+	</div>
 	<div class="row">
 		<h3 style="margin-left:75px;margin-bottom:15px;"><strong>{% if object %}Edit{% else %}Add{% endif %} 
 		{% if address_type %}{{address_type}} {% endif %}Address:</strong></h3>
@@ -55,7 +63,7 @@
 			<div class="form-group">
 			    <div class="col-sm-offset-2 col-xs-3">
 			    	<button type="submit" name="submit" value="I" class="btn btn-default">Save</button>
-			    	<a class="btn btn-default" href="{% if address_type == 'shipping'%}{% url 'shipping-order-address' %}{% else %}{% url 'billing-order-address' %}{% endif %}" role="button">Cancel</a>
+			    	<a class="btn btn-default" href="{% url 'user_address_list' %}" role="button">Cancel</a>
 			    </div>
 			</div>
 		</form>

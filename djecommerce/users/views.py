@@ -208,11 +208,9 @@ class UserAddressListView(LoginRequiredMixin, ListView):
 
 class UserAddressCreateView(LoginRequiredMixin, CreateView):
 	form_class = UserAddressForm
-	template_name = "orders/add_address.html"
+	template_name = "users/add_address.html"
 
 	def get_success_url(self, *args, **kwargs):
-		if self.request.GET.get('checkout',False):
-			return reverse("checkout")
 		return reverse("user_address_list")
 
 	def form_valid(self, form, *args, **kwargs):
@@ -231,8 +229,6 @@ class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 	template_name = "orders/add_address.html"
 
 	def get_success_url(self, *args, **kwargs):
-		if self.request.GET.get('selectaddress',False):
-			return reverse("order_address")
 		return reverse("user_address_list")
 
 	def form_valid(self, form, *args, **kwargs):
@@ -456,7 +452,6 @@ def access_denied(request,template='users/no-permission.html'):
 # class StaffRoleCreateView(CreateView):
 # 	form_class = UserAddressForm
 # 	template_name = "orders/add_address.html"
-# 	success_url = reverse_lazy("order_address")
 
 # 	def form_valid(self, form, *args, **kwargs):
 # 		form.instance.user = self.request.user
@@ -466,7 +461,6 @@ def access_denied(request,template='users/no-permission.html'):
 # 	model = UserAddress
 # 	form_class = UserAddressForm
 # 	template_name = "orders/add_address.html"
-# 	success_url = reverse_lazy("order_address")
 
 # 	def form_valid(self, form, *args, **kwargs):
 # 		form.instance.user = self.request.user

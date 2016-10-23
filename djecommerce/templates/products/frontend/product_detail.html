@@ -30,28 +30,36 @@
             <p id="id_product_price">${{default_variant.price}}</p>
             <hr>
             <form id='add-to-form' method='post' class="form-horizontal">{% csrf_token %}
-                <div class="form-group">
-                    <div class="col-xs-10">
-                        <input id="variant_qnt" type="number" min="1" max="{{default_variant.available_quantity}}" value="1" name="qty" class="form-control">
+                {% with product.get_available_variants as product_variants %}
+                {% if product_variants %}
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <input id="variant_qnt" type="number" min="1" max="{{default_variant.available_quantity}}" value="1" name="qty" class="form-control">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-10">
-                        <select onchange="variant_change();" id="id_variant" name="parent_category" class="form-control">
-                            {% for variant in product.variants.all %}
-                                <option {% if variant.id == default_variant.id %}selected{% endif %}
-                                data-quantity='{{variant.available_quantity}}' data-imgs='{{variant.get_variant_images}}' data-price="{{variant.price}}" value="{{variant.id}}">{{variant.get_display_label}}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <select onchange="variant_change();" id="id_variant" name="parent_category" class="form-control">
+                                {% for variant in product_variants %}
+                                    <option {% if variant.id == default_variant.id %}selected{% endif %}
+                                    data-quantity='{{variant.available_quantity}}' data-imgs='{{variant.get_variant_images}}' data-price="{{variant.price}}" value="{{variant.id}}">{{variant.get_display_label}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div id="product_action_buttons" class="form-group">
-                    <div class="col-xs-6">
-                        <button onclick="add_to_cart(false);" type="button" name="addtocart" class="btn btn-warning">Add to Cart</button>
-                        <button onclick="add_to_cart(true);" type="button" name="buynow" class="btn btn-success">Buy Now</button>
+                    <div id="product_action_buttons" class="form-group">
+                        <div class="col-xs-6">
+                            <button onclick="add_to_cart(false);" type="button" name="addtocart" class="btn btn-warning">Add to Cart</button>
+                            <button onclick="add_to_cart(true);" type="button" name="buynow" class="btn btn-success">Buy Now</button>
+                        </div>
                     </div>
-                </div>
-                <P id="product_not_available" style="color:red;display:none;" >Out of Stock</P>
+                    <P id="product_not_available" style="color:red;display:none;" >Out of Stock</P>
+                {% else %}
+                    <div class="alert alert-info">
+                      This product is currently unavailable.
+                    </div>
+                {% endif %}
+                {% endwith %}
             </form>
             <hr>
             <p class="lead">{{product.description}}</p>

@@ -29,6 +29,18 @@ class UserAddress(models.Model):
 	def get_address(self):
 		return "%s, %s, %s, %s %s" %(self.user.first_name+" "+self.user.last_name, self.street, self.city, self.state, self.zipcode)
 
+	def get_similar_billing_address(self):
+		billing_address = UserAddress.objects.filter(user=self.user,type='billing')
+		for addr in billing_address:
+			found = True
+			if not addr.street == self.street:found = False
+			if not addr.city == self.city:found = False
+			if not addr.state == self.state:found = False
+			if not addr.zipcode == self.zipcode:found = False
+			if found:
+				found = addr
+				break
+		return found
 
 ORDER_STATUS_CHOICES = (
 	('created', 'Created'),
@@ -75,7 +87,6 @@ class Order(models.Model):
 		order_total = Decimal(shipping_total_price) + Decimal(cart_total)
 		self.order_total = order_total
 		self.save()
-
 
 def order_pre_save(sender, instance, *args, **kwargs):
 	shipping_total_price = instance.shipping_total_price
