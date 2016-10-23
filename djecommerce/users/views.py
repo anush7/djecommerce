@@ -445,6 +445,19 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
         return render(request, self.template_name, context)
 
 
+class LowStockProducts(AdminRequiredMixin, TemplateView):
+    template_name = 'users/staff/low_stock_products.html'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(StaffRoleView, self).get_context_data(**kwargs)
+    #     context['parent_cats'] = LowStockProducts.objects.filter(parent__isnull=True).order_by('name')
+    #     return context
+
+    def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		return self.render_to_response(context)
+
+
 def access_denied(request,template='users/no-permission.html'):
     return render(request, template)
 
