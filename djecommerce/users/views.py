@@ -31,7 +31,7 @@ from orders.models import UserAddress, Order
 from orders.forms import UserAddressForm
 from users.mixins import AdminRequiredMixin, LoginRequiredMixin
 from catalog.models import Catalog, CatalogCategory
-from products.models import Product
+from products.models import Product, ProductVariant, Stock
 from users.utils import send_mg_email
 from collections import OrderedDict
 from users.decorators import only_staff_required
@@ -448,13 +448,41 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 class LowStockProducts(AdminRequiredMixin, TemplateView):
     template_name = 'users/staff/low_stock_products.html'
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(StaffRoleView, self).get_context_data(**kwargs)
-    #     context['parent_cats'] = LowStockProducts.objects.filter(parent__isnull=True).order_by('name')
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super(LowStockProducts, self).get_context_data(**kwargs)
+        key = {}
+        if not self.request.user.is_admin:
+        	key['product__created_by'] = self.request.user
+        else:
+        	if self.request.GET.get('filterby') and self.request.GET['filterby'] == 'my':
+        		key['product__created_by'] = self.request.user
+        		context['filterby'] = self.request.GET['filterby']
+
+        context['variants'] = ProductVariant.objects.annotate(
+						        	available=F('stocks__quantity')-F('stocks__quantity_allocated')
+						        ).filter(
+						        	available__lte=3, product__status='A', **key
+						        ).order_by('available','id')
+        return context
 
     def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
+		if request.is_ajax():
+			try:
+				variant_id = request.GET.get('variant_id')
+				if variant_id:
+					data = {}
+					stock = Stock.objects.get(variant_id=variant_id)
+					qty = int(request.GET.get('qty'))
+					if qty >= stock.quantity_allocated:
+						stock.quantity = qty
+						stock.save()
+					else:
+						data['qty'] = stock.quantity_allocated
+					data['status'] = 1
+					return JsonResponse(data)
+			except:pass
+			return JsonResponse({'status':0})
 		return self.render_to_response(context)
 
 

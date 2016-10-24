@@ -118,6 +118,16 @@ class ProductVariant(models.Model):
         return stock.quantity
 
     @property
+    def quantity_allocated(self):
+        stock = Stock.objects.get(variant=self.id)
+        return stock.quantity_allocated
+
+    @property
+    def get_stock_update_url(self):
+        stock = Stock.objects.get(variant=self.id)
+        return reverse('staff-stock-update', args=[self.product.id, stock.id])
+
+    @property
     def available_quantity(self):
         try:
             stock = Stock.objects.get(variant=self.id)
