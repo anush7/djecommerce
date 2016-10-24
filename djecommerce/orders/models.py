@@ -96,10 +96,9 @@ def order_pre_save(sender, instance, *args, **kwargs):
 
 pre_save.connect(order_pre_save, sender=Order)
 
-
-
-
-
+class OrderDetails(models.Model):
+	details = models.OneToOneField(Order, related_name='details')
+	address = models.TextField()
 
 
 
