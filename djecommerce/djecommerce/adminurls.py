@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from users import views
+from users import adminviews as views
 
 urlpatterns = [
 
