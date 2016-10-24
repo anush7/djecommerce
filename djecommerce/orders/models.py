@@ -75,6 +75,7 @@ class Order(models.Model):
 			self.order_id = order_id
 		self.order_placed = datetime.now()
 		self.save()
+		# OrderDetails.objects.create(group=grp)
 		citems = CartItem.objects.filter(cart=self.cart)
 		for citem in citems:
 			stock = Stock.objects.get(variant=citem.item)
@@ -97,7 +98,7 @@ def order_pre_save(sender, instance, *args, **kwargs):
 pre_save.connect(order_pre_save, sender=Order)
 
 class OrderDetails(models.Model):
-	details = models.OneToOneField(Order, related_name='details')
+	order = models.OneToOneField(Order, related_name='details')
 	address = models.TextField()
 
 
