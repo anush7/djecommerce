@@ -29,7 +29,7 @@ from users.models import GroupDetails
 from django.contrib.auth.decorators import login_required
 from orders.models import UserAddress, Order
 from orders.forms import UserAddressForm
-from users.mixins import AdminRequiredMixin, LoginRequiredMixin
+from users.mixins import AdminRequiredMixin, LoginRequiredMixin, OnlyStaffRequiredMixin
 from catalog.models import Catalog, CatalogCategory
 from products.models import Product, ProductVariant, Stock
 from users.utils import send_mg_email
@@ -259,7 +259,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 	# 	return super(UserAddressUpdateView, self).form_valid(form, *args, **kwargs)
 
 
-class LowStockProducts(AdminRequiredMixin, TemplateView):
+class LowStockProducts(OnlyStaffRequiredMixin, TemplateView):
     template_name = 'users/staff/low_stock_products.html'
 
     def get_context_data(self, **kwargs):

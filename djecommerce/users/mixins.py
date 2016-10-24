@@ -48,6 +48,20 @@ class StaffUpdateRequiredMixin(object):
 			return super(StaffUpdateRequiredMixin, self).dispatch(request, *args, **kwargs)
 		return HttpResponseRedirect(reverse('user-access-denied'))
 
+class OnlyStaffRequiredMixin(object):
+
+	@classmethod
+	def as_view(self, *args, **kwargs):
+		view = super(OnlyStaffRequiredMixin, self).as_view(*args, **kwargs)
+		return login_required(view)
+
+	@method_decorator(login_required)
+	def dispatch(self, request, *args, **kwargs):
+		if request.user.is_staff or request.user.is_admin:
+			return super(OnlyStaffRequiredMixin, self).dispatch(request, *args, **kwargs)
+		else:
+			return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
+
 class LoginRequiredMixin(object):
 	
 	@classmethod
