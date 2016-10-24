@@ -47,6 +47,7 @@ ORDER_STATUS_CHOICES = (
 	('created', 'Created'),
 	('paid', 'Paid'),
 	('shipped', 'Shipped'),
+	('delivered', 'delivered'),
 	('refunded', 'Refunded'),
 )
 
@@ -102,7 +103,11 @@ pre_save.connect(order_pre_save, sender=Order)
 class OrderDetails(models.Model):
 	order = models.OneToOneField(Order, related_name='details')
 	address = models.TextField()
-
+	approved = models.BooleanField(default=False)
+	processed = models.BooleanField(default=False)
+	shipped = models.BooleanField(default=False)
+	delivered = models.BooleanField(default=False)
+	returned = models.BooleanField(default=False)
 
 
 

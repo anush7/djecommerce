@@ -71,7 +71,7 @@
 			                </ul>
 			            </li>
 				    	<div class="navbar-form navbar-left" role="search">
-				    		<form action="/" method="GET">
+				    		<form method="GET">
 					        <div class="form-group">
 					        	<input style="width:250px !important;" id="id_search_product" type="text" class="form-control" name="q" placeholder="Search products">
 					        </div>
@@ -95,6 +95,7 @@
 				      			{% if user.is_staff %}
 				      				<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
 				      				<li><a href="{% url 'low-stock-products' %}">Low Stock Products</a></li>
+				      				<li><a href="{% url 'process-order' %}">Process Order</a></li>
 				      			{% endif %}
 				      			{% if user.is_admin %}
 					            	<li><a href="{% url 'staff_management' %}">Staff Management</a></li>
