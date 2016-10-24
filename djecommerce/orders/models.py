@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import json
 from decimal import Decimal
 from datetime import datetime
 from django.db import models
@@ -75,7 +76,8 @@ class Order(models.Model):
 			self.order_id = order_id
 		self.order_placed = datetime.now()
 		self.save()
-		# OrderDetails.objects.create(group=grp)
+		data = {'shipping':self.shipping_address.get_address(),'billing':self.billing_address.get_address()}
+		ord_detail = OrderDetails.objects.create(order=self, address=json.dumps(data))
 		citems = CartItem.objects.filter(cart=self.cart)
 		for citem in citems:
 			stock = Stock.objects.get(variant=citem.item)
