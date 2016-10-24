@@ -20,7 +20,7 @@ from users.mixins import AdminRequiredMixin
 
 
 class StaffManagementView(AdminRequiredMixin, ListView):
-	template_name = 'users/user_management.html'
+	template_name = 'users/admin/user_management.html'
 	paginate_by = 1
 
 	def get_queryset(self):
@@ -93,7 +93,7 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 				)
 
 			context = self.get_context_data(**kwargs)
-			html_data['html'] = render_to_string('users/part_staff_users.html',context,context_instance=RequestContext(request))
+			html_data['html'] = render_to_string('users/admin/part_staff_users.html',context,context_instance=RequestContext(request))
 			return JsonResponse(html_data)
 
 		context = self.get_context_data(**kwargs)
@@ -106,7 +106,7 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 			html_data = {}
 
 			context = self.get_context_data(**kwargs)
-			html_data['html'] = render_to_string('users/part_staff_users.html',context,context_instance=RequestContext(request))
+			html_data['html'] = render_to_string('users/admin/part_staff_users.html',context,context_instance=RequestContext(request))
 			return JsonResponse(html_data)
 
 		messages.error(request, "Please select a category")
@@ -150,7 +150,7 @@ class StaffInviteView(AdminRequiredMixin, View):
 
 
 class StaffRoleView(AdminRequiredMixin, TemplateView):
-    template_name = 'users/permissions.html'
+    template_name = 'users/admin/permissions.html'
 
     def get_context_data(self, **kwargs):
         context = super(StaffRoleView, self).get_context_data(**kwargs)
