@@ -1,9 +1,16 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
 
 {% block content %}
-
+<script src="{% static 'js/html2canvas.js' %}"></script>
 	{% include "orders/order_summary_short.html" with order=order %}
 
+<script type="text/javascript">
+$(document).ready(function(){
+	html2canvas(document.body).then(function(canvas) {
+	    document.body.appendChild(canvas);
+	});
+});
+</script>
 {% endblock %}
 

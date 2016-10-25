@@ -11,7 +11,7 @@ from django.db.models import IntegerField, FloatField
 from collections import OrderedDict
 from catalog.models import CatalogCategory
 
-def send_mg_email(subject, body, from_name=False, to_email=[]):
+def send_mg_email(subject, body, from_name=False, to_email=[], files=None):
 	mg_url = "https://api.mailgun.net/v3/%s/messages" % (settings.MG_DOMAIN)
 	mg_key = settings.MG_API_KEY
 	if from_name:
@@ -24,7 +24,7 @@ def send_mg_email(subject, body, from_name=False, to_email=[]):
 		"subject": subject,
 		"html": body
 	}
-	requests.post(mg_url, auth=("api", mg_key), data=msg_data)
+	requests.post(mg_url, auth=("api", mg_key), data=msg_data, files=files)
 
 def get_product_stack_query(st_dt, days, duration_type='this_quarter'):
 	from users.constants import month_count
