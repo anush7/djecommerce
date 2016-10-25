@@ -37,7 +37,7 @@ from collections import OrderedDict
 from users.decorators import only_staff_required
 
 @only_staff_required
-def dashboard(request,template='users/dashboard.html'):
+def dashboard(request,template='users/staff/dashboard.html'):
 	data={}
 	return render(request, template, data)
 
