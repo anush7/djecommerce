@@ -46,7 +46,6 @@ class UserAddress(models.Model):
 ORDER_STATUS_CHOICES = (
 	('created', 'Created'),
 	('paid', 'Paid'),
-	('shipped', 'Shipped'),
 	('delivered', 'delivered'),
 	('refunded', 'Refunded'),
 )
@@ -78,7 +77,7 @@ class Order(models.Model):
 		self.order_placed = datetime.now()
 		self.save()
 		data = {'shipping':self.shipping_address.get_address(),'billing':self.billing_address.get_address()}
-		ord_detail = OrderDetails.objects.create(order=self, address=json.dumps(data))
+		ord_detail = OrderDetails.objects.create(order=self, address=json.dumps(data), paid=True)
 		citems = CartItem.objects.filter(cart=self.cart)
 		for citem in citems:
 			stock = Stock.objects.get(variant=citem.item)
@@ -103,6 +102,7 @@ pre_save.connect(order_pre_save, sender=Order)
 class OrderDetails(models.Model):
 	order = models.OneToOneField(Order, related_name='details')
 	address = models.TextField()
+	paid = models.BooleanField(default=False)
 	approved = models.BooleanField(default=False)
 	processed = models.BooleanField(default=False)
 	shipped = models.BooleanField(default=False)

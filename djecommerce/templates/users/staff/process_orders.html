@@ -6,13 +6,20 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title" style="display:inline-block;">All Orders</h3>
-                {% if user.is_admin %}
-                    <select id="filter_type" style="margin-left:20px;">
-                        <option {% if filterby == 'all' %}selected{% endif %} value="all">Undelivered Products</option>
-                        <option {% if filterby == 'my' %}selected{% endif %} value="my">Delivered Products</option>
-                    </select>
-                {% endif %}
+                <h3 class="panel-title" style="display:inline-block;">Process Orders</h3>
+                <label style="margin-left:30px;">Filter By:</label>
+                <select id="filter_type" style="margin-left:20px;">
+                    <option value="paid">Paid</option>
+                    <option value="approved">Approved</option>
+                    <option value="-approved">Not Approved</option>
+                    <option value="processed">Processed</option>
+                    <option value="-processed">Not Processed</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="-shipped">Not Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="-delivered">Not Delivered</option>
+                    <option value="returned">Returned</option>
+                </select>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
@@ -28,39 +35,23 @@
                                 <th>Returned</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for order in object_list %}
-                                <tr id="order_{{order.id}}">
-                                    <td><a href="#">{{order.order_id}}</a></td>
-                                    <td>
-                                        <input data-id="{{order.id}}" type='checkbox' {% if order.details.approved %}checked{% endif %} class='order-status' name='approved'/>
-                                    </td>
-                                    <td>
-                                        <input data-id="{{order.id}}" type='checkbox' {% if order.details.processed %}checked{% endif %} class='order-status' name='processed'/>
-                                    </td>
-                                    <td>
-                                        <input data-id="{{order.id}}" type='checkbox' {% if order.details.shipped %}checked{% endif %} class='order-status' name='shipped'/>
-                                    </td>
-                                    <td>
-                                        <input data-id="{{order.id}}" type='checkbox' {% if order.details.delivered %}checked{% endif %} class='order-status' name='delivered'/>
-                                    </td>
-                                    <td>{{order.order_total}}</td>
-                                    <td>
-                                        <input data-id="{{order.id}}" type='checkbox' {% if order.details.returned %}checked{% endif %} class='order-status' name='returned'/>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                        <tbody id="ajax_process_orders">
+                            {% include 'users/staff/part_process_orders.html' %}
                         </tbody>
                     </table>
+                    <div id="paginate_html">
+                        {% include 'users/staff/part_pagination.html' %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<input type="hidden" name="filter" id="id_filter">
 <script type="text/javascript">
-
 $(document).ready(function(){
-    $(".order-status").change(function(){
+    $("#ajax_process_orders").on('change', '.order-status', function(){
+        ajax_process_orders
         var is_delete = true;
         var name = $(this).attr('name');
         var order_id = $(this).attr('data-id');
@@ -89,10 +80,44 @@ $(document).ready(function(){
     });
 
     $('#filter_type').change(function() {
-       var filterby = $('#filter_type option:selected').val();
-       window.location='{% url "low-stock-products" %}?filterby='+filterby
+        $('#id_filter').val($('#filter_type option:selected').val());
+        var dataString = 'filter='+$('#filter_type option:selected').val();
+        $.ajax({
+            url: '{% url "process-order" %}',
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            success:function(data){
+                $('#ajax_process_orders').empty().append(data['html']);
+                $('#paginate_html').empty().append(data['paginatehtml']);
+            },
+            error:function(data){
+                console.log(data.error)
+            }
+        });
     });    
 });
+
+function pagination(p){
+    var dataString='';
+    dataString+="page="+p;
+    if($('#id_filter').val()!='' && $('#id_filter').val()!=null){
+        dataString+="&filter="+$('#id_filter').val();
+    }
+    $.ajax({
+        url: '{% url "process-order" %}',
+        type: 'GET',
+        dataType: 'json',
+        data: dataString,
+        success:function(data){
+            $('#ajax_process_orders').empty().append(data['html']);
+            $('#paginate_html').empty().append(data['paginatehtml']);
+        },
+        error:function(data){
+            console.log(data.error)
+        }
+    });
+}
 
 </script>
 

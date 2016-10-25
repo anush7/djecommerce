@@ -1,0 +1,30 @@
+
+
+{% for order in object_list %}
+    <tr id="order_{{order.id}}">
+        <td><a href="#">{{order.order_id}}</a></td>
+        <td>
+            <input data-id="{{order.id}}" type='checkbox' {% if order.details.approved %}checked{% endif %} class='order-status' name='approved'/>
+        </td>
+        <td>
+            <input data-id="{{order.id}}" type='checkbox' {% if order.details.processed %}checked{% endif %} class='order-status' name='processed'/>
+        </td>
+        <td>
+            <input data-id="{{order.id}}" type='checkbox' {% if order.details.shipped %}checked{% endif %} class='order-status' name='shipped'/>
+        </td>
+        <td>
+            <input data-id="{{order.id}}" type='checkbox' {% if order.details.delivered %}checked{% endif %} class='order-status' name='delivered'/>
+        </td>
+        <td>{{order.order_total}}</td>
+        <td>
+            <input data-id="{{order.id}}" type='checkbox' {% if order.details.returned %}checked{% endif %} class='order-status' name='returned'/>
+        </td>
+    </tr>
+{% empty %}
+    <p>No Orders Found!</p>
+{% endfor %}
+<script type="text/javascript">
+    $(document).ready(function(){
+
+    });
+</script>

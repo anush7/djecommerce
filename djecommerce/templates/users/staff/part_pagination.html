@@ -1,0 +1,17 @@
+<div class="row">
+    <div class="col-lg-12">
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav>
+                <ul class="pager">
+                    {% if page_obj.has_previous %}
+                        <li><a onclick="pagination({{page_obj.previous_page_number}});" href="javascript:void(0);" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                    {% endif %}
+                    <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</li>
+                    {% if page_obj.has_next %}
+                        <li><a onclick="pagination({{page_obj.next_page_number}});" href="javascript:void(0);" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
