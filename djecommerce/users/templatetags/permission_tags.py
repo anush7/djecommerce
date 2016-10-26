@@ -27,7 +27,7 @@ def get_staff_nav_bar(user):
 def check_permission(user, permission):
 	if not user.is_staff: return False
 	if user.is_admin:return True
-	return all(map(lambda perm: user.has_perm(perm), permission))
+	return all(map(lambda perm: user.has_perm(perm), [permission]))
 
 
 @register.simple_tag

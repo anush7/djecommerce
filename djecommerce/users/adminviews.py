@@ -86,10 +86,13 @@ class StaffManagementView(AdminRequiredMixin, ListView):
 					staff.save()
 					html_data['status'] = 1
 				elif request.GET.get('role_id'):
-					grp = Group.objects.get(id=int(request.GET.get('role_id')))
-					staff.groups.clear()
-					staff.groups.add(grp)
-					return JsonResponse({'status':1})
+					try:
+						grp = Group.objects.get(id=int(request.GET.get('role_id')))
+						staff.groups.clear()
+						staff.groups.add(grp)
+						return JsonResponse({'status':1})
+					except:
+						return JsonResponse({'status':0})
 				elif request.GET.get('delete'):
 					staff.delete()
 

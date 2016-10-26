@@ -95,7 +95,10 @@
 				      			{% if user.is_staff %}
 				      				<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
 				      				<li><a href="{% url 'low-stock-products' %}">Low Stock Products</a></li>
-				      				<li><a href="{% url 'process-order' %}">Process Order</a></li>
+				      				{% check_permission user 'process_orders' as process_orders %}
+				      				{% if process_orders %}
+				      					<li><a href="{% url 'process-order' %}">Process Order</a></li>
+				      				{% endif %}
 				      			{% endif %}
 				      			{% if user.is_admin %}
 					            	<li><a href="{% url 'staff_management' %}">Staff Management</a></li>
