@@ -181,9 +181,10 @@ class CheckoutFinalView(LoginRequiredMixin, CartOrderMixin, View):
 			if result.is_success:
 				#result.transaction.id to order
 				order.mark_completed(order_id=result.transaction.id)
-				messages.success(request, "Thank you for your order.")
 				del request.session["cart_id"]
 				del request.session["order_id"]
+				order.send_invoice()
+				messages.success(request, "Thank you for your order. Check you email inbox for the Invoice")
 			else:
 				#messages.success(request, "There was a problem with your order.")
 				messages.success(request, "%s" %(result.message))

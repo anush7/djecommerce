@@ -11,11 +11,13 @@ from django.db.models import IntegerField, FloatField
 from collections import OrderedDict
 from catalog.models import CatalogCategory
 
-def send_mg_email(subject, body, from_name=False, to_email=[], files=None):
+def send_mg_email(subject, body, to_email=[], from_name=False, files=None):
 	mg_url = "https://api.mailgun.net/v3/%s/messages" % (settings.MG_DOMAIN)
 	mg_key = settings.MG_API_KEY
 	if from_name:
 		from_email = "%s <notifications@%s>" % (from_name, settings.MG_DOMAIN)
+	else:
+		from_email = "notifications@%s" % (settings.MG_DOMAIN)
 
 	#', '.join("{!s} <{!s}>".format(key,val) for (key,val) in to_email.items())
 	msg_data = {

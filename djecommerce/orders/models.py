@@ -5,10 +5,13 @@ from datetime import datetime
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
 
 from users.models import EcUser as User
 from carts.models import Cart, CartItem
 from products.models import Stock
+from users.utils import send_mg_email
+import pdfkit
 
 ADDRESS_TYPE = (
 	('billing', 'Billing'),
@@ -83,6 +86,26 @@ class Order(models.Model):
 			stock = Stock.objects.get(variant=citem.item)
 			stock.quantity_allocated += citem.quantity
 			stock.save()
+
+	def send_invoice(self):
+		order = Order.objects.get(id=self.id)
+		css = 'static/css/bootstrap.min.css'
+		file_data = render_to_string('orders/order_invoice.html', {'order': order})
+		options = {
+			'margin-top': '0.25in',
+			'margin-right': '0.25in',
+			'margin-bottom': '0.25in',
+			'margin-left': '0.25in',
+		}
+		pdf = pdfkit.from_string(file_data, False,options=options,css=css)
+		subject = 'Your Ecommerce Order'
+		body = 'Hi '+self.user.get_full_name()+',<br><br>'
+		body += 'Thank you for your order.<br>'
+		body += 'Order No: '+self.order_id+'<br><br>'
+		body += 'Please check the attachment for a copy of your order.<br><br>'
+		to_email = [self.user.email]
+		file_name = 'order_'+self.order_id+'.pdf'
+		send_mg_email(subject,body,to_email,files=[("attachment",(file_name, pdf))])
 
 	def update_order(self):
 		shipping_total_price = self.shipping_total_price
