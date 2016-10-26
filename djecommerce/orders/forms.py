@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserAddress
+from .models import UserAddress, Shipping
 from users.models import EcUser as User
 
 
@@ -39,10 +39,14 @@ class UserAddressForm(forms.ModelForm):
 
 
 
+class ShippingForm(forms.ModelForm):
+    name = forms.CharField(required=False,max_length=100, error_messages={'required': 'Please enter the shipping name '},widget=forms.TextInput(attrs={'class':'form-control', 'autocomplete':'off'}))
+    rate = forms.DecimalField(required=True,max_digits=10, decimal_places=5, error_messages={'required': 'Please enter the shipping rate '},widget=forms.NumberInput(attrs={'class':'form-control'}))
+    is_active = forms.BooleanField(required=False, widget=forms.CheckboxInput())
 
-
-
-
+    class Meta:
+        model = Shipping
+        fields = ['name','rate','is_active']
 
 
 

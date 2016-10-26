@@ -136,10 +136,12 @@ def forgot_password(request, template="users/forgot-password.html"):
 				if not user.uuid:
 					user.uuid = str(uuid.uuid4()).replace('-','')
 					user.save()
+				encoded = jwt.encode({'email': user.email}, settings.SECRET_KEY, algorithm='HS256')
 				email_data['user'] = user
-				email_data['reset_link'] = 'http://localhost:8000/reset-password/?uuid='+user.uuid
+				email_data['reset_link'] = 'http://localhost:8000/reset-password/?code='+encoded
 				html_content = body = render_to_string('users/reset-email.html',email_data,context_instance=RequestContext(request))
-				send_mail('Password Reset Link - ContactMgmt App', body, from_email, to_email,fail_silently=False, html_message=html_content,)
+				subject = 'Password Reset Link - Ecommerce App'
+				send_mg_email(subject, body, to_email=[user.email])
 				data['msg'] = 'Please check your email for password rest link'
 			except:
 				import sys
@@ -154,10 +156,11 @@ def reset_password(request, template="users/reset-password.html"):
 	if request.POST:
 		if request.POST.get('pass1',False) and request.POST.get('pass2',False):
 			try:
-				uuid = request.POST.get('uuid',False)
-				user = User.objects.get(uuid=uuid)
+				code = request.POST.get('code',False)
+				email = jwt.decode(code, settings.SECRET_KEY , algorithms=['HS256'])['email']
+				user = User.objects.get(email=email)
 				user.set_password(request.POST.get('pass1'))
-				user.user.save()
+				user.save()
 				data['msg'] = 'Password reset successful'
 			except:
 				data['msg'] = 'Oops no able to process your request!'
@@ -165,11 +168,12 @@ def reset_password(request, template="users/reset-password.html"):
 			data['msg'] = 'Please enter both the fields'
 		return HttpResponse(json.dumps(data))
 	else:
-		uuid = request.GET.get('uuid',False)
-		if uuid:
+		code = request.GET.get('code',False)
+		if code:
 			try:
-				user = User.objects.get(uuid=uuid)
-				data['uuid'] = uuid
+				email = jwt.decode(code, settings.SECRET_KEY , algorithms=['HS256'])['email']
+				user = User.objects.get(email=email)
+				data['code'] = code
 			except:data['msg'] = 'password reset Url expired'
 		else:data['msg'] = 'Invalid password reset Url'
 	return render(request, template, {'data': data})

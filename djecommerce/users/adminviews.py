@@ -9,14 +9,20 @@ from django.template import Context, loader, RequestContext
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.models import Permission, Group
 from django.views.generic.base import View, TemplateView
+from django.views.generic.edit import *
 from django.views.generic.list import ListView
 from users.utils import send_mg_email
 from django.conf import settings
 
 from catalog.models import Catalog, CatalogCategory
+from carts.models import Tax
+from catalog.forms import TaxForm
+from orders.forms import ShippingForm
+from orders.models import Shipping
 from users.models import EcUser as User
 from users.models import GroupDetails
-from users.mixins import AdminRequiredMixin
+from users.mixins import StaffRequiredMixin, StaffUpdateRequiredMixin, AdminRequiredMixin
+from users.decorators import staff_required, staff_update_required
 
 
 class StaffManagementView(AdminRequiredMixin, ListView):
@@ -204,3 +210,73 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 
         return render(request, self.template_name, context)
 
+"""###############################Tax Views############################"""
+
+class TaxListView(StaffRequiredMixin, ListView):
+    template_name = 'users/admin/tax_list.html'
+    permissions = ['access_tax']
+
+    def get_queryset(self):
+        return Tax.objects.all().order_by('name')
+
+class TaxFormView(StaffRequiredMixin, FormView):
+    template_name = 'users/admin/tax_form.html'
+    form_class = TaxForm
+    success_url = reverse_lazy('tax_list')
+    permissions = ['add_tax']
+
+    def get_form_kwargs(self):
+        kwargs = super(TaxFormView, self).get_form_kwargs()
+        if self.kwargs.get('pk'):
+            tax = Tax.objects.get(id=self.kwargs.get('pk'))
+            kwargs.update({'instance': tax})
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.object = form.save()
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
+
+class TaxDeleteView(StaffRequiredMixin, View):
+    permissions = ['delete_tax']
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            data = {}
+            try:
+                tax = Tax.objects.get(id=kwargs['pk'])
+                tax.delete()
+                data['status'] = 1
+            except:data['status'] = 0
+            return JsonResponse(data)
+        else:
+            raise Http404
+
+"""###############################Shipping Settings############################"""
+
+
+class ShippingFormView(StaffRequiredMixin, FormView):
+    template_name = 'users/admin/shipping_form.html'
+    form_class = ShippingForm
+    success_url = reverse_lazy('shipping_settings')
+    permissions = ['add_tax']
+
+    def get_form_kwargs(self):
+        kwargs = super(ShippingFormView, self).get_form_kwargs()
+        try:
+            shipObj = Shipping.objects.get(id=1)
+            kwargs.update({'instance': shipObj})
+        except:pass
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.object = form.save()
+            messages.success(request, "Shipping Rate Successfully updated")
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)

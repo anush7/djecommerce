@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% load permission_tags %}
-{% check_permission user 'delete_tax' as can_delete %}
 <div class="container">
-    <div class="row">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{% url 'tax_list' %}" style="cursor: pointer; cursor: hand;">Tax</a></li>
+        <li><a href="{% url 'shipping_settings' %}" style="cursor: pointer; cursor: hand;">Shipping Settings</a></li>
+    </ul>
+
+    <div class="row" style="margin-top:10px;">
         <div class="col-md-2">
-            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'staff-tax-add' %}">Add Tax</a>
+            <a style="margin-bottom:10px;" class="btn btn-primary" href="{% url 'tax_add' %}">Add Tax</a>
         </div>
         <div class="col-md-12" style="margin-top:15px;">
             <div class="row">
@@ -18,13 +21,8 @@
                                     <li class="list-group-item">
                                         {{tax.name}} | Tax Rate: {{tax.tax_percentage|floatformat:2}} | {% if tax.is_active %}Active{% else %}Inactive{% endif %}
                                     </li>
-                                    {% check_update_permission user tax.created_by 'change_tax,change_owned_tax' as can_update %}
-                                    {% if can_update %}
-                                        <a href="{% url 'staff-tax-update' tax.id %}" title="Edit tax" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
-                                    {% endif %}
-                                    {% if can_delete %}
-                                        <a onclick="delete_tax({{tax.id}})" href="javascript:void(0);" title="Delete tax" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
-                                    {% endif %}
+                                    <a href="{% url 'tax_update' tax.id %}" title="Edit tax" style="margin-top:-30px;margin-right:30px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-pencil"></span></a>
+                                    <a onclick="delete_tax({{tax.id}})" href="javascript:void(0);" title="Delete tax" style="margin-top:-30px;margin-right:5px;" class="pull-right btn btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
                                 </div>
                             </div>
                         {% endfor %}
@@ -44,7 +42,7 @@
                 type: 'GET',
                 dataType: 'json',
                 data: dataString,
-                url: '/staff/tax/delete/'+tid,
+                url: '/admin/tax/delete/'+tid,
                 success: function(data){
                     if(data.status == 1){
                         $('#id_tax_'+tid).remove();

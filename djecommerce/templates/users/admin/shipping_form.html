@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+	<ul class="nav nav-tabs">
+        <li><a href="{% url 'tax_list' %}" style="cursor: pointer; cursor: hand;">Tax</a></li>
+        <li class="active"><a href="{% url 'shipping_settings' %}" style="cursor: pointer; cursor: hand;">Shipping Settings</a></li>
+    </ul>
+
+	<h3 style="margin-left:75px;margin-bottom:15px;"><strong>Shipping rate:</strong></h3>
+
+	<form method='post' name="tax_form" class="form-horizontal">{% csrf_token %}
+		<div class="form-group">
+			<label for="id_title" class="col-sm-2 control-label">Set Shipping Rate</label>
+			<div class="col-xs-4">
+				{{form.rate}}
+				<p style="color:red;">{{ form.rate.errors.as_text }}</p>
+			</div>
+		</div>
+		<div class="form-group">
+		    <div class="col-sm-offset-2 col-xs-3">
+		      <button type="submit" name="submit" value="P" class="btn btn-default">Save</button>
+		    </div>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+	// $("form[name='tax_form']").validate({
+	//     rules: {
+	//     	name: "required",
+	//     	tax_percentage: {
+	//     		required: true,
+	//     		number: true
+	//     	}
+	//     },
+	//     messages: {
+	//     	name: "Please enter the Tax name",
+	//     	tax_percentage: "Please enter the tax percentage"
+	//    	},
+	//     submitHandler: function(form) {
+	//     	form.submit();
+	//     }
+	// });
+
+});
+
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+

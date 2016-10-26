@@ -417,48 +417,23 @@ def get_sub_cats(request, template="catalog/load_subcats.html"):
 """#################################################################################################"""
 
 
-class TaxListView(StaffRequiredMixin, ListView):
-    template_name = 'catalog/tax_list.html'
-    permissions = ['access_tax']
 
-    def get_queryset(self):
-        return Tax.objects.all().order_by('name')
 
-class TaxFormView(StaffRequiredMixin, FormView):
-    template_name = 'catalog/tax_form.html'
-    form_class = TaxForm
-    success_url = reverse_lazy('staff-tax-list')
-    permissions = ['add_tax']
 
-    def get_form_kwargs(self):
-        kwargs = super(TaxFormView, self).get_form_kwargs()
-        if self.kwargs.get('pk'):
-            tax = Tax.objects.get(id=self.kwargs.get('pk'))
-            kwargs.update({'instance': tax})
-        return kwargs
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            self.object = form.save()
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.form_invalid(form)
 
-class TaxDeleteView(StaffRequiredMixin, View):
-    permissions = ['delete_tax']
 
-    def get(self, request, *args, **kwargs):
-        if request.is_ajax():
-            data = {}
-            try:
-                tax = Tax.objects.get(id=kwargs['pk'])
-                tax.delete()
-                data['status'] = 1
-            except:data['status'] = 0
-            return JsonResponse(data)
-        else:
-            raise Http404
+
+
+
+
+
+
+
+
+
+
+
 
 
 # class AttributeFormView(FormView):

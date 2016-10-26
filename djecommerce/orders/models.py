@@ -59,7 +59,7 @@ class Order(models.Model):
 	user = models.ForeignKey(User, null=True)
 	billing_address = models.ForeignKey(UserAddress, related_name='billing_address', on_delete=models.SET_NULL, null=True)
 	shipping_address = models.ForeignKey(UserAddress, related_name='shipping_address', on_delete=models.SET_NULL, null=True)
-	shipping_total_price = models.DecimalField(max_digits=50, decimal_places=2, default=5.99)
+	shipping_total_price = models.DecimalField(max_digits=50, decimal_places=2, default=0.00)
 	order_total = models.DecimalField(max_digits=50, decimal_places=2, )
 	order_id = models.CharField(max_length=20, null=True, blank=True)
 	order_placed = models.DateTimeField(blank=True, null=True)
@@ -115,9 +115,13 @@ class Order(models.Model):
 		self.save()
 
 def order_pre_save(sender, instance, *args, **kwargs):
-	shipping_total_price = instance.shipping_total_price
+	try:
+		shipping = Shipping.objects.get(id=1).rate
+	except:
+		shipping = 0.0
+	instance.shipping_total_price = shipping
 	cart_total = instance.cart.total
-	order_total = Decimal(shipping_total_price) + Decimal(cart_total)
+	order_total = Decimal(instance.shipping_total_price) + Decimal(cart_total)
 	instance.order_total = order_total
 
 pre_save.connect(order_pre_save, sender=Order)
@@ -131,6 +135,12 @@ class OrderDetails(models.Model):
 	shipped = models.BooleanField(default=False)
 	delivered = models.BooleanField(default=False)
 	returned = models.BooleanField(default=False)
+
+
+class Shipping(models.Model):
+	name = models.CharField(max_length=500,blank=True, null=True)
+	rate = models.DecimalField(max_digits=10, decimal_places=2)
+	is_active = models.BooleanField(default=False)
 
 
 

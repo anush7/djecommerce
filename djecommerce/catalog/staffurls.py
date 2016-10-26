@@ -31,10 +31,10 @@ urlpatterns = [
 	url(r'^attribute/list_subcats$', staffviews.get_list_sub_cats, name='staff-ajax-load-list-subcats'),
 
 	#Tax urls
-	url(r'^tax$', staffviews.TaxListView.as_view(), name='staff-tax-list'),
-	url(r'^tax/add$', staffviews.TaxFormView.as_view(), name='staff-tax-add'),
-	url(r'^tax/(?P<pk>\d+)$', staffviews.TaxFormView.as_view(), name='staff-tax-update'),
-	url(r'^tax/delete/(?P<pk>\d+)$', staffviews.TaxDeleteView.as_view(), name='staff-tax-delete'),
+	# url(r'^tax$', staffviews.TaxListView.as_view(), name='staff-tax-list'),
+	# url(r'^tax/add$', staffviews.TaxFormView.as_view(), name='staff-tax-add'),
+	# url(r'^tax/(?P<pk>\d+)$', staffviews.TaxFormView.as_view(), name='staff-tax-update'),
+	# url(r'^tax/delete/(?P<pk>\d+)$', staffviews.TaxDeleteView.as_view(), name='staff-tax-delete'),
 
 
 
