@@ -11,7 +11,7 @@
                     <button id="id_active_{{staff.id}}" onclick="change_status({{staff.id}},'I');" style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;{% if not staff.is_active %}display:none;{% endif %}">Active</button>
                     <button id="id_inactive_{{staff.id}}" onclick="change_status({{staff.id}},'A');" style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;{% if staff.is_active %}display:none;{% endif %}">Inactive</button>
                     <select id="id_role_{{staff.id}}" onchange="change_role($('#id_role_{{staff.id}}').val(),{{staff.id}})" style="display:inline-block;float:right;margin-right:10px;margin-top:-6px;"">
-                        <option>Select Role</option>
+                        <option value="norole">Select Role</option>
                         {% for role in roles %}
                             <option {% if role.id in staff.get_roles %}selected{% endif %} value="{{role.id}}">{{role.name}}</option>
                         {% endfor %}
@@ -41,20 +41,24 @@
 <script type="text/javascript">
 
 function change_role(rid, sid){
-    var dataString='role_id='+rid+'&staff_id='+sid;
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        data: dataString,
-        url: '{% url "staff_management" %}',
-        success: function(data){
-            if(data.status){
-                showFlashMessage('Role Updated!');
-            }else{
-                showFlashMessage('Please select a role.');
+    if(rid != 'norole'){
+        var dataString='role_id='+rid+'&staff_id='+sid;
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            data: dataString,
+            url: '{% url "staff_management" %}',
+            success: function(data){
+                if(data.status){
+                    showFlashMessage('Role Updated!');
+                }else{
+                    showFlashMessage('Please select a role.');
+                }
             }
-        }
-    });
+        });
+    }else{
+        showFlashMessage('Please select a role.');
+    }
 }
 
 function change_status(cid, status){
