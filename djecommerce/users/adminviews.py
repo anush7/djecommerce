@@ -27,7 +27,7 @@ from users.decorators import staff_required, staff_update_required
 
 class StaffManagementView(AdminRequiredMixin, ListView):
 	template_name = 'users/admin/user_management.html'
-	paginate_by = 1
+	paginate_by = 10
 
 	def get_queryset(self):
 		key = {'is_staff':True,'is_superuser':False}
@@ -215,18 +215,16 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 
 """###############################Tax Views############################"""
 
-class TaxListView(StaffRequiredMixin, ListView):
+class TaxListView(AdminRequiredMixin, ListView):
     template_name = 'users/admin/tax_list.html'
-    permissions = ['access_tax']
 
     def get_queryset(self):
         return Tax.objects.all().order_by('name')
 
-class TaxFormView(StaffRequiredMixin, FormView):
+class TaxFormView(AdminRequiredMixin, FormView):
     template_name = 'users/admin/tax_form.html'
     form_class = TaxForm
     success_url = reverse_lazy('tax_list')
-    permissions = ['add_tax']
 
     def get_form_kwargs(self):
         kwargs = super(TaxFormView, self).get_form_kwargs()
@@ -243,8 +241,7 @@ class TaxFormView(StaffRequiredMixin, FormView):
         else:
             return self.form_invalid(form)
 
-class TaxDeleteView(StaffRequiredMixin, View):
-    permissions = ['delete_tax']
+class TaxDeleteView(AdminRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
@@ -261,11 +258,10 @@ class TaxDeleteView(StaffRequiredMixin, View):
 """###############################Shipping Settings############################"""
 
 
-class ShippingFormView(StaffRequiredMixin, FormView):
+class ShippingFormView(AdminRequiredMixin, FormView):
     template_name = 'users/admin/shipping_form.html'
     form_class = ShippingForm
     success_url = reverse_lazy('shipping_settings')
-    permissions = ['add_tax']
 
     def get_form_kwargs(self):
         kwargs = super(ShippingFormView, self).get_form_kwargs()
