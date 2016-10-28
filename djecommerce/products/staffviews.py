@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.core.files.base import ContentFile
 
 from django.views.generic.list import ListView
 from django.views.generic import View, TemplateView
@@ -396,9 +397,9 @@ class ProductImageCreateView(StaffRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        from django.core.files.base import ContentFile
+        file_name = str(self.request.FILES['cover_image'])
         image = image_cropper(self.request.POST,self.request.FILES['cover_image'], self.object)
-        self.object.image.save('image_name_tttttttt', ContentFile(image.read()))
+        self.object.image.save(file_name, ContentFile(image.read()))
         # self.object.image = self.request.FILES['cover_image']
         self.object.save()
         # image = image_cropper(self.request.POST, self.object)
@@ -406,7 +407,7 @@ class ProductImageCreateView(StaffRequiredMixin, CreateView):
 
 class ProductImageUpdateView(StaffRequiredMixin, UpdateView):
     model = ProductImage
-    form_class = StockForm
+    form_class = ProductImageForm
     template_name = 'products/image_form.html'
     permissions = ['change_product','change_owned_product']
 
@@ -422,9 +423,10 @@ class ProductImageUpdateView(StaffRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.object.image = self.request.FILES['cover_image']
+        file_name = str(self.request.FILES['cover_image'])
+        image = image_cropper(self.request.POST,self.request.FILES['cover_image'], self.object)
+        self.object.image.save(file_name, ContentFile(image.read()))
         self.object.save()
-        image = image_cropper(self.request.POST, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
 @staff_required(['delete_product'])

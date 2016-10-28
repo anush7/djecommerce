@@ -13,7 +13,6 @@ from catalog.models import CatalogCategory
 from django.contrib.postgres.fields import JSONField
 from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
-from djecommerce.s3utils import CustomS3BotoStorage
 
 class ProductCategory(models.Model):
     product = models.ForeignKey('Product')
@@ -208,8 +207,7 @@ class Stock(models.Model):
     variant = models.ForeignKey(ProductVariant, related_name='stocks')
 
 def get_product_image_path(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = "%s-%s.%s" % (uuid.uuid4(), str(instance.id), ext)
+    filename = "%s-%s" % (uuid.uuid4(), filename)
     return os.path.join('product/images', filename)
 
 class ProductImage(models.Model):

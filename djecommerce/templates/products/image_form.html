@@ -35,9 +35,9 @@
 				<label class="col-md-2 control-label">Image</label>
 			    <div class="col-xs-4" id="image-cropper">
 			    	<div id="id_preview_image" class="cropit-image-preview" style="{% if object.image %}display:none;{% endif %}"></div>
-		    		<input type="range" class="cropit-image-zoom-input" style="{% if object.image %}display:none;{% endif %}" />
+		    		<input type="range" id="id_preview_zoom" class="cropit-image-zoom-input" style="{% if object.image %}display:none;{% endif %}" />
 		    		{% if object.image %}
-		    			<img class="img-responsive" src="{{object.image.url}}" alt="">
+		    			<img id="selected_image" class="img-responsive" src="{{object.image.url}}" alt="">
 		    		{% endif %}
 					<input name="cover_image" class="cropit-image-input" id="cover_image_upload" type="file" 
 						accept="image/*" tabindex="-1">
@@ -47,7 +47,7 @@
 			<div class="form-group">
 				<label for="id_content" class="col-md-2 control-label">Variant</label>
 				<div class="col-xs-4">
-					{{form.variant}}
+					{{form.variant}} {{form.errors}}
 				</div>
 			</div>
 			<input type="hidden" id="cover_x1" name="cover_x1">
@@ -104,6 +104,9 @@ $(document).ready(function(){
     });
 	
 	function crp_update(crpObj){
+		$('#id_preview_image').show();
+		$('#id_preview_zoom').show();
+		$('#selected_image').hide();
 		$('#cover_x1').val(crpObj.x);
 		$('#cover_y1').val(crpObj.y);
 		$('#zoom').val(editor.cropit('zoom'));
