@@ -72,26 +72,28 @@
             <!--hr-->
         </div>
     </div>
-    <div class="row" style="margin-top:30px;">
-        <div class="col-lg-12">
-            <h3>Similar Products</h3>
+    {% if related_products %}
+        <div class="row" style="margin-top:30px;">
+            <div class="col-lg-12">
+                <h3>Similar Products</h3>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        {% for rprod in related_products %}
-            <div class="col-md-3 col-sm-6 hero-feature">
-                <div class="thumbnail">
-                    <img src="{% if product.get_cover_image %}{{product.get_cover_image}}{% else %}http://placehold.it/800x500{% endif %}" alt="">
-                    <div class="caption">
-                        <h4>
-                            <a href="{% url 'product-detail' rprod.id %}">{{rprod.title}}</a>
-                        </h4>
-                        <p>${{rprod.price}}</p>
+        <div class="row">
+            {% for rprod in related_products %}
+                <div class="col-md-3 col-sm-6 hero-feature">
+                    <div class="thumbnail">
+                        <img src="{% if rprod.get_cover_image %}{{rprod.get_cover_image}}{% else %}http://placehold.it/800x500{% endif %}" alt="">
+                        <div class="caption">
+                            <h4>
+                                <a href="{% url 'product-detail' rprod.id %}">{{rprod.title}}</a>
+                            </h4>
+                            <p>${{rprod.price}}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 
 <script type="text/javascript">
