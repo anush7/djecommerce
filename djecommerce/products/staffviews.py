@@ -35,7 +35,7 @@ from products.forms import ProductForm, VariantForm, StockForm, ProductImageForm
 from products.utils import image_cropper, get_unique_slug, get_rows
 
 class ProductListView(StaffRequiredMixin, ListView):
-    paginate_by = 2
+    paginate_by = 10
     template_name = 'products/product_list.html'
     permissions = ['access_product']
 
@@ -70,7 +70,7 @@ def ajax_product_list(request, template='products/part_product_list.html'):
 
     try:page = request.GET.get('page')
     except:page = 1
-    paginator = Paginator(product_list, 2)
+    paginator = Paginator(product_list, 10)
     try:
         product_list = paginator.page(page)
     except PageNotAnInteger:

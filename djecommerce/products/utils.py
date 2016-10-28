@@ -26,10 +26,12 @@ def image_cropper(data, LogoObject):
         zoom = Decimal(data['zoom'])
         top = int(-Decimal(data['cover_y1']))/ zoom
         left = int(-Decimal(data['cover_x1']))/ zoom
-        print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        print zoom
         print top
         print left
-        print "ggggg"
+        print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        
         width = image.size[0]
         height = image.size[1]
         right = left + (450 / zoom)
@@ -39,7 +41,7 @@ def image_cropper(data, LogoObject):
         print right
         print height
         print bottom
-        print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        print "cccccccccccccccccccccccccccccccccccccccccccccccccccc"
 
         if width < right:
             right = width

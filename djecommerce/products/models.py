@@ -214,7 +214,7 @@ def get_product_image_path(instance, filename):
 
 class ProductImage(models.Model):
     variant = models.ForeignKey(ProductVariant, related_name='images')
-    image = models.ImageField(storage=CustomS3BotoStorage(),upload_to=get_product_image_path, max_length=255)
+    image = models.ImageField(upload_to=get_product_image_path, max_length=255)
     caption = models.CharField(max_length=200, null=True, blank=True)
     display_order = models.PositiveIntegerField(default=0)
     created_on = models.DateTimeField(auto_now_add=True)
