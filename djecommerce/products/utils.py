@@ -31,7 +31,7 @@ def image_cropper(data, LogoObject):
         print top
         print left
         print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-        
+
         width = image.size[0]
         height = image.size[1]
         right = left + (450 / zoom)
@@ -62,7 +62,7 @@ def image_cropper(data, LogoObject):
         f_thumb = custom_storage.open(file_path, "w")
         # f_thumb = storage.open(file_path, "w")
         # f_thumb = S3BotoStorage.open(file_path, 'w')
-        image.save(f_thumb, "JPG")
+        image.save(f_thumb, "JPEG")
         f_thumb.seek(0)
         f_thumb.close()
         print "2222222222222222222222222222222222222222222222222222222"
