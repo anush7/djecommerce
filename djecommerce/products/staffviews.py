@@ -396,9 +396,12 @@ class ProductImageCreateView(StaffRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.object.image = self.request.FILES['cover_image']
+        from django.core.files.base import ContentFile
+        image = image_cropper(self.request.POST,self.request.FILES['cover_image'], self.object)
+        self.object.image.save('image_name_tttttttt', ContentFile(image.read()))
+        # self.object.image = self.request.FILES['cover_image']
         self.object.save()
-        image = image_cropper(self.request.POST, self.object)
+        # image = image_cropper(self.request.POST, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
 class ProductImageUpdateView(StaffRequiredMixin, UpdateView):

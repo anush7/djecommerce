@@ -10,10 +10,66 @@ from products.models import Product
 from storages.backends.s3boto import S3BotoStorage
 from django.core.files.storage import default_storage as storage
 from djecommerce.s3utils import CustomS3BotoStorage, MediaRootS3BotoStorage
-
+from cStringIO import StringIO
+from django.core.files.base import ContentFile
 custom_storage = CustomS3BotoStorage()
 
-def image_cropper(data, LogoObject):
+def image_cropper(data, img_file, LogoObject):
+    try:
+        print "111111111111111111111111111111111111111111111111111"
+        inmemory_img = StringIO(img_file.read())
+        image = Image.open(inmemory_img)
+
+        zoom = Decimal(data['zoom'])
+        top = int(-Decimal(data['cover_y1']))/ zoom
+        left = int(-Decimal(data['cover_x1']))/ zoom
+        print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        print zoom
+        print top
+        print left
+        print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+        width = image.size[0]
+        height = image.size[1]
+        right = left + (450 / zoom)
+        bottom = top + (450 / zoom)
+
+        print width
+        print right
+        print height
+        print bottom
+        print "cccccccccccccccccccccccccccccccccccccccccccccccccccc"
+
+        if width < right:
+            right = width
+            left = 0
+        if height < bottom:
+            bottom = height
+            top = 0
+
+        box = (left, top, right, bottom)
+        image = image.crop(box)
+        image = image.resize((450, 450), Image.ANTIALIAS)
+        if image.mode not in ('L', 'RGB'):
+            image = image.convert('RGB')
+        enhancer = ImageEnhance.Sharpness(image)
+        image = enhancer.enhance(1.0)
+        image = image.filter(ImageFilter.DETAIL)
+
+        temp_handle = StringIO()
+        image.save(temp_handle, "JPEG")
+        temp_handle.seek(0)
+        print "2222222222222222222222222222222222222222222222222222222"
+        return temp_handle
+    except:
+        import sys
+        print "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        print sys.exc_info()
+        print "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        return False
+
+
+def image_cropper2(data, LogoObject):
     try:
         file_path = LogoObject.image.name
         print "111111111111111111111111111111111111111111111111111"
