@@ -7,13 +7,22 @@ from django.core.cache import cache
 from django.template.defaultfilters import slugify
 import decimal
 from products.models import Product
+from storages.backends.s3boto import S3BotoStorage
 from django.core.files.storage import default_storage as storage
+from djecommerce.s3utils import CustomS3BotoStorage, MediaRootS3BotoStorage
+
+custom_storage = CustomS3BotoStorage()
 
 def image_cropper(data, LogoObject):
     try:
-        # path = LogoObject.image.path
+        file_path = LogoObject.image.name
+        print "111111111111111111111111111111111111111111111111111"
+        print file_path
+        f = custom_storage.open(file_path, 'r')
         # f = storage.open(file_path, 'r')
-        image = Image.open(LogoObject.image)
+        # f = S3BotoStorage.open(file_path, 'r')
+        image = Image.open(f)
+
         zoom = Decimal(data['zoom'])
         top = int(-Decimal(data['cover_y1']))/ zoom
         left = int(-Decimal(data['cover_x1']))/ zoom
@@ -48,9 +57,13 @@ def image_cropper(data, LogoObject):
         image = enhancer.enhance(1.0)
         image = image.filter(ImageFilter.DETAIL)
 
-        fh = storage.open(LogoObject.image.name, "w")
-        image.save(fh,quality=90,optimised=True)
-        #image.save(path,quality=90,optimised=True)
+        f_thumb = custom_storage.open(file_path, "w")
+        # f_thumb = storage.open(file_path, "w")
+        # f_thumb = S3BotoStorage.open(file_path, 'w')
+        image.save(f_thumb, "JPG")
+        f_thumb.seek(0)
+        f_thumb.close()
+        print "2222222222222222222222222222222222222222222222222222222"
         try: cache.clear()
         except: pass
         return image
