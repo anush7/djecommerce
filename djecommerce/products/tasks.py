@@ -1,7 +1,9 @@
 import csv
+from celery import shared_task
 from products.models import Product, ProductCategory
 from catalog.models import CatalogCategory
 
+@shared_task
 def import_data(data, user, csvfile_data):
 
 	req_fields = ['title','description','price','rating','status']
@@ -25,3 +27,5 @@ def import_data(data, user, csvfile_data):
 			for cid in subcat_ids:
 				subcat = CatalogCategory.objects.get(id=cid)
 				ProductCategory.objects.create(product=new_product, category=subcat)
+
+

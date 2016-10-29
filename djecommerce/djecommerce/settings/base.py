@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'storages',
+    'djcelery'
 ]
 
 MIDDLEWARE_CLASSES = [

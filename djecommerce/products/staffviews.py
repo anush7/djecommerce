@@ -467,7 +467,7 @@ class ProductImportView(StaffRequiredMixin, TemplateView):
             return render(request, self.template_name, {})
 
         from products.tasks import import_data
-        import_data(request.POST, request.user, csvfile)
+        import_data.delay(request.POST, request.user, csvfile)
 
         messages.success(request, "Import Complete")
         return render(request, self.template_name, {})
