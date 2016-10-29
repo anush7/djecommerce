@@ -27,6 +27,8 @@ SECRET_KEY = '*&3&r^&^j0c%vp28yqun9!4_r1%72mr40j0^upg&ooyf%*g@%e'
 
 ALLOWED_HOSTS = ['*']
 
+LOGIN_URL = '/login'
+
 # Application definition
 
 INSTALLED_APPS = [

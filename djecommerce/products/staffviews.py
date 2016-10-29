@@ -466,31 +466,13 @@ class ProductImportView(StaffRequiredMixin, TemplateView):
             messages.error(request, "Please select a file to import")
             return render(request, self.template_name, {})
 
-        req_fields = ['title','description','price','rating','status']
-        python_csv_object = csv.DictReader(csvfile.read().splitlines())
-        new_product = Product()
-        for i, rowData in enumerate(python_csv_object):
-            row = {}
-            for k in rowData.keys():row[k.replace(' ','_').lower()] = rowData[k]
-            if i == 0:
-                if not all(map(lambda v: v in row.keys(), req_fields)):
-                    messages.error(request, "Required Columns not available")
-                    return render(request, self.template_name, {})
-
-            for field in req_fields:
-                setattr(new_product, field, row[field])
-
-            new_product.created_by = request.user
-            new_product.save()
-            subcat_ids = self.request.POST.getlist('category')
-            if subcat_ids:
-                ProductCategory.objects.filter(product=self.object).delete()
-                for cid in subcat_ids:
-                    subcat = CatalogCategory.objects.get(id=cid)
-                    ProductCategory.objects.create(product=new_product, category=subcat)
+        from products.tasks import import_data
+        import_data(request.POST, request.user, csvfile)
 
         messages.success(request, "Import Complete")
         return render(request, self.template_name, {})
+
+        
 
 class ProductExportView(StaffRequiredMixin, TemplateView):
     template_name = 'products/export.html'
@@ -633,8 +615,47 @@ def ProductExportCsv(request):
 
 
 
+# class ProductImportView(StaffRequiredMixin, TemplateView):
+#     template_name = 'products/import.html'
+#     permissions = ['access_import']
 
+#     def get_context_data(self, **kwargs):
+#         context = super(ProductImportView, self).get_context_data(**kwargs)
+#         return context
 
+#     def post(self, request, *args, **kwargs):
+#         if not request.POST.getlist('category'):
+#             messages.error(request, "Please select a category")
+#             return render(request, self.template_name, {})
 
+#         try:csvfile = request.FILES['csvfile']
+#         except:
+#             messages.error(request, "Please select a file to import")
+#             return render(request, self.template_name, {})
 
+#         req_fields = ['title','description','price','rating','status']
+#         python_csv_object = csv.DictReader(csvfile.read().splitlines())
+#         new_product = Product()
+#         for i, rowData in enumerate(python_csv_object):
+#             row = {}
+#             for k in rowData.keys():row[k.replace(' ','_').lower()] = rowData[k]
+#             if i == 0:
+#                 if not all(map(lambda v: v in row.keys(), req_fields)):
+#                     messages.error(request, "Required Columns not available")
+#                     return render(request, self.template_name, {})
+
+#             for field in req_fields:
+#                 setattr(new_product, field, row[field])
+
+#             new_product.created_by = request.user
+#             new_product.save()
+#             subcat_ids = self.request.POST.getlist('category')
+#             if subcat_ids:
+#                 ProductCategory.objects.filter(product=self.object).delete()
+#                 for cid in subcat_ids:
+#                     subcat = CatalogCategory.objects.get(id=cid)
+#                     ProductCategory.objects.create(product=new_product, category=subcat)
+
+#         messages.success(request, "Import Complete")
+#         return render(request, self.template_name, {})
 

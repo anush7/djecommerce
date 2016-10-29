@@ -118,7 +118,7 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         try:context['default_variant'] = ProductVariant.objects.get(default=True, product_id=self.kwargs['pk'])
-        except:messages.success(self.request, "Product inactive. No variants available!")
+        except:pass
         product = self.get_object()
         context['related_products'] = Product.objects.filter(status='A',categories__in=product.categories.all()).exclude(id=product.id).distinct()[:4]
         return context

@@ -26,11 +26,13 @@
         </div>
         <!-- <div class="divider-vertical"></div> -->
         <div class="col-md-7 col-sm-12">
+            {% with product.get_available_variants as product_variants %}
             <h1>{{product.title}}</h1>
-            <p id="id_product_price">${{default_variant.price}}</p>
+            {% if product_variants %}
+                <p id="id_product_price">${{default_variant.price}}</p>
+            {% endif %}
             <hr>
             <form id='add-to-form' method='post' class="form-horizontal">{% csrf_token %}
-                {% with product.get_available_variants as product_variants %}
                 {% if product_variants %}
                     <div class="form-group">
                         <div class="col-xs-10">
@@ -59,11 +61,11 @@
                       This product is currently unavailable.
                     </div>
                 {% endif %}
-                {% endwith %}
             </form>
             <hr>
             <p class="lead">{{product.description}}</p>
             <hr>
+            {% endwith %}
             <!-- <p class="lead">by <a href="#">{{product.created_by}}</a></p><hr> -->
             <!-- <div style="float:left;" class="fb-share-button" data-href="http://{{request.get_host}}{{request.path}}" data-layout="button_count"></div>
             <span style="margin-left:10px;"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{product.title}}" data-size="large">Tweet</a></span><hr> -->
@@ -80,9 +82,9 @@
         </div>
         <div class="row">
             {% for rprod in related_products %}
-                <div class="col-md-3 col-sm-6 hero-feature">
+                <div class="col-md-3 col-sm-6 thumb">
                     <div class="thumbnail">
-                        <img src="{% if rprod.get_cover_image %}{{rprod.get_cover_image}}{% else %}http://placehold.it/800x500{% endif %}" alt="">
+                        <img src="{% if rprod.get_cover_image %}{{rprod.get_cover_image}}{% else %}http://placehold.it/320x150{% endif %}" alt="" style="min-height:100px; height:250px;">
                         <div class="caption">
                             <h4>
                                 <a href="{% url 'product-detail' rprod.id %}">{{rprod.title}}</a>
