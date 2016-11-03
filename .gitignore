@@ -2,6 +2,8 @@
 .gitignore~
 djecommerce/djecommerce/settings/local.py
 djecommerce/djecommerce/settings/access_settings.py
+djecommerce/deploy/guni.pid
+djecommerce/deploy/w1.pid
 estatic_prod/
 __pycache__/
 *.py[cod]
