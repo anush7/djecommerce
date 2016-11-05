@@ -53,7 +53,7 @@
 			</div>
 			{% for attr in product.attributes.all %}
 				<div class="form-group">
-					<label for="id_content" class="col-md-2 control-label">{{attr.name}} <span style="color:red;">*</span></label>
+					<label for="id_content" class="col-md-2 control-label">{{attr.name}}</label>
 					<div class="col-xs-4">
 						<input type="text" class="form-control" name="{{attr.id}}" value="{{object|get_attr_val:attr.id}}"></input>
 					</div>
