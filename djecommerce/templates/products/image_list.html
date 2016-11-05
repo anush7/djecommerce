@@ -37,7 +37,7 @@
 			            <img class="img-responsive" src="{{image.image.url}}" alt="">
 			        </a>
 			        <div class="ratings" style="padding-bottom:10px;margin-top:5px;">
-			        	{{image.variant}}
+			        	{{image.variant|truncatechars:30}}
 	                	<a href="{% url 'staff-image-update' product.id image.id %}" style="margin-left:5px;" class="pull-right btn btn-xs btn-info"><span class="glyphicon glyphicon-pencil"></span></a>
 	                	<a onclick="delete_image({{image.id}})" href="javascript:void(0);" class="pull-right btn btn-xs btn-warning"><span class="glyphicon glyphicon-trash"></span></a>
 	                </div>
