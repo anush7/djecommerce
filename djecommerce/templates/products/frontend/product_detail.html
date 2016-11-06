@@ -29,7 +29,7 @@
             {% with product.get_available_variants as product_variants %}
             <h1>{{product.title}}</h1>
             {% if product_variants %}
-                <p id="id_product_price">${{default_variant.price}}</p>
+                <p id="id_product_price">$<b>{{default_variant.price}}</b></p>
             {% endif %}
             <hr>
             <form id='add-to-form' method='post' class="form-horizontal">{% csrf_token %}
@@ -63,7 +63,7 @@
                 {% endif %}
             </form>
             <hr>
-            <p class="lead">{{product.description}}</p>
+            <p class="lead">{{product.description|linebreaks}}</p>
             <hr>
             {% endwith %}
             <!-- <p class="lead">by <a href="#">{{product.created_by}}</a></p><hr> -->

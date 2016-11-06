@@ -109,7 +109,15 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(Product, related_name='variants')
 
     def __str__(self):
-        return self.name
+        label = self.name+', '
+        try:attributes = self.attributes.iteritems()
+        except:attributes = json.loads(self.attributes).iteritems()
+        for attr_id,attr_value in attributes:
+            if attr_value:
+                attr_name = ProductAttribute.objects.get(id=attr_id).name
+                label += attr_name+' - '+attr_value+', '
+        label = label[:-2]
+        return label
 
     @property
     def quantity(self):
@@ -141,8 +149,9 @@ class ProductVariant(models.Model):
         try:attributes = self.attributes.iteritems()
         except:attributes = json.loads(self.attributes).iteritems()
         for attr_id,attr_value in attributes:
-            attr_name = ProductAttribute.objects.get(id=attr_id).name
-            label += attr_name+' - '+attr_value+', '
+            if attr_value:
+                attr_name = ProductAttribute.objects.get(id=attr_id).name
+                label += attr_name+' - '+attr_value+', '
         label = label[:-2]
         return label
 

@@ -33,10 +33,11 @@
 		{% for image in object_list %}
 		    <div id="image_{{image.id}}" class="col-lg-3 col-md-4 col-xs-6 thumb">
 		    	<div class="thumbnail">
-			        <a href="#">
+			        <a href="{% url 'staff-image-update' product.id image.id %}">
 			            <img class="img-responsive" src="{{image.image.url}}" alt="">
 			        </a>
-			        <div class="ratings" style="padding-bottom:25px;margin-top:5px;">
+			        <div class="ratings" style="padding-bottom:10px;margin-top:5px;">
+			        	{{image.variant|truncatechars:30}}
 	                	<a href="{% url 'staff-image-update' product.id image.id %}" style="margin-left:5px;" class="pull-right btn btn-xs btn-info"><span class="glyphicon glyphicon-pencil"></span></a>
 	                	<a onclick="delete_image({{image.id}})" href="javascript:void(0);" class="pull-right btn btn-xs btn-warning"><span class="glyphicon glyphicon-trash"></span></a>
 	                </div>
