@@ -18,7 +18,7 @@ class OrderList(LoginRequiredMixin, ListView):
 	queryset = Order.objects.all()
 
 	def get_queryset(self):
-		return super(OrderList, self).get_queryset().filter(user=self.request.user)
+		return super(OrderList, self).get_queryset().filter(user=self.request.user, status='paid')
 
 class OrderDetail(LoginRequiredMixin, DetailView):
 	model = Order
