@@ -9,11 +9,12 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Permission, Group
 from django.utils.translation import ugettext_lazy as _
 
-
-braintree.Configuration.configure(braintree.Environment.Sandbox,
-  merchant_id=settings.BRAINTREE_MERCHANT_ID,
-  public_key=settings.BRAINTREE_PUBLIC,
-  private_key=settings.BRAINTREE_PRIVATE)
+braintree.Configuration.configure(
+    environment=settings.BRAINTREE_ENVIRONEMNT,
+    merchant_id=settings.BRAINTREE_MERCHANT_ID,
+    public_key=settings.BRAINTREE_PUBLIC,
+    private_key=settings.BRAINTREE_PRIVATE
+)
 
 def generate_uuid():
     return str(uuid.uuid4()).replace("-", "")

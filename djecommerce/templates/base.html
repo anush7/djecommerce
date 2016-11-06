@@ -92,6 +92,7 @@
 				      		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{user.email}} <span class="caret"></span></a>
 				      		<ul class="dropdown-menu" style="min-width: 181px;">
 					            <li><a href="{% url 'user_profile' user.id %}">Account</a></li>
+					            <li><a href="{% url 'orders' %}">Your Orders</a></li>
 				      			{% if user.is_staff %}
 				      				<li><a href="{% url 'staff-dashboard' %}">Dashboard</a></li>
 				      				<li><a href="{% url 'low-stock-products' %}">Low Stock Products</a></li>

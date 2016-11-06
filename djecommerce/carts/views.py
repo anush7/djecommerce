@@ -16,11 +16,12 @@ from products.models import Product, ProductVariant
 from carts.models import Cart, CartItem
 from users.mixins import LoginRequiredMixin
 
-if settings.DEBUG:
-	braintree.Configuration.configure(environment=braintree.Environment.Sandbox,
-      merchant_id=settings.BRAINTREE_MERCHANT_ID,
-      public_key=settings.BRAINTREE_PUBLIC,
-      private_key=settings.BRAINTREE_PRIVATE)
+braintree.Configuration.configure(
+	environment=settings.BRAINTREE_ENVIRONEMNT,
+	merchant_id=settings.BRAINTREE_MERCHANT_ID,
+	public_key=settings.BRAINTREE_PUBLIC,
+	private_key=settings.BRAINTREE_PRIVATE
+)
 
 
 class CartView(SingleObjectMixin, View):

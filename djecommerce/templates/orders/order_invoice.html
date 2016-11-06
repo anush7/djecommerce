@@ -11,6 +11,7 @@
 				<table class="table table-striped table-hover" style="margin-bottom:0px;">
 					<tbody id="ajax_order_list">
 						<tr><td><b>Order Id:</b></td> <td>{% if order.order_id %}{{ order.order_id }}{% else %}{{order.id}}{% endif %}</td></tr>
+						<tr><td><b>Order Date:</b></td> <td>{{order.order_placed|date:"D d M Y P"}}</td></tr>
 						<tr class='clickable-row' style="cursor: pointer;" data-href="">
 							<td>
 								<b>{{order.cart.cartitem_set.count}} Item(s):</b><br>

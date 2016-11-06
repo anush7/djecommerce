@@ -34,7 +34,7 @@
 							<td>
 							<a href="{{object.get_absolute_url}}">{% if object.order_id %}{{ object.order_id }}{% else %}{{ object.id }}{% endif %}</a>
 							</td>
-							<td>{{object.order_placed|date:"D d M Y"}}</td>
+							<td>{{object.order_placed|date:"D d M Y P"}}</td>
 							<td>{{object.cart.items.count}}</td>
 							<td>{{currency_symbol}}{{object.order_total}}</td>
 						</tr>
