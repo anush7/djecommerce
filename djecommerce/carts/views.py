@@ -139,13 +139,7 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 		return cart
 
 	def get_context_data(self, *args, **kwargs):
-		print "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-		try:
-			context = super(CheckoutView, self).get_context_data(*args, **kwargs)
-		except:
-			import sys
-			print sys.exc_info()
-		print "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+		context = super(CheckoutView, self).get_context_data(*args, **kwargs)
 
 		if self.request.user.is_authenticated():
 			context["client_token"] = self.request.user.get_client_token()
@@ -155,18 +149,13 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 		return context
 
 	def get(self, request, *args, **kwargs):
-		print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 		get_data = super(CheckoutView, self).get(request, *args, **kwargs)
-		print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 		cart = self.get_object()
-		print "ccccccccccccccccccccccccccccccccccccccccccccc"
 		if cart == None or not cart.total:
 			return redirect("add-to-cart")
-		print "ddddddddddddddddddddddddddddddddddddddddddddd"
 		if self.request.user.is_authenticated():
 			new_order = self.get_order()
 			if new_order.shipping_address == None:
-				print "11111111111111111111111111111111111111111"
 			 	return redirect("shipping-order-address")
 			elif new_order.billing_address == None:
 				return redirect("billing-order-address")
