@@ -28,7 +28,7 @@ class StaffUpdateRequiredMixin(object):
 			return super(StaffUpdateRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 		role_permissions = Permission.objects\
-							.filter(codename__in=permissions,group__user=request.user)\
+							.filter(codename__in=self.permissions,group__user=request.user)\
 							.values_list('codename',flat=True)
 
 		grant_access = False							

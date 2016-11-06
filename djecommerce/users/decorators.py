@@ -72,25 +72,7 @@ def only_staff_required(view_func):
 	wrapped_view_func.__name__ = view_func.__name__
 	return wrapped_view_func
 
-
-def admin_required(permissions):
-	def admin_required_dec(view_func):
-		def wrapped_view_func(request, *args, **kwargs):
-			if request.user.is_authenticated():
-				if request.user.is_admin:
-					return view_func(request, *args, **kwargs)
-				else:
-					if request.is_ajax():return HttpResponse(json.dumps({'error':'Access denied!'}))
-					return HttpResponseRedirect(reverse('staff-dashboard'))	
-			else:
-				if request.is_ajax():return HttpResponse(json.dumps({'error':'Access denied!'}))
-				return HttpResponseRedirect(reverse('user_signin')+"?next="+request.META['PATH_INFO'])
-		wrapped_view_func.__doc__ = view_func.__doc__
-		wrapped_view_func.__name__ = view_func.__name__
-		return wrapped_view_func
-	return admin_required_dec
-
-def only_admin_required(view_func):
+def admin_required(view_func):
 	def wrapped_view_func(request, *args, **kwargs):
 		if request.user.is_authenticated():
 			if request.user.is_admin:

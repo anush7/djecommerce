@@ -8,9 +8,9 @@ from products.models import Product
 from users.utils import get_product_stack_query, get_product_pie_query, get_revenue_stack_query, get_revenue_pie_query, get_dates
 from collections import OrderedDict
 from orders.models import Order
-from users.decorators import only_staff_required, admin_required, only_admin_required
+from users.decorators import only_staff_required, admin_required
 
-@only_admin_required
+@admin_required
 def revenue_stats(request):
 	from users.constants import month_count
 	key = {}
