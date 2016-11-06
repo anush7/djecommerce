@@ -29,7 +29,6 @@ def revenue_stats(request):
 
 	if stack_chart:
 		dates, q = get_revenue_stack_query(start, days, stat_duration)
-		print dates
 
 	if pie_chart:
 		pq = get_revenue_pie_query()
