@@ -1,7 +1,7 @@
 import jwt
 import json
 from django.http import JsonResponse, Http404
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
@@ -210,8 +210,9 @@ class StaffRoleView(AdminRequiredMixin, TemplateView):
 
     	context['role'] = grp
     	context['permissions'] = grp.permissions.values_list('codename', flat=True)
+    	return HttpResponseRedirect(reverse('staff_management'))
 
-        return render(request, self.template_name, context)
+        # return render(request, self.template_name, context)
 
 """###############################Tax Views############################"""
 

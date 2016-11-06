@@ -230,7 +230,7 @@ class UserAddressCreateView(LoginRequiredMixin, CreateView):
 class UserAddressUpdateView(LoginRequiredMixin, UpdateView):
 	model = UserAddress
 	form_class = UserAddressForm
-	template_name = "orders/add_address.html"
+	template_name = "users/add_address.html"
 
 	def get_success_url(self, *args, **kwargs):
 		return reverse("user_address_list")
