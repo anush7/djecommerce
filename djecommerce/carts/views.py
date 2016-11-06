@@ -133,20 +133,19 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 	success_url = reverse_lazy("checkout")
 
 	def get_object(self, *args, **kwargs):
-		print "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 		cart = self.get_cart()
-		print "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
 		if cart == None:
-			print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 			return None
-		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
-		print type(cart)
-		print cart
-		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
 		return cart
 
 	def get_context_data(self, *args, **kwargs):
-		context = super(CheckoutView, self).get_context_data(*args, **kwargs)
+		print "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		try:
+			context = super(CheckoutView, self).get_context_data(*args, **kwargs)
+		except:
+			import sys
+			print sys.exc_info()
+		print "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
 
 		if self.request.user.is_authenticated():
 			context["client_token"] = self.request.user.get_client_token()
