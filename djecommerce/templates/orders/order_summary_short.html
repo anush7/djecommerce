@@ -19,11 +19,11 @@
 							{% endwith %}
 						</td>
 					</tr>
-					<tr><td><b>Cart Subtotal:</b></td> <td>{{order.cart.subtotal}}</td></tr>
-					<tr><td><b>Tax:</b></td> <td>{{order.cart.tax_total}}</td></tr>
-					<tr><td><b>Items Total:</b></td> <td>{{order.cart.total}}</td></tr>
-					<tr><td><b>Shipping:</b></td> <td>{{order.shipping_total_price }}</td></tr>
-					<tr><td><b>Order Total:</b></td> <td> {{ order.order_total }}</td></tr>
+					<tr><td><b>Cart Subtotal:</b></td> <td>{{currency_symbol}}{{order.cart.subtotal}}</td></tr>
+					<tr><td><b>Tax:</b></td> <td>{{currency_symbol}}{{order.cart.tax_total}}</td></tr>
+					<tr><td><b>Items Total:</b></td> <td>{{currency_symbol}}{{order.cart.total}}</td></tr>
+					<tr><td><b>Shipping:</b></td> <td>{{currency_symbol}}{{order.shipping_total_price }}</td></tr>
+					<tr><td><b>Order Total:</b></td> <td> {{currency_symbol}}{{ order.order_total }}</td></tr>
 					<tr><td><b>Billing to:</b></td> <td>{{order.billing_address.get_address}}</td></tr>
 					<tr><td><b>Shipping to:</b></td> <td>{{order.shipping_address.get_address}}</td></tr>
 				</tbody>

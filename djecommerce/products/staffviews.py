@@ -247,7 +247,7 @@ class VariantCreateView(StaffRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         product = Product.objects.get(id=self.kwargs['pid'])
-        self.initial = {'price':product.price}
+        self.initial = {'name':product.title,'price':product.price}
         context = super(VariantCreateView, self).get_context_data(**kwargs)
         context['product'] = product
         return context

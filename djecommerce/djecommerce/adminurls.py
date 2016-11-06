@@ -15,6 +15,8 @@ urlpatterns = [
 
 	url(r'^shipping$', views.ShippingFormView.as_view(), name='shipping_settings'),
 
+	url(r'^currency$', views.CurrencyFormView.as_view(), name='currency_settings'),
+
 
 	
 ]

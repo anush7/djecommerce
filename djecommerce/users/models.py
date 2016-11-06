@@ -122,8 +122,9 @@ class EcUser(AbstractBaseUser, PermissionsMixin):
     def get_client_token(self):
         customer_id = self.get_braintree_id
         if customer_id:
-            client_token = braintree.ClientToken.generate({
-                "customer_id": customer_id
-            })
+            # client_token = braintree.ClientToken.generate({
+            #     "customer_id": customer_id
+            # })
+            client_token = braintree.ClientToken.generate()
             return client_token
         return None

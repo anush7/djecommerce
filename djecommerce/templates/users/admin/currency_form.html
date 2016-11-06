@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+	<ul class="nav nav-tabs">
+        <li><a href="{% url 'tax_list' %}" style="cursor: pointer; cursor: hand;">Tax</a></li>
+        <li><a href="{% url 'shipping_settings' %}" style="cursor: pointer; cursor: hand;">Shipping Settings</a></li>
+        <li class="active"><a href="{% url 'shipping_settings' %}" style="cursor: pointer; cursor: hand;">Currency</a></li>
+    </ul>
+
+	<form style="margin-top:30px;" method='post' name="tax_form" class="form-horizontal">{% csrf_token %}
+		<div class="form-group">
+			<label for="id_title" class="col-sm-2 control-label">Set Currency</label>
+			<div class="col-xs-4">
+				{{form.currency}}
+				<p style="color:red;">{{ form.currency.errors.as_text }}</p>
+			</div>
+		</div>
+		<div class="form-group">
+		    <div class="col-sm-offset-2 col-xs-3">
+		      <button type="submit" name="submit" value="P" class="btn btn-default">Save</button>
+		    </div>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+});
+
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+

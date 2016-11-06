@@ -17,8 +17,8 @@ from django.conf import settings
 from catalog.models import Catalog, CatalogCategory
 from carts.models import Tax
 from catalog.forms import TaxForm
-from orders.forms import ShippingForm
-from orders.models import Shipping
+from orders.forms import ShippingForm, CurrencyForm
+from orders.models import Shipping, Currency
 from users.models import EcUser as User
 from users.models import GroupDetails
 from users.mixins import StaffRequiredMixin, StaffUpdateRequiredMixin, AdminRequiredMixin
@@ -276,6 +276,29 @@ class ShippingFormView(AdminRequiredMixin, FormView):
         if form.is_valid():
             self.object = form.save()
             messages.success(request, "Shipping Rate Successfully updated")
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
+
+
+class CurrencyFormView(AdminRequiredMixin, FormView):
+    template_name = 'users/admin/currency_form.html'
+    form_class = CurrencyForm
+    success_url = reverse_lazy('currency_settings')
+
+    def get_form_kwargs(self):
+        kwargs = super(CurrencyFormView, self).get_form_kwargs()
+        try:
+            currObj = Currency.objects.get(id=1)
+            kwargs.update({'instance': currObj})
+        except:pass
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.object = form.save()
+            messages.success(request, "Currency Successfully updated")
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.form_invalid(form)

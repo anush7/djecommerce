@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserAddress, Shipping
+from .models import UserAddress, Shipping, Currency
 from users.models import EcUser as User
 
 
@@ -47,6 +47,21 @@ class ShippingForm(forms.ModelForm):
     class Meta:
         model = Shipping
         fields = ['name','rate','is_active']
+
+ALLOWED_CURRENCIES = (
+	('$', 'USD'),
+)
+
+class CurrencyForm(forms.ModelForm):
+    currency = forms.ChoiceField(
+    			required=True,
+				choices=ALLOWED_CURRENCIES, 
+				widget=forms.Select(attrs={'class':'form-control'})
+			)
+
+    class Meta:
+        model = Currency
+        fields = ['currency']
 
 
 

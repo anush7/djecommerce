@@ -90,7 +90,11 @@ class Order(models.Model):
 	def send_invoice(self):
 		order = Order.objects.get(id=self.id)
 		css = 'static/css/bootstrap.min.css'
-		file_data = render_to_string('orders/order_invoice.html', {'order': order})
+		try:
+			cur_sym = Currency.objects.get(id=1).currency
+		except:
+			cur_sym = '$'
+		file_data = render_to_string('orders/order_invoice.html', {'order': order,'currency_symbol':cur_sym})
 		options = {
 			'margin-top': '0.25in',
 			'margin-right': '0.25in',
@@ -141,6 +145,13 @@ class Shipping(models.Model):
 	name = models.CharField(max_length=500,blank=True, null=True)
 	rate = models.DecimalField(max_digits=10, decimal_places=2)
 	is_active = models.BooleanField(default=False)
+
+ALLOWED_CURRENCIES = (
+	('$', 'USD'),
+)
+
+class Currency(models.Model):
+	currency = models.CharField(max_length=120, choices=ALLOWED_CURRENCIES, default='$')
 
 
 

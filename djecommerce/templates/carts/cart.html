@@ -38,20 +38,20 @@
 							</td>
 							<td class='text-right' id='item-line-total-{{item.item.id}}'>
 								{% if not item.out_of_stock %}
-									{{item.line_item_total}}
+									{{currency_symbol}}{{item.line_item_total}}
 								{% endif %}
 							</td>
 						</tr>
 					{% endfor %}
 					<tr>
-						<td colspan='4' class='text-right'>Subtotal: <span id='subtotal'>{{ object.subtotal }}</span></td>
+						<td colspan='4' class='text-right'>Subtotal: <span id='subtotal'>{{currency_symbol}}{{ object.subtotal }}</span></td>
 					</tr>
 					<tr>
-						<td colspan='4' class='text-right'>Tax (Estimated): <span id='taxtotal'>{{ object.tax_total }}</span></td>
+						<td colspan='4' class='text-right'>Tax (Estimated): <span id='taxtotal'>{{currency_symbol}}{{ object.tax_total }}</span></td>
 					</tr>
 
 					<tr>
-						<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{ object.total }}</span></td>
+						<td colspan='4' class='text-right'>Total: <span id='carttotal'>{{currency_symbol}}{{ object.total }}</span></td>
 					</tr>
 					<tr>
 						<td colspan='4' class='text-right'>
@@ -106,18 +106,18 @@ function cart_ajax_call(data, item){
 		success: function(data) {
 			if (data.deleted){
 				$("#item-"+item).fadeOut();
-				$("#subtotal").text(data.subtotal);
-				$("#taxtotal").text(data.tax_total);
-				$("#carttotal").text(data.cart_total);
+				$("#subtotal").text('{{currency_symbol}}'+data.subtotal);
+				$("#taxtotal").text('{{currency_symbol}}'+data.tax_total);
+				$("#carttotal").text('{{currency_symbol}}'+data.cart_total);
 			} else {
 				if (data.max_qty){
 					$("#item-qty-"+item).val(data.max_qty)
 				}
-				$("#item-line-total-"+item).text(data.line_total);
+				$("#item-line-total-"+item).text('{{currency_symbol}}'+data.line_total);
 				$("#item-total-qty-"+item).text($("#item-qty-"+item).val());
-				$("#subtotal").text(data.subtotal);
-				$("#taxtotal").text(data.tax_total);
-				$("#carttotal").text(data.cart_total);
+				$("#subtotal").text('{{currency_symbol}}'+data.subtotal);
+				$("#taxtotal").text('{{currency_symbol}}'+data.tax_total);
+				$("#carttotal").text('{{currency_symbol}}'+data.cart_total);
 			}
 			if (data.total_items == 0 ) {
 				$(".table").fadeOut()

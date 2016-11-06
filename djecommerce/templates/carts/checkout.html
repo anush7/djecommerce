@@ -25,7 +25,7 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<td class='text-right'>{{ citem.line_item_total }}</td>
+						<td class='text-right'>{{currency_symbol}}{{ citem.line_item_total }}</td>
 					</tr>
 				{% endfor %}
 				<tr>
@@ -33,35 +33,35 @@
 					<td></td>
 					<td></td>
 					<td class='text-right'>Cart Subtotal:</td>
-					<td class='text-right'>{{ order.cart.subtotal }}</td>
+					<td class='text-right'>{{currency_symbol}}{{ order.cart.subtotal }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
 					<td class='text-right'>Tax:</td>
-					<td class='text-right'>{{ order.cart.tax_total }}</td>
+					<td class='text-right'>{{currency_symbol}}{{ order.cart.tax_total }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
 					<td class='text-right'>Items Total:</td>
-					<td class='text-right'>{{ order.cart.total }}</td>
+					<td class='text-right'>{{currency_symbol}}{{ order.cart.total }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
 					<td class='text-right'>Shipping:</td>
-					<td class='text-right'>{{ order.shipping_total_price }}</td>
+					<td class='text-right'>{{currency_symbol}}{{ order.shipping_total_price }}</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td></td>
 					<td></td>
 					<td class='text-right'>Order Total:</td>
-					<td class='text-right'>{{ order.order_total }}</td>
+					<td class='text-right'>{{currency_symbol}}{{ order.order_total }}</td>
 				</tr>
 			</tbody>
 		</table>
