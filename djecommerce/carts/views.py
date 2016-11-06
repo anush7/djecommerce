@@ -133,9 +133,15 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 	success_url = reverse_lazy("checkout")
 
 	def get_object(self, *args, **kwargs):
+		print "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 		cart = self.get_cart()
+		print "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
 		if cart == None:
+			print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 			return None
+		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
+		print cart
+		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
 		return cart
 
 	def get_context_data(self, *args, **kwargs):
