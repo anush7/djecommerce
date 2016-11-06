@@ -34,10 +34,14 @@ class ShippingAddressSelectView(LoginRequiredMixin, CartOrderMixin, TemplateView
 	template_name = "orders/shipping_address_select.html"
 
 	def dispatch(self, *args, **kwargs):
+		print "22222222222222222222222222222222222222222222222222222222"
 		s_address = UserAddress.objects.filter(user=self.request.user,type='shipping').exists()
+		print "3333333333333333333333333333333333333333333333333333333333333"
 		if not s_address:
+			print "444444444444444444444444444444444444444444444444"
 			return HttpResponseRedirect(reverse("order-address-add")+'?address_type=shipping')
 		else:
+			print "55555555555555555555555555555555555555555555555555"
 			return super(ShippingAddressSelectView, self).dispatch(*args, **kwargs)
 
 	def get(self, request, *args, **kwargs):

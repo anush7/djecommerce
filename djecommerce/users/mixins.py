@@ -60,11 +60,14 @@ class LoginRequiredMixin(object):
 	
 	@classmethod
 	def as_view(self, *args, **kwargs):
+		print "66666666666666666666666666666666666666666666666666666"
 		view = super(LoginRequiredMixin, self).as_view(*args, **kwargs)
+		print "777777777777777777777777777777777777777777777777777"
 		return login_required(view)
 
 	@method_decorator(login_required)
 	def dispatch(self, request, *args, **kwargs):
+		print "88888888888888888888888888888888888888888888888"
 		return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 class AdminRequiredMixin(object):
