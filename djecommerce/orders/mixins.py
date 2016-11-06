@@ -20,16 +20,22 @@ class CartOrderMixin(object):
 		return new_order
 
 	def get_cart(self, *args, **kwargs):
+		print "cccccccccccccccccccccccccccccccccccccccc"
 		cart_id = self.request.session.get("cart_id")
+		print cart_id
 		if cart_id == None:
 			return None
 		cart = Cart.objects.get(id=cart_id)
-
+		print cart
 		citems = CartItem.objects.filter(cart=cart)
 		for citem in citems:
 			if citem.item.available_quantity <= 0:
 				citem.delete()
 		cart.update_subtotal()
+
+		print cart
+		print type(cart)
+		print "cccccccccccccccccccccccccccccccccccccccc"
 
 		if cart.items.count() <= 0:
 			return None

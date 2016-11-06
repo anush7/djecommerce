@@ -140,6 +140,7 @@ class CheckoutView(CartOrderMixin, FormMixin, DetailView):
 			print "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 			return None
 		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
+		print type(cart)
 		print cart
 		print "xxxxxxxxxxxxxxxxx2222222222222222222222"
 		return cart
