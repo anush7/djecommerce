@@ -11,12 +11,12 @@ config.read(os.path.join(SETTINGS_DIR, 'config.cfg'))
 
 DATABASES = {
     'default': {
-        'ENGINE': config.get('work_local_db', 'ENGINE'),
-        'NAME': config.get('work_local_db', 'NAME'),
-        'USER': config.get('work_local_db', 'USER'),
-        'PASSWORD': config.get('work_local_db', 'PASSWORD'),
-        'HOST': config.get('work_local_db', 'HOST'),
-        'PORT': config.get('work_local_db', 'PORT'),
+        'ENGINE': config.get('local_db', 'ENGINE'),
+        'NAME': config.get('local_db', 'NAME'),
+        'USER': config.get('local_db', 'USER'),
+        'PASSWORD': config.get('local_db', 'PASSWORD'),
+        'HOST': config.get('local_db', 'HOST'),
+        'PORT': config.get('local_db', 'PORT'),
     }
 }
 from access_settings import *
