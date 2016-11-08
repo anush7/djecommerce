@@ -15,12 +15,12 @@ from users.mixins import StaffRequiredMixin
 
 class ProcessOrderView(StaffRequiredMixin, ListView):
 	template_name = 'users/staff/process_orders.html'
-	paginate_by = 1
+	paginate_by = 5
 	permissions = ['process_orders']
 
 	def get_queryset(self):
 		key = {}
-		filterby  = self.request.GET.get('filter',False)
+		filterby  = self.request.GET.get('filter','paid')
 		if filterby in ['paid','approved', 'processed', 'shipped', 'delivered', 'returned']:
 			key['details__'+filterby] = True
 		elif filterby in ['-approved', '-processed', '-shipped', '-delivered', '-returned']:

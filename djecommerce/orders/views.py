@@ -15,10 +15,9 @@ from .models import UserAddress, Order
 from users.mixins import StaffRequiredMixin, LoginRequiredMixin
 
 class OrderList(LoginRequiredMixin, ListView):
-	queryset = Order.objects.all()
 
 	def get_queryset(self):
-		return super(OrderList, self).get_queryset().filter(user=self.request.user, status='paid')
+		return Order.objects.filter(user=self.request.user, details__paid=True).order_by('-order_placed')
 
 class OrderDetail(LoginRequiredMixin, DetailView):
 	model = Order
