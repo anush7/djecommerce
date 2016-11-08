@@ -1,7 +1,0 @@
-boto==2.42.0
-braintree==3.28.0
-Django==1.9.6
-django-storages==1.4.1
-Pillow==2.4.0
-psycopg2==2.6
-requests==2.10.0
